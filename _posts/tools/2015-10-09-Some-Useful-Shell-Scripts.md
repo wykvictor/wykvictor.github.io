@@ -25,7 +25,7 @@ for i in *_trainval.txt; do echo $i; grep " 1" $i | awk '{print $1}' > $i.list; 
 {% endhighlight %}
 b. 将该20个文件(cat_trainval.txt.list,...,etc)，批量重命名成cat.txt格式方便后边操作:
 {% highlight Bash shell scripts %}
-for var in *.list; do echo "Processing $var..."; mv "$var" "`echo $var|awk -F '_' '{print $1}'`.txt"; done
+for var in *.list; do echo "Processing $var..."; mv "$var" "`echo $var|awk -F '_' '{print $1}'`.txt"; done  #批量重命名
 {% endhighlight %}
 c. 开始分类copy:
 {% highlight Bash shell scripts %}
@@ -38,7 +38,7 @@ done
 {% endhighlight %}
 (Note: for循环的另一种常用写法：for i in {1..5})
 
-### 2. 等待脚本，一旦某个条件符合，就执行特定操作
+### 2. 等待脚本：一旦某个条件符合，就执行特定操作
 用GPU训练Caffe Model的时候，因为跟大家共享GPU资源，因此很多时候内存不够用，需要等待。简单写了个等待脚本，一旦发现GPU使用量有变化，就开始执行自己的task：
 {% highlight Bash shell scripts %}
 while [[ `nvidia-smi | grep 3862 | wc -l` -gt 0 ]]; do echo "wait..."; sleep 120; done; echo "Start!"; ./mytask.sh
@@ -51,6 +51,20 @@ while [[ `nvidia-smi | grep 3862 | wc -l` -gt 0 ]]; do echo "wait..."; sleep 120
 # Usage: ./processLog.sh LogOrigionalName cat(or dog/flower...)
 # Output file: LogOrigionalName-cat.csv
 grep "Train net output" $1 | grep $2 | awk '{print $15}' > $1-$2.tmp
-awk 'BEGIN{sum=0;}{sum=sum+$1;if(NR%40 == 0){printf("%.8f\n", sum/40); sum=0;}}' $1-$2.tmp > $1-$2.csv
+awk 'BEGIN{sum=0;}{sum=sum+$1;if(NR%40 == 0){printf("%.8f\n", sum/40); sum=0;}}' $1-$2.tmp > $1-$2.csv  #利用awk求均值
 rm $1-$2.tmp
+{% endhighlight %}
+
+### 4. 抽取某一个class如plant的feature，之后和其他class的ground truth结合成新的feature文件
+在Train SVM model的时候，用了开源库liblinear，基于每一个class的输入图片list来抽取feature。
+
+但是由于每个class的图片列表都相同，所以重复抽取feature不仅浪费时间而且没有意义，可以利用以下脚本组合成新的feature文件：
+{% highlight Bash shell scripts %}
+for i in `ls VOCtrainFilelist`; do  #文件夹VOCtrainFilelist中有20个classes的list文件
+  echo "VOCtrainFilelist/$i"
+  sed 's/^[0-1]\s//g' plant/train_data.txt > 1.tmp  #利用plant抽取好的feature，删除第一列label
+  awk '{print $2}' VOCtrainFilelist/$i > 2.tmp  #ground truth列表，新class的label
+  paste 2.tmp 1.tmp > 3.tmp  # 将2个文件合并成新class的feature文件(label+features)
+done
+rm 1.tmp 2.tmp 3.tmp
 {% endhighlight %}
