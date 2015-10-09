@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Some useful Shell Scripts to Process Text"
+title:  "Some useful Shell Scripts"
 date:   2015-10-09 15:30:00
 tags: [shell, scripts, 脚本]
 categories: tools
@@ -35,4 +35,22 @@ for j in cat dog person plane bike bird boat bottle bus car chair cow table hors
     cp ../../VOC2007train/VOCtrainval_06-Nov-2007/VOCdevkit/VOC2007/JPEGImages/$i.jpg ./$j/; 
   done; 
 done
+{% endhighlight %}
+(Note: for循环的另一种常用写法：for i in {1..5})
+
+### 2. 等待脚本，一旦某个条件符合，就执行特定操作
+用GPU训练Caffe Model的时候，因为跟大家共享GPU资源，因此很多时候内存不够用，需要等待。简单写了个等待脚本，一旦发现GPU使用量有变化，就开始执行自己的task：
+{% highlight Bash shell scripts %}
+while [[ `nvidia-smi | grep 3862 | wc -l` -gt 0 ]]; do echo "wait..."; sleep 120; done; echo "Start!"; ./mytask.sh
+{% endhighlight %}
+(每隔120s查询一次while循环条件，条件可以根据情况自定义)
+
+### 3. Caffe训练的时候，直接把所有的输出都record下来了，设置的是每一个iter都有输出，想要得到如每40个iters的平均的loss曲线
+{% highlight Bash shell scripts %}
+#!/bin/bash
+# Usage: ./processLog.sh LogOrigionalName cat(or dog/flower...)
+# Output file: LogOrigionalName-cat.csv
+grep "Train net output" $1 | grep $2 | awk '{print $15}' > $1-$2.tmp
+awk 'BEGIN{sum=0;}{sum=sum+$1;if(NR%40 == 0){printf("%.8f\n", sum/40); sum=0;}}' $1-$2.tmp > $1-$2.csv
+rm $1-$2.tmp
 {% endhighlight %}
