@@ -43,7 +43,7 @@ done
 {% highlight Bash shell scripts %}
 while [[ `nvidia-smi | grep 3862 | wc -l` -gt 0 ]]; do echo "wait..."; sleep 120; done; echo "Start!"; ./mytask.sh
 {% endhighlight %}
-(每隔120s查询一次while循环条件，条件可以根据情况自定义)
+(每隔120s查询一次while循环条件，终止条件可以根据情况自定义)
 
 ### 3. Caffe训练的时候，直接把所有的输出都record下来了，设置的是每一个iter都有输出，想要得到如每40个iters的平均的loss曲线
 {% highlight Bash shell scripts %}
@@ -67,4 +67,10 @@ for i in `ls VOCtrainFilelist`; do  #文件夹VOCtrainFilelist中有20个classes
   paste 2.tmp 1.tmp > 3.tmp  # 将2个文件合并成新class的feature文件(label+features)
 done
 rm 1.tmp 2.tmp 3.tmp
+{% endhighlight %}
+
+### 5. 对一个文件的某一列进行数值计算
+有时会遇到某一列probability的ground truth打反了，需要将prob一列修改为1-prob：
+{% highlight Bash shell scripts %}
+awk '{printf("%s %.14f\n", $1, 1.0-$2)}' origin > origin-flip #源文件有2列，第2列为prob
 {% endhighlight %}
