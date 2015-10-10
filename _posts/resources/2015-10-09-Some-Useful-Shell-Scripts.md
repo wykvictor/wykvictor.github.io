@@ -3,10 +3,10 @@ layout: post
 title:  "Some useful Shell Scripts"
 date:   2015-10-09 15:30:00
 tags: [shell, scripts, 脚本]
-categories: tools
+categories: resources
 ---
 
-> 最近在用Deep learning工具[caffe](http://caffe.berkeleyvision.org/)，基于数据集[VOC](http://host.robots.ox.ac.uk/pascal/VOC/)做一些实验，里边有20个Object Class，所以得到结果后经常会遇到重复处理20遍文件。因此写了一些脚本，用来简化操作。
+> 最近在用Deep learning工具[caffe](http://caffe.berkeleyvision.org/)，基于数据集[VOC](http://host.robots.ox.ac.uk/pascal/VOC/)做一些实验，里边有20个Object Class，所以得到结果后经常会遇到重复处理20遍文件。因此写了一些脚本，用来执行重复操作。
 
 ### 1. 将20类的图片按照类别copy到相应的文件夹
 a. 以训练(Train)图片为例，首先根据每一类的初始列表如cat_trainval.txt(20个相同类型文件):
@@ -73,4 +73,55 @@ rm 1.tmp 2.tmp 3.tmp
 有时会遇到某一列probability的ground truth打反了，需要将prob一列修改为1-prob：
 {% highlight Bash shell scripts %}
 awk '{printf("%s %.14f\n", $1, 1.0-$2)}' origin > origin-flip #源文件有2列，第2列为prob
+{% endhighlight %}
+
+### 6. 批量create20个class的lmdb文件
+{% highlight Bash shell scripts %}
+#!/bin/bash
+# Usage: ./processLog.sh origionalNameList (./sh *_trainval.txt)
+
+list=($@)  # get input parameter's list
+for i in ${list[@]}; do  # loop over the parameters(different classes)
+  echo "Processing $i..."  # for each class's file lists
+  awk '{print $2}' $i > $i-gt.tmp  # get ground-truth label list(different from the caffe's requirement)
+  for val in `cat $i-gt.tmp`  # flip labels: -1->0; 0->0; 1->1 (maybe `sed` could better fit the need)
+    do
+      if [ $val = "-1" ]; then
+        echo "0" >>  $i-gt-VOC.tmp
+      elif [ $val = "0" ]; then
+        echo "0" >>  $i-gt-VOC.tmp
+      else
+        echo "1" >>  $i-gt-VOC.tmp
+      fi
+    done
+  paste list.txt $i-gt-VOC.tmp > $i.list
+  rm ./*.tmp
+  # use the list to get the lmdb
+  caffe.git/build/tools/convert_imageset -resize_height 256 -resize_width 256 -shuffle / $i.list $i-lmdb
+  rm ./*.list
+done
+{% endhighlight %}
+
+### 7. awkfile的应用：先匹配，再操作
+对于稍复杂的操作，不便于在一行命令操作，可以创建awk file供awk命令使用，比如之前用到的一个：
+{% highlight Bash shell scripts %}
+# Parse caffe logs
+# Usage: awk -f log.awk logs > loss.csv
+
+# Set output field seperator as comma used in .csv file
+BEGIN { OFS = "," }
+
+# Match loss lines
+/.*] Iteration [0-9]+, loss = [0-9]+\.[0-9]+/ {
+  print format_time($2), $NF  # call function, print "time + loss value"
+}
+
+function format_time(time) {
+  nano = substr(time, length(time) - 6)  # use substr()
+  time = substr(time, 1, length(time) - 7)
+  # print time, nano
+  gsub(/:/, " ", time)  # use gsub()
+  return time nano  # return str
+  # return mktime(strftime("%Y ") month " " day " " time) nano
+}
 {% endhighlight %}
