@@ -125,3 +125,15 @@ function format_time(time) {
   # return mktime(strftime("%Y ") month " " day " " time) nano
 }
 {% endhighlight %}
+
+### 8. 查看某个文件有多少列
+某个文件很长，列数不规则，可以通过以下命令判断，最多的大概有多少列：
+{% highlight Bash shell scripts %}
+awk '{if($7 != "") print}' list.txt | wc -l
+{% endhighlight %}
+
+### 9. 删除文件特定行
+{% highlight Bash shell scripts %}
+sed -i '/^$/d' filename  # 删除空行
+sed -i '/tags/d' filename  # 删除匹配tags的行
+{% endhighlight %}
