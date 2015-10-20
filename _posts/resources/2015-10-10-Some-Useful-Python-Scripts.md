@@ -6,8 +6,28 @@ tags: [python, scripts, 脚本]
 categories: resources
 ---
 
+### 1. 利用map()函数，转换list中元素的类型
+map(function, list)函数有点函数式编程的意思，对list列表执行function操作：
+{% highlight Python %}
+ground_truth = map(int, truth_line.split()[1:])  # 将str第二个开始的元素转换为int数组
+{% endhighlight %}
 
-### 1. 对格式稍微复杂的3个文件，对应的域求平均
+### 2. 利用heapq，求list的topk
+{% highlight Python %}
+import heapq
+tmp = heapq.nlargest(topk_num, list)  # 得到topk list
+for i in range(topk_num)
+	topk_index.append(list.index(tmp[i]))  # 保存下标
+{% endhighlight %}
+
+### 3. 利用numpy，求list的average
+{% highlight Python %}
+import numpy as np
+print np.array(result_list).mean()
+{% endhighlight %}
+
+
+### 4. 对格式稍微复杂的3个文件，对应的域求平均
 需求是对3个feature文件的对应域求平均，feature文件的格式如下：
 
 0 0:0.0 1:0.0003 2:0.0 ....
