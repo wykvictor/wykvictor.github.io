@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Docker commands"
+title:  "Docker Commands"
 date:   2015-10-15 15:30:00
 tags: [docker, command]
 categories: resources
