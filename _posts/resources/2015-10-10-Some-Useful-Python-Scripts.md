@@ -26,8 +26,13 @@ import numpy as np
 print np.array(result_list).mean()
 {% endhighlight %}
 
+### 4. 利用random，随机取list的某个值
+{% highlight Python %}
+import random
+value = lines[random.randint(0, len(lines)-1)]
+{% endhighlight %}
 
-### 4. 对格式稍微复杂的3个文件，对应的域求平均
+### 5. 对格式稍微复杂的3个文件，对应的域求平均
 需求是对3个feature文件的对应域求平均，feature文件的格式如下：
 
 0 0:0.0 1:0.0003 2:0.0 ....
