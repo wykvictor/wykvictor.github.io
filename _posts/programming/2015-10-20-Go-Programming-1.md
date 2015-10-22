@@ -6,6 +6,10 @@ tags: [go, programming, language]
 categories: programming
 ---
 
+> 教程  [tour of golang][link-slice] 
+
+[link-slice]: https://tour.go-zh.org/
+
 ### 1. 包
 {% highlight Go %}
 package main  // Go程序都是由包组成的，入口是包main
@@ -23,7 +27,7 @@ func main() {
 {% highlight Go %}
 // 类型 在变量名 之后，且可以省略前边相同的类型
 // 函数可以返回 任意数量的返回值
-func swap(x, y string) (string, string) {
+func swap(x, y string) (string, string) {  //func关键字必须有!
 	return y, x
 }
 // 返回值可以被命名，并且像变量那样使用

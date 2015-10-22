@@ -29,15 +29,17 @@ if v := math.Pow(x, n); v < lim {  // 跟for一样，if可以在条件判断中�
 {% endhighlight %}
 
 ### 3. 实例-牛顿法求平方
+exercise-loops-and-functions
 {% highlight Go %}
 func Sqrt(x float64) float64 {
 	z := float64(1)
 	for {
-		z = (z + x/z) / 2.0
-		fmt.Println(z)
-		if z == (z + x/z) / 2.0 {
+		y := (z + x/z) / 2.0
+		fmt.Println(y)
+		if math.Abs(z - y) < 1e-10 {
 			break
 		}
+		z = y
 	}
 	return z
 }
@@ -56,7 +58,7 @@ switch os := runtime.GOOS; os {  // 也可以用没有条件的 switch（同swit
 }
 {% endhighlight %}
 
-### 4. defer 语句
+### 5. defer 语句
 {% highlight Go %}
 // 延迟调用的参数会立刻生成，但是在上层函数返回前函数都不会被调用
 fmt.Println("counting")
