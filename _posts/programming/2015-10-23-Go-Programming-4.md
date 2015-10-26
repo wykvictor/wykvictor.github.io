@@ -20,3 +20,59 @@ func (v *Vertex) Scale(f float64) {
 	v.Y = v.Y * f
 }
 {% endhighlight %}
+
+### 2. 接口
+{% highlight Go %}
+type Abser interface {  // 一组方法定义的集合
+	Abs() float64
+}
+var a Abser  // a可以赋值：实现这些方法如Abs()的任何值
+// 例子
+type Person struct {
+	Name string
+	Age  int
+}
+func (p Person) String() string {  //`fmt`包使用接口Stringer中的String()方法来进行输出
+	return fmt.Sprintf("%v (%v years)", p.Name, p.Age)
+}
+func main() {
+	a := Person{"Arthur Dent", 42}
+	fmt.Println(a)  // Arthur Dent (42 years), 相当于 重载了cout
+}
+{% endhighlight %}
+
+
+### 3. 异常
+{% highlight Go %}
+i, err := strconv.Atoi("42")
+if err != nil {  // 非空表示失败
+    fmt.Printf("couldn't convert number: %v\n", err)
+}
+fmt.Println("Converted integer:", i)
+{% endhighlight %}
+Exercise - error: 实现Sqrt使其接收到一个负数时，返回一个非nil错误值
+{% highlight Go %}
+type ErrNegativeSqrt float64
+func (e ErrNegativeSqrt) Error() string {
+	return "cannot Sqrt negative number:" + fmt.Sprint(float64(e))
+}
+func Sqrt(x float64) (float64, error) {
+	if(x < 0) {
+		return x, ErrNegativeSqrt(x)
+	}
+	z := float64(1)
+	for {
+		y := (z + x/z) / 2.0
+		fmt.Println(y)
+		if math.Abs(z - y) < 1e-10 {
+			break
+		}
+		z = y
+	}
+	return z, nil
+}
+func main() {
+	fmt.Println(Sqrt(2))
+	fmt.Println(Sqrt(-2))  // fmt包在输出时也会试图匹配 error接口
+}
+{% endhighlight %}
