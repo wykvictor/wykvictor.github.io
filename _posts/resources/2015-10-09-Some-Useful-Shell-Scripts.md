@@ -137,3 +137,9 @@ awk '{if($7 != "") print}' list.txt | wc -l
 sed -i '/^$/d' filename  # 删除空行
 sed -i '/tags/d' filename  # 删除匹配tags的行
 {% endhighlight %}
+
+### 10. vim中的匹配和替换
+{% highlight Bash shell scripts %}
+%s/_mean_[a-z]*.binary/_mean.binary/  # 将 “_单词“ 删掉
+%s/_mean_.*512.binary/_mean_512.binary/g  # 将512之前的单词删掉
+{% endhighlight %}
