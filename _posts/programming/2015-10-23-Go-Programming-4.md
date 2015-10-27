@@ -41,7 +41,6 @@ func main() {
 }
 {% endhighlight %}
 
-
 ### 3. 异常
 {% highlight Go %}
 i, err := strconv.Atoi("42")
@@ -50,7 +49,7 @@ if err != nil {  // 非空表示失败
 }
 fmt.Println("Converted integer:", i)
 {% endhighlight %}
-Exercise - error: 实现Sqrt使其接收到一个负数时，返回一个非nil错误值
+#### Exercise - error: 实现Sqrt使其接收到一个负数时，返回一个非nil错误值
 {% highlight Go %}
 type ErrNegativeSqrt float64
 func (e ErrNegativeSqrt) Error() string {
@@ -75,4 +74,46 @@ func main() {
 	fmt.Println(Sqrt(2))
 	fmt.Println(Sqrt(-2))  // fmt包在输出时也会试图匹配 error接口
 }
+{% endhighlight %}
+
+### 4. io.Reader接口
+{% highlight Go %}
+r := strings.NewReader("Hello, Reader!")  // 创建Reader
+b := make([]byte, 8)  // 每次读取8字节
+for {
+	n, err := r.Read(b)  // Reader接口中的Read方法
+	fmt.Printf("n = %v err = %v b = %v\n", n, err, b)  // 8 nil;6 nil;0 EOF
+	fmt.Printf("b[:n] = %q\n", b[:n])  // %q, 打印字符串
+	if err == io.EOF {  // 遇到数据流结尾时返回
+		break
+	}
+}
+{% endhighlight %}
+#### Exercise - rot13Reader:  io.Reader包裹另一个io.Reader
+{% highlight Go %}
+type rot13Reader struct {
+	r io.Reader
+}
+func (rr rot13Reader) Read(s []byte) (n int, e error) {
+	n, e = rr.r.Read(s)
+	for i := 0; i < n; i++ {
+	   if((s[i]>='a'&&s[i]<'n') || (s[i]>='A'&&s[i]<'N')) {
+		   s[i] += 13
+	   } else {
+			s[i] -= 13
+	   }
+	}
+    return  //可以省略
+}
+func main() {
+	s := strings.NewReader("Lbh penpxrq gur pbqr!")
+	r := rot13Reader{s}
+	io.Copy(os.Stdout, &r)
+}
+{% endhighlight %}
+
+### 5. Web Server
+包http通过任何实现了http.Handler接口的值来响应HTTP请求, 如其中的ServeHTTP函数
+{% highlight Go %}
+
 {% endhighlight %}
