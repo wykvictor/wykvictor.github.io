@@ -115,5 +115,26 @@ func main() {
 ### 5. Web Server
 包http通过任何实现了http.Handler接口的值来响应HTTP请求, 如其中的ServeHTTP函数
 {% highlight Go %}
-
+import (
+	"log"
+	"net/http"
+	"fmt"
+)
+type String string
+func (s String) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprint(w, s)
+}
+type Struct struct {  // 各种类型都可以实现该接口
+    Greeting string
+    Punct    string
+    Who      string
+}
+func (s *Struct) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprint(w, s.Greeting, s.Punct, s.Who)
+}
+func main() {
+	http.Handle("/string", String("I'm a frayed knot."))
+	http.Handle("/struct", &Struct{"Hello", ":", "Gophers!"})
+	http.ListenAndServe("localhost:4000", nil)
+}
 {% endhighlight %}
