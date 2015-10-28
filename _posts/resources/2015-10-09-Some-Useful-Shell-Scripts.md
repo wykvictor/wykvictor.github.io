@@ -144,7 +144,7 @@ sed -i '/tags/d' filename  # 删除匹配tags的行
 %s/_mean_.*512.binary/_mean_512.binary/g  # 将512之前的单词删掉
 {% endhighlight %}
 
-## 11. function 函数的使用
+### 11. function 函数的使用
 {% highlight Bash shell scripts %}
 #!/bin/bash
 function fSum()  // 函数定义 必须放在使用前

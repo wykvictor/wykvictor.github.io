@@ -97,11 +97,11 @@ type rot13Reader struct {
 func (rr rot13Reader) Read(s []byte) (n int, e error) {
 	n, e = rr.r.Read(s)
 	for i := 0; i < n; i++ {
-	   if((s[i]>='a'&&s[i]<'n') || (s[i]>='A'&&s[i]<'N')) {
-		   s[i] += 13
-	   } else {
+		if((s[i]>='a'&&s[i]<'n') || (s[i]>='A'&&s[i]<'N')) {
+			s[i] += 13
+		} else {
 			s[i] -= 13
-	   }
+		}
 	}
     return  //可以省略
 }
