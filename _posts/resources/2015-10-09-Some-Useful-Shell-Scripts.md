@@ -143,3 +143,15 @@ sed -i '/tags/d' filename  # 删除匹配tags的行
 %s/_mean_[a-z]*.binary/_mean.binary/  # 将 “_单词“ 删掉
 %s/_mean_.*512.binary/_mean_512.binary/g  # 将512之前的单词删掉
 {% endhighlight %}
+
+## 11. function 函数的使用
+{% highlight Bash shell scripts %}
+#!/bin/bash
+function fSum()  // 函数定义 必须放在使用前
+{
+#   echo $1,$2;
+   echo $(($1+$2));  // 如果没有显示的return语句，则最后一句作为返回值
+}
+t=$(fSum 3 2)  // 相当于定义了fSum命令，传入参数
+echo $t, $?  // 5, 0，$?是上一句命令的返回值，0代表成功
+{% endhighlight %}
