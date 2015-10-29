@@ -25,3 +25,69 @@ func main() {
 	fmt.Println(x, y, x+y)  // -5 17 12，channel实现了 同步；输出顺序不重要!!!go线程调度的问题
 }
 {% endhighlight %}
+
+### 2. channel的range和close
+{% highlight Go %}
+func fibonacci(n int, c chan int) {
+	x, y := 0, 1
+	for i := 0; i < n; i++ {
+		c <- x
+		x, y = y, x+y
+	}
+	close(c)  // 关闭channel，中断main中的range操作
+}
+func main() {
+	c := make(chan int, 10)
+	go fibonacci(cap(c), c)
+	for i := range c {  // 不断从c拿值，直到被close。v, ok := <-ch，ch关闭后ok为false了
+		fmt.Println(i)
+	}
+}
+{% endhighlight %}
+
+### 3. select 语句
+select语句使得一个goroutine在多个通讯操作上等待。哪个ready执行哪个
+{% highlight Go %}
+func fibonacci(c, quit chan int) {
+	x, y := 0, 1
+	for {
+		select {
+		case c <- x:
+			x, y = y, x+y
+		case <-quit:  // 强制等待
+			fmt.Println("quit")
+			return
+		}
+	}
+}
+func main() {
+	c := make(chan int)
+	quit := make(chan int)
+	go func() {
+		for i := 0; i < 10; i++ {
+			fmt.Println(<-c)  // 先打印完了10次c，才有quit
+		}
+		quit <- 0
+	}()
+	fibonacci(c, quit)
+}  // output: 0 1 1 2 3 5 8 13 21 34 quit
+{% endhighlight %}
+定时器例子：
+{% highlight Go %}
+func main() {
+	tick := time.Tick(100 * time.Millisecond)  // 隔100ms执行一次
+	boom := time.After(500 * time.Millisecond)
+	for {
+		select {
+		case <-tick:
+			fmt.Println("tick.")
+		case <-boom:
+			fmt.Println("BOOM!")
+			return
+		default:  // 当select中其他条件分支都没有准备好时，default分支执行
+			fmt.Println("    .")
+			time.Sleep(50 * time.Millisecond)
+		}
+	}
+}
+{% endhighlight %}
