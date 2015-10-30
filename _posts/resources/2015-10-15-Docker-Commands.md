@@ -48,3 +48,10 @@ docker ps [-a]
 # 保存对容器的修改; -a, --author="" Author; -m, --message="" Commit message  
 docker commit ID new_image_name 
 {% endhighlight %}
+
+### 4. docker资源
+{% highlight Bash shell scripts %}
+docker stats [docker names]  // 查看CPU，Memory，Network使用
+docker内存限制可以在创建docker时使用-m参数：-m 256m，容器里程序可以跑到256m*2=512m后会被oom给杀死
+目前cpu限制可以使用绑定到具体的线程，或者是在绑定线程基础上对线程资源权重分配。绑定线程可以使用参数--cpuset-cpus=7
+{% endhighlight %}
