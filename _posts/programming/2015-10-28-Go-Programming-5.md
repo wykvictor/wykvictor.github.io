@@ -91,3 +91,172 @@ func main() {
 	}
 }
 {% endhighlight %}
+
+### 4. Exercise: Equivalent Binary Trees
+{% highlight Go %}
+type Tree struct {
+    Left  *Tree
+    Value int
+    Right *Tree
+}
+// Walk 步进 tree t 将所有的值从 tree 发送到 channel ch。
+func Walk(t *tree.Tree, ch chan int) {
+	if(t == nil) {
+		return
+	}
+	ch <- t.Value
+	Walk(t.Left, ch)
+	Walk(t.Right, ch)
+}
+// Same 检测树 t1 和 t2 是否含有相同的值。
+func Same(t1, t2 *tree.Tree) bool {
+	ch1 := make(chan int)
+    ch2 := make(chan int)
+    go Walk(t1, ch1)
+    go Walk(t2, ch2)
+    for i := 0; i < 10; i++ {
+          v1 := <-ch1
+          v2 := <-ch2
+          if v1 != v2 {
+               return false;
+          }
+     }
+     return true
+}
+{% endhighlight %}
+
+### 5. Exercise: Web Crawler
+Crawl函数并行抓取URLs，并且保证不重复
+{% highlight Go %}
+type Fetcher interface {
+	// Fetch返回URL的body，并将此页面上的URL放到slice中
+	Fetch(url string) (body string, urls []string, err error)
+}
+// fetched tracks URLs that have been fetched.
+// The lock must be held while reading from or writing to the map.
+var fetched = struct {
+        m map[string]bool
+        sync.Mutex  // 匿名！相当于继承
+}{m: make(map[string]bool)}
+// Crawl使用fetcher从某URL递归爬取页面，直到最大深度。
+func Crawl(url string, depth int, fetcher Fetcher) {
+	if depth <= 0 {
+	        fmt.Printf("Done with %v, depth 0.\n", url)
+	        return
+	}
+	fetched.Lock()  //读写fetched，均要同步
+	if _, ok := fetched.m[url]; ok {
+	        fetched.Unlock()
+	        fmt.Printf("Done with %v, already fetched.\n", url)
+	        return
+	}
+	// then load it concurrently.
+	body, urls, err := fetcher.Fetch(url)
+	// And update the status in a synced zone.
+	fetched.m[url] = true
+	fetched.Unlock()
+
+	if err != nil {
+	        fmt.Printf("<- Error on %v: %v\n", url, err)
+	        return
+	}
+	fmt.Printf("Found: %s %q\n", url, body)
+	done := make(chan bool)
+	for i, u := range urls {
+	        fmt.Printf("-> Crawling child %v/%v of %v : %v.\n", i, len(urls), url, u)
+	        go func(url string) {  // 需要套一层，直接调用go Crawl错误:done标记需要在内部!
+	                Crawl(url, depth-1, fetcher)
+	                done <- true
+	        }(u)
+	}
+	for i, u := range urls {
+	        fmt.Printf("<- [%v] %v/%v Waiting for child %v.\n", url, i, len(urls), u)
+	        <-done
+	}
+	fmt.Printf("<- Done with %v\n", url)
+}
+func main() {
+	Crawl("http://golang.org/", 4, fetcher)
+}
+// fakeFetcher 是返回若干结果的 Fetcher。
+type fakeFetcher map[string]*fakeResult
+type fakeResult struct {
+	body string
+	urls []string
+}
+func (f fakeFetcher) Fetch(url string) (string, []string, error) {
+	if res, ok := f[url]; ok {
+		return res.body, res.urls, nil
+	}
+	return "", nil, fmt.Errorf("not found: %s", url)
+}
+// fetcher是填充后的fakeFetcher。
+var fetcher = fakeFetcher{
+	"http://golang.org/": &fakeResult{
+		"The Go Programming Language",
+		[]string{
+			"http://golang.org/pkg/",
+			"http://golang.org/cmd/",
+		},
+	},
+	"http://golang.org/pkg/": &fakeResult{
+		"Packages",
+		[]string{
+			"http://golang.org/",
+			"http://golang.org/cmd/",
+			"http://golang.org/pkg/fmt/",
+			"http://golang.org/pkg/os/",
+		},
+	},
+	"http://golang.org/pkg/fmt/": &fakeResult{
+		"Package fmt",
+		[]string{
+			"http://golang.org/",
+			"http://golang.org/pkg/",
+		},
+	},
+	"http://golang.org/pkg/os/": &fakeResult{
+		"Package os",
+		[]string{
+			"http://golang.org/",
+			"http://golang.org/pkg/",
+		},
+	},
+}
+Output:
+Found: http://golang.org/ "The Go Programming Language"
+-> Crawling child 0/2 of http://golang.org/ : http://golang.org/pkg/.
+-> Crawling child 1/2 of http://golang.org/ : http://golang.org/cmd/.
+<- [http://golang.org/] 0/2 Waiting for child http://golang.org/pkg/.
+<- Error on http://golang.org/cmd/: not found: http://golang.org/cmd/
+<- [http://golang.org/] 1/2 Waiting for child http://golang.org/cmd/.
+Found: http://golang.org/pkg/ "Packages"
+-> Crawling child 0/4 of http://golang.org/pkg/ : http://golang.org/.
+-> Crawling child 1/4 of http://golang.org/pkg/ : http://golang.org/cmd/.
+-> Crawling child 2/4 of http://golang.org/pkg/ : http://golang.org/pkg/fmt/.
+-> Crawling child 3/4 of http://golang.org/pkg/ : http://golang.org/pkg/os/.
+<- [http://golang.org/pkg/] 0/4 Waiting for child http://golang.org/.
+Found: http://golang.org/pkg/os/ "Package os"
+-> Crawling child 0/2 of http://golang.org/pkg/os/ : http://golang.org/.
+-> Crawling child 1/2 of http://golang.org/pkg/os/ : http://golang.org/pkg/.
+<- [http://golang.org/pkg/os/] 0/2 Waiting for child http://golang.org/.
+Done with http://golang.org/pkg/, already fetched.
+<- [http://golang.org/pkg/os/] 1/2 Waiting for child http://golang.org/pkg/.
+Done with http://golang.org/, already fetched.
+<- [http://golang.org/pkg/] 1/4 Waiting for child http://golang.org/cmd/.
+Done with http://golang.org/cmd/, already fetched.
+<- [http://golang.org/pkg/] 2/4 Waiting for child http://golang.org/pkg/fmt/.
+Found: http://golang.org/pkg/fmt/ "Package fmt"
+-> Crawling child 0/2 of http://golang.org/pkg/fmt/ : http://golang.org/.
+-> Crawling child 1/2 of http://golang.org/pkg/fmt/ : http://golang.org/pkg/.
+<- [http://golang.org/pkg/fmt/] 0/2 Waiting for child http://golang.org/.
+Done with http://golang.org/pkg/, already fetched.
+<- [http://golang.org/pkg/fmt/] 1/2 Waiting for child http://golang.org/pkg/.
+Done with http://golang.org/, already fetched.
+<- Done with http://golang.org/pkg/os/
+<- [http://golang.org/pkg/] 3/4 Waiting for child http://golang.org/pkg/os/.
+Done with http://golang.org/, already fetched.
+<- Done with http://golang.org/pkg/fmt/
+<- Done with http://golang.org/pkg/
+<- Done with http://golang.org/
+{% endhighlight %}

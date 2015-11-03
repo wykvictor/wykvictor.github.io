@@ -108,7 +108,7 @@ exercise-map:　wordcount
 {% highlight Go %}
 func WordCount(s string) map[string]int {
 	res := make(map [string]int)
-	for _,v := range strings.Fields(s) {
+	for _,v := range strings.Fields(s) {  // Fields函数，类似Python的Split
 		res[v]++
 	}
 	return res
