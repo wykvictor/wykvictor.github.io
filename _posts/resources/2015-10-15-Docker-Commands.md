@@ -37,7 +37,7 @@ $ docker rmi image_name  # delete image
 
 ### 3. 操作docker container
 {% highlight Bash shell scripts %}
-# 启动container，挂载GPU卡和本地目录(dest目录:本地目录)，进入交互式bash
+# 启动container，挂载GPU卡和本地目录(本地主机目录:image内目录)，进入交互式bash
 docker run -ti $DOCKER_NVIDIA_DEVICES --name container-name -v /mnt_data:/mnt_data1 image-name bash
 # 退出但不停止container: ctrl p + ctrl q; exit 和 ctrl d都会暂停container，之后需要运行start启动
 # 之后进入docker(-it 交互式伪终端)，ctrl+D/exit退出都不会退出container
