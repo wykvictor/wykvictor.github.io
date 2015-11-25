@@ -33,6 +33,13 @@ tleyden5iwx/caffe-gpu-master                                                   2
 nakosung/caffe-gpu                                                             0                    [OK]
 $ docker pull image-name  # download image
 $ docker rmi image_name  # delete image
+
+# 也可以从Dockerfile，自己建立image:
+FROM docker/whalesay:latest  # 基于哪个镜像
+RUN apt-get -y update && apt-get install -y fortunes  # 安装软件用
+CMD /usr/games/fortune -a | cowsay # container启动时执行的命令，但只能有一条CMD命令，多条则只执行最后一条
+# 之后基于此构建image whale-yk
+docker build -t whale-yk . # 当前目录找dockerfile
 {% endhighlight %}
 
 ### 3. 操作docker container
