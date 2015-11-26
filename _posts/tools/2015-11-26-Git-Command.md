@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Application Memory Analysis"
+title:  "Git Command"
 date:   2015-11-17 16:30:00
 tags: [memory, analysis, tool]
 categories: tools
