@@ -21,6 +21,7 @@ $ git checkout -b branch-name  # 直接建立新branch，并自动checkout到新
 $ git merge branch_name  # 从别的branch merge改动到当前branch（若加--squash，代表别的分支的所有改动合并成1个commit）
 # 如果遇到冲突，可以直接编辑冲突文件，手动处理冲突的内容；或者用
 $ git branch -d branch_name  # 删除branch
+$ git pull -p  # 等同于git fetch --prune origin；git fetch -p，删除远端已经删除的分支
 {% endhighlight %}
 
 ### 3. Repo
@@ -30,4 +31,5 @@ $ git fetch  # 从远程拉取东西，但是不自动merge
 $ git merge origin/master  # 之后执行这个，merge过来本地的master  这2条相当于pull
 $ git push origin local-branch
 $ git push origin test:test  #  本地的test分支，push到origin的test分支
+$ git mv string.c src/  # 重构代码目录；或者重命名
 {% endhighlight %}
