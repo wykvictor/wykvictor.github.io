@@ -3,7 +3,7 @@ layout: post
 title:  "Docker Commands"
 date:   2015-10-15 15:30:00
 tags: [docker, command]
-categories: resources
+categories: tools
 ---
 
 ### 1. 查看docker信息（version、info）
