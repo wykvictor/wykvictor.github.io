@@ -19,7 +19,7 @@ $ git reset 7be7ec672af  # 恢复到某一次commit，填大于7个字符的hash
 $ git branch branch-name  # 建新branch，之后可以checkout到新branch
 $ git checkout -b branch-name  # 直接建立新branch，并自动checkout到新branch
 $ git merge branch_name  # 从别的branch merge改动到当前branch（若加--squash，代表别的分支的所有改动合并成1个commit）
-# 如果遇到冲突，可以直接编辑冲突文件，手动处理冲突的内容；或者用
+# 如果遇到冲突，可以直接编辑冲突文件，手动处理冲突的内容；或者用git checkout --ours/theirs filename
 $ git branch -d branch_name  # 删除branch
 $ git pull -p  # 等同于git fetch --prune origin；git fetch -p，删除远端已经删除的分支
 {% endhighlight %}
