@@ -45,7 +45,7 @@ func main() {
 
 ### 3. 变量
 {% highlight Go %}
-var c, pythonbool  // 变量列表，类型在后，必须有类型
+var c, python bool  // 变量列表，类型在后，必须有类型
 var a, b = 3, 4  // 可以初始化，有且只有 每个变量对应一个，类型可以不写（编译器推导出来了）
 func main() {
 	var i int  // var的作用范围：函数内或外边的包内
