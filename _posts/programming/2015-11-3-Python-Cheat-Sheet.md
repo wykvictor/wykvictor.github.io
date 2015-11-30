@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Python Cheat Sheet - 1"
+title:  "Python Cheat Sheet"
 date:   2015-11-3 17:00:00
 tags: [python, programming, language]
 categories: programming
@@ -10,7 +10,6 @@ categories: programming
 
 [link]: https://www.codecademy.com/learn/python
 
-{% highlight Python %}
 1. name = raw_input("What is your name")   # 获取用户输入
 2. 逻辑运算符: not, and, or
 3. list中：append多用于把元素作为一个整体插入；insert多用于固定位置插入；extend多用于list中多项分别插入
@@ -20,4 +19,7 @@ categories: programming
 6. print char, “,”保证输出不换行
 7. for index, item in enumerate(choices): # 同时获取index和item
 8. zip能创建2个以上lists的pair/tuple等，在最短的list的end处停止。
-{% endhighlight %}
+9. a, b = 1, 2;  a, b = str.split('-') # 逗号分别赋值
+10. print a, b 等同 print a + " " + b，但后者使用了字符串连接符，可能类型不匹配，前者更好
+11. lists[::-1]，代表lists逆序
+12. [i for i in my if i%3==0] 等同 filter(lambda i: i%3==0, my)  # 重组list列表
