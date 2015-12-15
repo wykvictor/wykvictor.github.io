@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Learning Go Programming Language - 1 basic"
+title:  "Learning Go - 1 basic"
 date:   2015-10-20 16:00:00
 tags: [go, programming, language]
-categories: programming
+categories: Programming
 ---
 
 > 教程  [tour of golang][link-slice] 

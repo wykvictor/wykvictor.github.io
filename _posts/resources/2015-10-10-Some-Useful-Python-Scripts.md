@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Some useful Python Scripts"
+title:  "Some Python Scripts"
 date:   2015-10-10 15:20:00
 tags: [python, scripts, 脚本]
-categories: resources
+categories: Resources
 ---
 
 ### 1. 利用map()函数，转换list中元素的类型

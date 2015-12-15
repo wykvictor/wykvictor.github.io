@@ -3,7 +3,7 @@ layout: post
 title:  "Markdown Syntax"
 date:   2015-11-27 12:30:00
 tags: [markdown, syntax]
-categories: tools
+categories: Tools
 ---
 
 > Modified based on [wowubuntu](http://wowubuntu.com/markdown/)

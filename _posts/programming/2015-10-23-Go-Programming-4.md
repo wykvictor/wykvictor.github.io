@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Learning Go Programming Language - 4 Methods and Interfaces"
+title:  "Learning Go - 4 Methods and Interfaces"
 date:   2015-10-23 10:00:00
 tags: [go, programming, language]
-categories: programming
+categories: Programming
 ---
 
 ### 1. 方法

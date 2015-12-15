@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Learning Go Programming Language - 3 more types"
+title:  "Learning Go - 3 more types"
 date:   2015-10-22 16:00:00
 tags: [go, programming, language]
-categories: programming
+categories: Programming
 ---
 
 ### 1. 指针

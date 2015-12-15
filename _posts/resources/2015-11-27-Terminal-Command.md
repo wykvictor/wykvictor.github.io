@@ -3,7 +3,7 @@ layout: post
 title:  "Terminal Command"
 date:   2015-11-27 11:30:00
 tags: [linux, terminal, command]
-categories: tools
+categories: Resources
 ---
 
 

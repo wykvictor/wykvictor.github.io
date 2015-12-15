@@ -3,7 +3,7 @@ layout: post
 title:  "Python Cheat Sheet"
 date:   2015-11-3 17:00:00
 tags: [python, programming, language]
-categories: programming
+categories: Programming
 ---
 
 > 教程  [code codecademy python][link] 

@@ -3,7 +3,7 @@ layout: post
 title:  "Git Command"
 date:   2015-11-17 16:30:00
 tags: [memory, analysis, tool]
-categories: tools
+categories: Resources
 ---
 
 ### 1. Back Track
@@ -32,4 +32,15 @@ $ git merge origin/master  # 之后执行这个，merge过来本地的master  �
 $ git push origin local-branch
 $ git push origin test:test  #  本地的test分支，push到origin的test分支
 $ git mv string.c src/  # 重构代码目录；或者重命名
+{% endhighlight %}
+实例：拉取他人repo，merge到自己的branch
+{% highlight Bash shell scripts %}
+$ git remote add local-name git-repo  # 增加一个远程仓库(-t branch-name:可以只跟踪某个branch)
+$ git fetch local-name  # 拉取东西，但是不自动merge
+$ git checkout local-name/master  # 切换到他人分支
+# checkout到别人分支后，处于detached HEAD状态，这时候所作的commit都会被丢弃。要在别人代码的基础上进行修改，可以新建一个本地分支
+$ git checkout -b merge-branch
+# 之后可以在此分支上进行一些修改
+$ git checkout master  # 切换到自己的master分支
+$ git merge merge-branch  # merge, 如果有冲突需要先解决
 {% endhighlight %}

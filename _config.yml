@@ -1,12 +1,34 @@
-# Site settings
-title: Victor's New Start
-email: yakunw.victor@gmail.com
+permalink: /:year/:month/:day/:title.html
+markdown: kramdown
+highlighter: pygments
+
+kramdown:
+  input: GFM
+
+# 作者信息
+author: 
+  name: Yakun Wang
+  email: yakunw.victor@gmail.com
+  link: http://wykvictor.github.io/
+  github:  wykvictor
+
+# 站点信息
+title: Yakun's Blog 
 description: > # this means to ignore newlines until "baseurl:"
   Learn from the Past. Life with Computer Science.
+url: http://wykvictor.github.io/
+rss_url: /pages/atom.xml
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://wykvictor.github.io/" # the base hostname & protocol for your site
-github_username:  wykvictor
 
-# Build settings
-markdown: kramdown
-# highlighter: true
+# avatar头像及Favicon
+avatar: http://7xno5y.com1.z0.glb.clouddn.com/avatar-big.png
+favicon: http://7xno5y.com1.z0.glb.clouddn.com/avatar.png
+
+# google analytics 设置
+ga:
+  id: UA-71423811-1
+  url: wykvictor.github.io
+
+# disqus 设置
+disqus:
+  shortname: yakun

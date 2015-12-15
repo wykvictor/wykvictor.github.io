@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Learning Go Programming Language - 5 Concurrancy"
+title:  "Learning Go - 5 Concurrancy"
 date:   2015-10-28 15:40:00
 tags: [go, programming, language]
-categories: programming
+categories: Programming
 ---
 
 ### 1. channel管道

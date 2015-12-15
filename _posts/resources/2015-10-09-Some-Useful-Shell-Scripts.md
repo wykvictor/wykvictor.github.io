@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Some useful Shell Scripts"
+title:  "Some Useful Shell Resources"
 date:   2015-10-09 15:30:00
 tags: [shell, scripts, 脚本]
-categories: resources
+categories: Resources
 ---
 
 > 最近在用Deep learning工具[caffe](http://caffe.berkeleyvision.org/)，基于数据集[VOC](http://host.robots.ox.ac.uk/pascal/VOC/)做一些实验，里边有20个Object Class，所以得到结果后经常会遇到重复处理20遍文件。因此写了一些脚本，用来执行重复操作。
@@ -154,4 +154,16 @@ function fSum()  // 函数定义 必须放在使用前
 }
 t=$(fSum 3 2)  // 相当于定义了fSum命令，传入参数
 echo $t, $?  // 5, 0，$?是上一句命令的返回值，0代表成功
+{% endhighlight %}
+
+### 12. 批量杀死进程
+{% highlight Bash shell scripts %}
+ps aux|grep name|grep -v grep|awk '{print $2}'|xargs kill -9
+{% endhighlight %}
+
+### 13. 查看Linux内核版本或发布版本
+{% highlight Bash shell scripts %}
+lsb_release -a
+cat /etc/issue
+uname -a
 {% endhighlight %}

@@ -3,7 +3,7 @@ layout: post
 title:  "Application Memory Analysis"
 date:   2015-11-17 16:30:00
 tags: [memory, analysis, tool]
-categories: tools
+categories: Tools
 ---
 
 ### 1. Linux利用proc下status文件分析内存

@@ -3,7 +3,7 @@ layout: post
 title:  "Some C++ Snippets"
 date:   2015-11-10 15:00:00
 tags: [c++, snippets]
-categories: resources
+categories: Resources
 ---
 
 ### 1. Sort a vector and Get the Index

@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Learning Go Programming Language - 2 flow control"
+title:  "Learning Go - 2 flow control"
 date:   2015-10-21 16:00:00
 tags: [go, programming, language]
-categories: programming
+categories: Programming
 ---
 
 ### 1. 循环 - 仅for一种
