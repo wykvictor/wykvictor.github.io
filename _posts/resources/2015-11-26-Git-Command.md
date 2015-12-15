@@ -43,4 +43,11 @@ $ git checkout -b merge-branch
 # 之后可以在此分支上进行一些修改
 $ git checkout master  # 切换到自己的master分支
 $ git merge merge-branch  # merge, 如果有冲突需要先解决
+# 之后add, commit, push
+
+# 以上步骤的问题是: merge时没有使用--squash参数，保留了merge-branch的所有commit历史，修改：
+$ git reset aa020070  # 恢复到merge之前的commit
+$ git add -A  # 重新add所有的修改
+$ git commit -m "..."
+$ git push -f  # 由于落后于remote，需要加-f: 利用强覆盖方式用本地 替代 git仓库的内容
 {% endhighlight %}
