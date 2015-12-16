@@ -3,7 +3,7 @@ layout: post
 title: Welcome
 ---
 
-## 记录 by Yakun
+## 记录
 
 #### Learn from the Past. 
 

@@ -6,12 +6,79 @@ tags: [memory, analysis, tool]
 categories: Resources
 ---
 
+### 0. Basic
+部分内容引用自一个非常好的git教程[backlog](http://backlogtool.com/git-guide/cn/intro/intro1_1.html)
+
+####  a. HEAD索引
+HEAD指向当前分支的最后一次commit。通过移动HEAD，就可以变更使用的分支。
+![git-HEAD](http://7xno5y.com1.z0.glb.clouddn.com/git-head.png)
+图中HEAD~指定HEAD之前的第几次提交记录。HEAD^指定使用哪个父节点
+
+####  b. Git Stash
+还未提交的修改留在索引区或工作树的情况下，切换分支时修改内容会*随身带到目标分支*。
+但如果在checkout的目标分支中相同的文件也有修改，checkout会失败。这时要么先提交修改内容，要么用stash暂时保存修改内容后再checkout。
+stash是临时保存文件修改内容的区域。可以暂时保存**工作树和索引**里还没提交的修改内容，可以事后再取出暂存的修改，应用到原先的分支或其他的分支上。
+
+####  c. Merge
+Merge会生成一个新提交，master分支的HEAD会移动到该提交上
+![git-Merge](http://7xno5y.com1.z0.glb.clouddn.com/git-merge.png)
+
+####  d. Rebase
+rebase bugfix分支到master分支, bugfix分支的历史记录会添加在master分支的后面。
+![git-Rebase](http://7xno5y.com1.z0.glb.clouddn.com/git-rebase.png)
+如图，历史记录成一条线很整洁。这时移动提交X和Y有可能会发生冲突，需要修改各自的提交时发生冲突的部分。
+
+实例：
+{% highlight Bash shell scripts %}
+# master分出2个branch，并行各自开发，先merge-1(fast-forward)，再merge-2(解决冲突)
+$ git log --graph --oneline  # 之后的状态如下，log较为混乱
+*   5ac2fc4 merge     # 这是merge的提交
+|\
+| * c7cbf1e branch 2  # 这是branch2的修改
+* | 5f9a478 branch 1  # 这是branch1的修改，也是fast-forward
+|/
+* 489bc6e master      # 这是最初的提交
+# 下面使用rebase
+$ git reset --hard HEAD^  # 暂时取消刚才的合并
+$ git checkout branch-2  # 切换到branch-2分支后，对master执行rebase
+$ git rebase master  # 同样之后，手工解决conflict
+$ git add test.txt  # 添加后，不能用commit
+$ git rebase --continue  # 而是执行rebase，指定--continue；若要取消，指定--abort
+$ git checkout master  # master分支此时可以 fast-forward合并branch-2了
+$ git merge branch-2  # fast-forward合并
+$ git log --graph --oneline  # 之后的状态如下，工作区test.txt结果相同，但log灰常清晰
+* edec60f branch 2    # 这是branch2的修改，也是fast-forward
+* 5f9a478 branch 1    # 这是branch1的修改，是fast-forward
+* 489bc6e master      # 这是最初的提交
+{% endhighlight %}
+
+####  e. Tag
+标签是为了更方便地参考提交而给它标上易懂的名称。
+Git可以使用2种标签：轻标签（本地暂时使用）和注解标签（需添加注解或签名，发布用）
+{% highlight Bash shell scripts %}
+$ git tag tag-1  # 添加轻标签
+$ git tag  # 显示已有标签列表
+$ git log --decorate --oneline  # decorate选项，可以显示包含标签资料的log
+edec60f (HEAD -> master, tag: tag-1, branch-2) branch 2
+5f9a478 (branch-1) branch 1
+489bc6e master
+$ git tag -am "comment" tag-2  # -a为注解tag，需要-m添加comment
+$ git tag -n  # -n除了列表，也显示出comments
+tag-1           branch 2
+tag-2           comment
+$ git tag -d tag-1  # 删除tag
+Deleted tag 'tag-1' (was edec60f)
+{% endhighlight %}
+
+
 ### 1. Back Track
 {% highlight Bash shell scripts %}
+$ git log --graph --oneline  # graph:以文本形式显示更新流程;oneline:在一行中显示提交的信息
 $ git show HEAD  # 查看最近一次commit的详细内容
 $ git checkout HEAD filename  # 某个文件从上次commit后又修改了，但是想丢弃这些修改，恢复到commit时的结果
 $ git reset HEAD scene-2.txt  # 将该文件从add后的stage区域取消，unstage
 $ git reset 7be7ec672af  # 恢复到某一次commit，填大于7个字符的hash值即可，之后所有的改动变成unstaged
+$ git reset HEAD^  # 取消这次的commit信息，HEAD恢复到上一次commit后，本次修改需重新add
 {% endhighlight %}
 
 ### 2. Branch
@@ -49,5 +116,5 @@ $ git merge merge-branch  # merge, 如果有冲突需要先解决
 $ git reset aa020070  # 恢复到merge之前的commit
 $ git add -A  # 重新add所有的修改
 $ git commit -m "..."
-$ git push -f  # 由于落后于remote，需要加-f: 利用强覆盖方式用本地 替代 git仓库的内容
+$ git push -f  # 由于落后于remote，需要加 -f: 利用强覆盖方式用本地 替代 git仓库的内容
 {% endhighlight %}
