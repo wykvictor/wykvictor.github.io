@@ -118,3 +118,32 @@ $ git add -A  # 重新add所有的修改
 $ git commit -m "..."
 $ git push -f  # 由于落后于remote，需要加 -f: 利用强覆盖方式用本地 替代 git仓库的内容
 {% endhighlight %}
+
+### 4. Revert & Reset
+
+<table class="table table-bordered table-striped table-condensed">
+	<tr>
+	    <th>模式名称</th>
+	    <th>HEAD的位置</th>
+	    <th>索引区</th>
+	    <th>工作树</th>
+	</tr>
+	<tr>
+	    <td>soft</td>
+	    <td>修改</td>
+	    <td>不修改</td>
+	    <td>不修改</td>
+	</tr>
+	<tr>
+	    <td>mixed</td>
+	    <td>修改</td>
+	    <td>修改</td>
+	    <td>不修改</td>
+	</tr>
+	<tr>
+	    <td>hard</td>
+	    <td>修改</td>
+	    <td>修改</td>
+	    <td>修改</td>
+	</tr>
+</table>
