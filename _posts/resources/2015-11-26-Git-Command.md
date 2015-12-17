@@ -19,14 +19,32 @@ HEAD指向当前分支的最后一次commit。通过移动HEAD，就可以变更
 但如果在checkout的目标分支中相同的文件也有修改，checkout会失败。这时要么先提交修改内容，要么用stash暂时保存修改内容后再checkout。
 stash是临时保存文件修改内容的区域。可以暂时保存**工作树和索引**里还没提交的修改内容，可以事后再取出暂存的修改，应用到原先的分支或其他的分支上。
 
-####  c. Merge
+####  c. Git commit --amend
+git add添加新内容后，执行commit --amend，会修改上次的commit合并为1个。
+使用场合：
+1.  添加最近那次commit时，漏掉add的内容
+2.  修改最近那次commit的comments(也就是commit后立马执行amend)
+
+####  d. Cherry-pick
+从其他分支复制*指定*的commit，merge进来：
+![git-Cherry-pick](http://7xno5y.com1.z0.glb.clouddn.com/git-cherry-pick.png)
+{% highlight Bash shell scripts %}
+$ git cherry-pick c81dba1  # merge其他分支的某个commit的hash值
+# 如果有冲突，解决后add，再commit
+{% endhighlight %}
+
+####  e. Merge
 Merge会生成一个新提交，master分支的HEAD会移动到该提交上
 ![git-Merge](http://7xno5y.com1.z0.glb.clouddn.com/git-merge.png)
 
-####  d. Rebase
+####  f. Rebase
 rebase bugfix分支到master分支, bugfix分支的历史记录会添加在master分支的后面。
 ![git-Rebase](http://7xno5y.com1.z0.glb.clouddn.com/git-rebase.png)
-如图，历史记录成一条线很整洁。这时移动提交X和Y有可能会发生冲突，需要修改各自的提交时发生冲突的部分。
+如图，历史记录成一条线很整洁。这时移动提交X和Y有可能会发生冲突，需要修改各自的提交时发生冲突的部分。另：
+```
+git rebase -i hash 可以汇合几个commit，或者改写某个commit。
+```
+用的不多，具体参照 [教程](http://backlogtool.com/git-guide/cn/stepup/stepup7_5.html)和[汇总](http://backlogtool.com/git-guide/cn/reference/log.html)。
 
 实例：
 {% highlight Bash shell scripts %}
@@ -52,7 +70,7 @@ $ git log --graph --oneline  # 之后的状态如下，工作区test.txt结果�
 * 489bc6e master      # 这是最初的提交
 {% endhighlight %}
 
-####  e. Tag
+####  g. Tag
 标签是为了更方便地参考提交而给它标上易懂的名称。
 Git可以使用2种标签：轻标签（本地暂时使用）和注解标签（需添加注解或签名，发布用）
 {% highlight Bash shell scripts %}
@@ -76,7 +94,7 @@ Deleted tag 'tag-1' (was edec60f)
 $ git log --graph --oneline  # graph:以文本形式显示更新流程;oneline:在一行中显示提交的信息
 $ git show HEAD  # 查看最近一次commit的详细内容
 $ git checkout HEAD filename  # 某个文件从上次commit后又修改了，但是想丢弃这些修改，恢复到commit时的结果
-$ git reset HEAD scene-2.txt  # 将该文件从add后的stage区域取消，unstage
+$ git reset HEAD filename  # 将该文件从add后的stage区域取消，unstage
 $ git reset 7be7ec672af  # 恢复到某一次commit，填大于7个字符的hash值即可，之后所有的改动变成unstaged
 $ git reset HEAD^  # 取消这次的commit信息，HEAD恢复到上一次commit后，本次修改需重新add
 {% endhighlight %}
@@ -120,30 +138,46 @@ $ git push -f  # 由于落后于remote，需要加 -f: 利用强覆盖方式用�
 {% endhighlight %}
 
 ### 4. Revert & Reset
-
-<table class="table table-bordered table-striped table-condensed">
-	<tr>
-	    <th>模式名称</th>
-	    <th>HEAD的位置</th>
-	    <th>索引区</th>
-	    <th>工作树</th>
+**reset** 可以恢复commit，除了默认的mixed模式，还有soft和hard模式：
+<table border="2" frame="box" cellspacing="0px" style="border-collapse:collapse" valign="center">
+	<tr bgcolor="lightgreen">
+	    <th align="center">　模式名称　</th>
+	    <th align="center">　HEAD位置　</th>
+	    <th align="center">　索引区　</th>
+	    <th align="center">　工作树　</th>
+	    <th align="center">　使用场合　</th>
 	</tr>
 	<tr>
-	    <td>soft</td>
-	    <td>修改</td>
-	    <td>不修改</td>
-	    <td>不修改</td>
+	    <td align="center">soft</td>
+	    <td align="center">修改</td>
+	    <td align="center">不修改</td>
+	    <td align="center">不修改</td>
+	    <td align="center">只取消commit</td>
 	</tr>
 	<tr>
-	    <td>mixed</td>
-	    <td>修改</td>
-	    <td>修改</td>
-	    <td>不修改</td>
+	    <td align="center">mixed</td>
+	    <td align="center">修改</td>
+	    <td align="center">修改</td>
+	    <td align="center">不修改</td>
+	    <td align="center">取消commit和add</td>
 	</tr>
 	<tr>
-	    <td>hard</td>
-	    <td>修改</td>
-	    <td>修改</td>
-	    <td>修改</td>
+	    <td align="center">hard</td>
+	    <td align="center">修改</td>
+	    <td align="center">修改</td>
+	    <td align="center">修改</td>
+	    <td align="center">　彻底复原上一次commit　</td>
 	</tr>
 </table>
+**revert** 可以安全地取消指定的commit，但跟reset不同，不会回退，只会生成新的commit：
+
+![git-Revert](http://7xno5y.com1.z0.glb.clouddn.com/git-revert.png)
+{% highlight Bash shell scripts %}
+$ git revert HEAD  # 取消上次的commit
+$ git revert HEAD^  # 也可以直接取消上上次的commit，但是此时肯定有confict，需要解决后再commit
+{% endhighlight %}
+
+**ORIG_HEAD** 指向之前的HEAD。Reset或Revert错误的时候，在ORIG_HEAD上reset就可以还原之前状态：
+{% highlight Bash shell scripts %}
+$ git reset ORIG_HEAD
+{% endhighlight %}
