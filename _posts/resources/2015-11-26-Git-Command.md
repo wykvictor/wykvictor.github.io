@@ -15,12 +15,12 @@ HEAD指向当前分支的最后一次commit。通过移动HEAD，就可以变更
 图中HEAD~指定HEAD之前的第几次提交记录。HEAD^指定使用哪个父节点
 
 ####  b. Git Stash
-还未提交的修改留在索引区或工作树的情况下，切换分支时修改内容会*随身带到目标分支*。
-但如果在checkout的目标分支中相同的文件也有修改，checkout会失败。这时要么先提交修改内容，要么用stash暂时保存修改内容后再checkout。
+还未提交的修改留在索引区或工作树的情况下：切换分支时修改内容会*随身带到目标分支*，可以add并commit；
+但如果在checkout的目标分支中相同的文件也有后来的修改(即hash值不同)，checkout会失败。这时要么先提交commit修改内容，要么用stash暂时保存修改内容后再checkout。
 stash是临时保存文件修改内容的区域。可以暂时保存**工作树和索引**里还没提交的修改内容，可以事后再取出暂存的修改，应用到原先的分支或其他的分支上。
 
-####  c. Git commit --amend
-git add添加新内容后，执行commit --amend，会修改上次的commit合并为1个。
+####  c. Git commit \-\-amend
+git add添加新内容后，执行commit \-\-amend，会修改上次的commit合并为1个。
 使用场合：
 1.  添加最近那次commit时，漏掉add的内容
 2.  修改最近那次commit的comments(也就是commit后立马执行amend)
