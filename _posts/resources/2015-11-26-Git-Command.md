@@ -88,6 +88,19 @@ $ git tag -d tag-1  # 删除tag
 Deleted tag 'tag-1' (was edec60f)
 {% endhighlight %}
 
+####  h. Sparse checkout
+若git repo太大，可以用该方法只clone子目录：
+{% highlight Bash shell scripts %}
+$ mkdir <repo>
+$ cd <repo>
+$ git init
+$ git remote add -f origin <url>
+# This creates an empty repository with your remote, and fetches all objects but doesn't check them out.
+$ git config core.sparseCheckout true
+$ echo "some/dir/" >> .git/info/sparse-checkout
+$ git pull origin master
+{% endhighlight %}
+
 
 ### 1. Back Track
 {% highlight Bash shell scripts %}
