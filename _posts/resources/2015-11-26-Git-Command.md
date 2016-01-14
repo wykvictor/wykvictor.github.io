@@ -37,6 +37,11 @@ $ git cherry-pick c81dba1  # merge其他分支的某个commit的hash值
 Merge会生成一个新提交，master分支的HEAD会移动到该提交上
 ![git-Merge](http://7xno5y.com1.z0.glb.clouddn.com/git-merge.png)
 
+另，一个有用的命令，把另一个branch的某个file，checkout到本分支上来:
+```
+git checkout other-branch-name -- want-file-name
+```
+
 ####  f. Rebase
 rebase bugfix分支到master分支, bugfix分支的历史记录会添加在master分支的后面。
 ![git-Rebase](http://7xno5y.com1.z0.glb.clouddn.com/git-rebase.png)
