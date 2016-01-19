@@ -11,6 +11,7 @@ categories: Resources
 | Ctrl+e | 光标移动到最末尾 |
 | Ctrl+k | 删除此处至末尾的所有内容 |
 | Ctrl+u | 删除此处至开始的所有内容 |
+| Ctrl+w | 删除此处 之前的单词 |
 | Ctrl+Left/Right-Arrow | 按单词左右移动 |
 | Shift+PgUp/PgDn | 终端上下翻页滚动 |
 | Shift+Ctrl+N | 打开新的终端窗口 |
