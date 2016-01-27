@@ -106,6 +106,14 @@ $ echo "some/dir/" >> .git/info/sparse-checkout
 $ git pull origin master
 {% endhighlight %}
 
+####  i. Git Init
+初始化git目录
+{% highlight Bash shell scripts %}
+$ mkdir <repo>
+$ cd <repo>
+$ git init  # this will initialize the git repo in repo/.git/
+$ git --git-dir=lib init  # initialize in lib/ directly, lib/objects/ 存放具体数据
+{% endhighlight %}
 
 ### 1. Back Track
 {% highlight Bash shell scripts %}
@@ -198,4 +206,43 @@ $ git revert HEAD^  # 也可以直接取消上上次的commit，但是此时肯�
 **ORIG_HEAD** 指向之前的HEAD。Reset或Revert错误的时候，在ORIG_HEAD上reset就可以还原之前状态：
 {% highlight Bash shell scripts %}
 $ git reset ORIG_HEAD
+{% endhighlight %}
+
+### 5. Git Submodule
+{% highlight Bash shell scripts %}
+# 如何 add
+$ git submodule add lib-git-repo-link libs/lib-name  # 添加submodule, 生成.gitmodules记录引用信息
+
+# 如何 clone，正常clone后，.git/config中没有注册submodule的索引信息
+$ git submodule  # 查看submodule情况，前边的"-"，表示还没有检出
+$ git submodule init  # 此时，再查看.git/config中，已经注册了submodule的url
+$ git submodule update  # 真正检出了submodule
+# 以上2条命令，可以在clone时，加--recursive参数，一条命令替代!!!
+
+# 如何修改lib
+$ cd libs/lib-name  # 此时头指针是一个commit id
+$ git checkout master # 想修改，切换到master，做一些修改
+# Note: 如果忘记切换就修改，则无法push，切换到master后，用git merge/cherry-pick change-id即可
+$ pushd ../../;git diff; popd  # 会显示更新的lib1
+--- a/libs/lib1
++++ b/libs/lib1
+@@ -1 +1 @@
+-Subproject commit c22aff85be91eca442734dcb07115ffe526b13a1
++Subproject commit 36ad12d40d8a41a4a88a64add27bd57cf56c9de2
+$ git push  # 将改动提交到lib1原始repo
+# 最后，要到主repo, add libs/lib-name，git commit, push将新的commit id提交
+
+# 别的project的人，如何拿到最新的commit id和lib
+$ git pull  # (可以加--recurse-submodules) 拉取最新的project id
+$ git diff  # 现在居然有问题: libs/lib-name不是最新
+$ git submodule update  # (--recursive) 现在检出更新到最新
+
+# 如果其他的project-b，如果用到了这个lib，那么需要手动进去checkout master,并pull最新的lib
+# 如果很多的project用到了该lib，则可以写个脚本，依次进去git pull
+$ git submodule foreach "git checkout master && git pull"  # 该命令取代上述脚本
+
+# 如何删除submodule
+$ git rm -r --cached libs/lib2  # 从git删除，--cached会保留实际的文件
+$ rm -rf libs/lib2  # 实际删除物理文件
+# 之后编辑.gitmodules(前边这几步，可以用git rm代替)和.git/config，删除对应的条目，最后git add，push
 {% endhighlight %}
