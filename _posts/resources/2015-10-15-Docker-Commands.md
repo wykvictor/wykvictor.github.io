@@ -33,13 +33,7 @@ tleyden5iwx/caffe-gpu-master                                                   2
 nakosung/caffe-gpu                                                             0                    [OK]
 $ docker pull image-name  # download image
 $ docker rmi image_name  # delete image
-
-# 也可以从Dockerfile，自己建立image:
-FROM docker/whalesay:latest  # 基于哪个镜像
-RUN apt-get -y update && apt-get install -y fortunes  # 安装软件用
-CMD /usr/games/fortune -a | cowsay # container启动时执行的命令，但只能有一条CMD命令，多条则只执行最后一条
-# 之后基于此构建image whale-yk
-docker build -t whale-yk . # 当前目录找dockerfile
+$ docker rmi $(docker images -a -f "dangling=true" -q)  # dangling的镜像
 {% endhighlight %}
 
 ### 3. 操作docker container
@@ -49,6 +43,8 @@ docker run -ti $DOCKER_NVIDIA_DEVICES --name container-name -v /mnt_data:/mnt_da
 # 退出但不停止container: ctrl p + ctrl q; exit 和 ctrl d都会暂停container，之后需要运行start启动
 # 之后进入docker(-it 交互式伪终端)，ctrl+D/exit退出都不会退出container
 docker exec -it 102d3e949a37 bash
+# 删除所有已经exit的container -q(id号) -f(filter) -v:移除挂载目录(如果不加，会残留垃圾文件)
+docker rm -v $(docker ps -a -q -f status=exited)
 
 # 查看运行的container
 docker ps [-a]
@@ -56,9 +52,38 @@ docker ps [-a]
 docker commit ID new_image_name 
 {% endhighlight %}
 
-### 4. docker资源
+### 4. docker占用资源查询
 {% highlight Bash shell scripts %}
 docker stats [docker names]  // 查看CPU，Memory，Network使用
 docker内存限制可以在创建docker时使用-m参数：-m 256m，容器里程序可以跑到256m*2=512m后会被oom给杀死
 目前cpu限制可以使用绑定到具体的线程，或者是在绑定线程基础上对线程资源权重分配。绑定线程可以使用参数--cpuset-cpus=7
 {% endhighlight %}
+
+### 5. [Dockerfile](https://docs.docker.com/engine/articles/dockerfile_best-practices/)
+{% highlight Bash shell scripts %}
+# 可以从Dockerfile，自己建立image:
+FROM docker/whalesay:latest  # 基于哪个镜像
+RUN apt-get -y update && apt-get install -y fortunes  # 安装软件用
+ENV PATH ${PATH}:/opt/tools  # 设置环境变量
+COPY requirements.txt /tmp/  # copying local files into the container 
+WORKDIR /root/workdir  # 设置之后所有RUN命令的工作目录
+CMD /usr/games/fortune -a | cowsay # container启动时执行的命令，但只能有一条CMD命令，多条则只执行最后一条
+# 之后基于此构建image whale-yk
+docker build -t whale-yk . # 当前目录找dockerfile
+{% endhighlight %}
+另，Dockerfile中每一条命令是一个step，在image中新加一层（新建一个container，然后操作，然后rm掉container，得到一个加一层的image）
+所以修改某一条命令后，之前的Cache，之后的丢掉重新建
+
+### 6. Container网络配置
+[[reference]](http://www.infoq.com/cn/articles/docker-network-and-pipework-open-source-explanation-practice/)
+docker run创建容器时，可以用--net选项指定网络模式，有以下4种：
+
+* host模式，--net=host：无独立的Network Namespace，不虚拟网卡，使用宿主机的IP和端口(最简单的直接上网的办法)
+* container模式，--net=container:NAME_or_ID : 与上种类似，只是与其他的某个容器共享网络资源
+* none模式，--net=none：独立Network Namespace，但是并不进行任何网络配置，需添加网卡、配置IP等
+* bridge模式，--net=bridge，默认设置
+
+*bridge模式*
+为每一个容器分配Network Namespace、设置IP等，并将一个主机上的Docker容器连接到一个虚拟网桥上：
+![docker-network](http://7xno5y.com1.z0.glb.clouddn.com/docker-network.png)
+
