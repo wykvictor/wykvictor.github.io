@@ -63,7 +63,8 @@ docker内存限制可以在创建docker时使用-m参数：-m 256m，容器里�
 {% highlight Bash shell scripts %}
 # 可以从Dockerfile，自己建立image:
 FROM docker/whalesay:latest  # 基于哪个镜像
-RUN apt-get -y update && apt-get install -y fortunes  # 安装软件用
+# 安装软件用,常用，不要忘记清空lists目录，可以缩小image大小
+RUN apt-get -y update && apt-get install -y fortunes && rm -rf /var/lib/apt/lists/*
 ENV PATH ${PATH}:/opt/tools  # 设置环境变量
 COPY requirements.txt /tmp/  # copying local files into the container 
 WORKDIR /root/workdir  # 设置之后所有RUN命令的工作目录
