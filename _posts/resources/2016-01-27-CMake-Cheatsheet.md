@@ -60,6 +60,11 @@ find_package(Eigen REQUIRED)
 include_directories(SYSTEM ${EIGEN_INCLUDE_DIR})  # SYSTEM：to use system include directories on some platforms
 add_definitions(-DUSE_EIGEN)  # 用于添加编译器命令行标志
 
+#caffe
+find_package(Caffe REQUIRED)  # [link](https://cmake.org/cmake/help/v3.4/command/find_package.html?highlight=find_package)若找到，则name_FOUND被自动置为1
+find_library(CAFFE_LIB_PATH ${Caffe_LIBRARIES})  # 查找library的绝对路径，存入变量
+message(STATUS "caffe:${Caffe_LIBRARIES} ${Caffe_FOUND} ${CAFFE_LIB_PATH}") 
+
 set(project_src a.cpp b.cpp c.cpp)
 
 # 用于指定从一组源文件中编译出一个库文件 libproject.so
@@ -87,4 +92,6 @@ else(NOT DEFINED BUILD_ANDROID)
 endif(DEFINED BUILD_ANDROID)
 
 install(TARGETS project DESTINATION ${INSTALL_DIST_PATH})  # 指定install的时候，执行的命令，跟make时没关系
+# 将需要的lib也install到目标目录
+install(FILES ${CAFFE_LIB_PATH} DESTINATION ${INSTALL_DIST_PATH}) #[link](https://cmake.org/cmake/help/v3.4/command/install.html#installing-files)
 {% endhighlight %}
