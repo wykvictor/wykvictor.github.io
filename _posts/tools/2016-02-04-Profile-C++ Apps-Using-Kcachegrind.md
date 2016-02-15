@@ -6,7 +6,8 @@ tags: [app, profile, valgrind, kcachegrind]
 categories: Tools
 ---
 
->  通过工具Valgrind和Kcachegrind，图形化显示函数调用关系和时间占比[link](http://baptiste-wicht.com/posts/2011/09/profile-c-application-with-callgrind-kcachegrind.html)
+>  通过工具Valgrind和Kcachegrind，图形化显示函数调用关系和时间占比
+[link](http://baptiste-wicht.com/posts/2011/09/profile-c-application-with-callgrind-kcachegrind.html)
 
 #### 1. 安装
 	sudo apt-get install valgrind kcachegrind graphviz
