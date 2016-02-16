@@ -47,6 +47,7 @@ rebase bugfix分支到master分支, bugfix分支的历史记录会添加在maste
 ![git-Rebase](http://7xno5y.com1.z0.glb.clouddn.com/git-rebase.png)
 如图，历史记录成一条线很整洁。这时移动提交X和Y有可能会发生冲突，需要修改各自的提交时发生冲突的部分。另：
 ```
+git rebase HEAD^ --onto master 自己的上一个commit不要了，rebase master上的(onto指定upstream)
 git rebase -i hash 可以汇合几个commit，或者改写某个commit。
 ```
 用的不多，具体参照 [教程](http://backlogtool.com/git-guide/cn/stepup/stepup7_5.html)和[汇总](http://backlogtool.com/git-guide/cn/reference/log.html)。
