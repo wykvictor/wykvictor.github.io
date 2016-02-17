@@ -5,7 +5,7 @@ date:   2016-01-29 11:30:00
 tags: [cmake, cheatsheet]
 categories: Resources
 ---
-[Link](http://name5566.com/1795.html)
+[Link1](http://name5566.com/1795.html) [Link2](http://www.hahack.com/codes/cmake/)
 
 ### 1. 常用:readlink获取工作目录全路径
 {% highlight Bash shell scripts %}
@@ -22,9 +22,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)  # 设置 ARCHIVE �
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)  # 设置 LIBRARY 目标的输出路径
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)  # 设置 RUNTIME 目标的输出路径
 set(CMAKE_CXX_STANDARD 11)  #  initialize the CXX_FLAGS on all targets, -std=c++11，一些C++高级特性
-
-# 设置一些Options. Turn on with 'cmake -Dmyvarname=ON'.
-option(test "Build all tests." 0) # 可定义一些编译开关ON/OFF，最后给出默认值
 
 if(UNIX OR APPLE)  # UNIX-like 的系统，包括 Apple OS X 和 CygWin 或  Apple 系统
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall -DUSE_OPENCV=1")
@@ -61,7 +58,8 @@ include_directories(SYSTEM ${EIGEN_INCLUDE_DIR})  # SYSTEM：to use system inclu
 add_definitions(-DUSE_EIGEN)  # 用于添加编译器命令行标志
 
 #caffe
-find_package(Caffe REQUIRED)  # [link](https://cmake.org/cmake/help/v3.4/command/find_package.html?highlight=find_package)若找到，则name_FOUND被自动置为1
+# [link](https://cmake.org/cmake/help/v3.4/command/find_package.html?highlight=find_package)
+find_package(Caffe REQUIRED)  # 若找到，则name_FOUND被自动置为1
 find_library(CAFFE_LIB_PATH ${Caffe_LIBRARIES})  # 查找library的绝对路径，存入变量
 message(STATUS "caffe:${Caffe_LIBRARIES} ${Caffe_FOUND} ${CAFFE_LIB_PATH}") 
 
@@ -82,7 +80,7 @@ set(main_lib project)
 TARGET_LINK_LIBRARIES(main ${main_lib})
 
 if(ENABLE_JNI)
-   add_subdirectory(src/jni)  # 添加一个需要进行构建的子目录
+   add_subdirectory(src/jni)  # 添加一个需要进行构建的子目录，里边编辑子CMakeLists.txt
 endif()
 
 if(DEFINED BUILD_ANDROID)
@@ -93,5 +91,31 @@ endif(DEFINED BUILD_ANDROID)
 
 install(TARGETS project DESTINATION ${INSTALL_DIST_PATH})  # 指定install的时候，执行的命令，跟make时没关系
 # 将需要的lib也install到目标目录
-install(FILES ${CAFFE_LIB_PATH} DESTINATION ${INSTALL_DIST_PATH}) #[link](https://cmake.org/cmake/help/v3.4/command/install.html#installing-files)
+# [link](https://cmake.org/cmake/help/v3.4/command/install.html#installing-files)
+install(FILES ${CAFFE_LIB_PATH} DESTINATION ${INSTALL_DIST_PATH})
+
+# 设置一些Options. Turn on with 'cmake -Dmyvarname=ON'.
+option(BUILD_TESTS "Build all tests." 0) # 可定义一些编译开关ON/OFF，最后给出默认值如0
+
+if (BUILD_TESTS)
+    enable_testing()
+    # add_subdirectory(tests)  # 也可以在tests目录内定义add_test等内容
+
+    find_package(GTest REQUIRED)
+    include_directories(${GTEST_INCLUDE_DIRS})
+
+    ##############
+    ##############
+    # Unit Tests
+    ##############
+    add_executable(runUnitTests test/testMain.cpp src/a.cpp)
+    # Standard linking to gtest stuff.
+    target_link_libraries(runUnitTests ${GTEST_BOTH_LIBRARIES})
+    # Extra linking for the project.
+    target_link_libraries(runUnitTests ${main_lib})
+    # This is so you can do 'make test' to see all your tests run, instead of
+    # manually running the executable runUnitTests to see those specific tests.
+    # [link](https://cmake.org/cmake/help/v3.4/command/add_test.html?highlight=add_test)
+    add_test(NAME unittest COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/runUnitTests)
+endif()
 {% endhighlight %}
