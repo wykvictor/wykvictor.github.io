@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Pass Protobuf through JNI(C++ to Java)"
-date:   2016-02-19 16:00:00
+date:   2016-02-18 16:00:00
 tags: [protobuf, c++ to java, jni, tech]
 categories: Tech
 ---

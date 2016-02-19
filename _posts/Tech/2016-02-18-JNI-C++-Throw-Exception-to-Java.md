@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Throw Exception through JNI(C++/Java)"
-date:   2016-02-19 12:00:00
+date:   2016-02-18 12:00:00
 tags: [exception, jni, tech]
 categories: Tech
 ---
