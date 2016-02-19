@@ -27,7 +27,7 @@ VmSwap:	       0 kB
 
 ### 2. 一个c程序，读取stat文件来获得内存数据
 这个文件的数据与status文件相同，但是格式混乱不易读，可以简单写程序读取stat：
-{% highlight C++ scripts %}
+{% highlight C++ %}
 #include <unistd.h>
 #include <ios>
 #include <iostream>
