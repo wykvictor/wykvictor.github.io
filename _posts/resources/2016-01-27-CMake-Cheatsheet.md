@@ -97,25 +97,37 @@ install(FILES ${CAFFE_LIB_PATH} DESTINATION ${INSTALL_DIST_PATH})
 # 设置一些Options. Turn on with 'cmake -Dmyvarname=ON'.
 option(BUILD_TESTS "Build all tests." 0) # 可定义一些编译开关ON/OFF，最后给出默认值如0
 
+########################
+# 可以定义子函数
+# Short command for adding unit-test
+# Usage:
+#     add_unit_test(test_case_name <src_file>)
+########################
+function(add_unit_test test_case_name)
+  add_executable(${test_case_name} ${ARGN})  # ARGN隐式参数，如果是多个src_file参数
+
+  # Standard linking to gtest stuff.
+  target_link_libraries(${test_case_name} ${GTEST_BOTH_LIBRARIES})
+
+  # Extra linking for the project.
+  target_link_libraries(${test_case_name} ${main_lib})
+
+  # This is so you can do 'make test' to see all your tests run, instead of
+  # manually running the executable runUnitTests to see those specific tests.
+  # [link](https://cmake.org/cmake/help/v3.4/command/add_test.html?highlight=add_test)
+  add_test(NAME ${test_case_name} COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${test_case_name})
+endfunction()
+
 if (BUILD_TESTS)
     enable_testing()
-    # add_subdirectory(tests)  # 也可以在tests目录内定义add_test等内容
+    # add_subdirectory(tests)  # 可在tests目录添加CMakeLists.txt, 并添加以下add_test等内容
 
     find_package(GTest REQUIRED)
     include_directories(${GTEST_INCLUDE_DIRS})
 
-    ##############
-    ##############
-    # Unit Tests
-    ##############
-    add_executable(runUnitTests test/testMain.cpp src/a.cpp)
-    # Standard linking to gtest stuff.
-    target_link_libraries(runUnitTests ${GTEST_BOTH_LIBRARIES})
-    # Extra linking for the project.
-    target_link_libraries(runUnitTests ${main_lib})
-    # This is so you can do 'make test' to see all your tests run, instead of
-    # manually running the executable runUnitTests to see those specific tests.
-    # [link](https://cmake.org/cmake/help/v3.4/command/add_test.html?highlight=add_test)
-    add_test(NAME unittest COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/runUnitTests)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/test)  # 放到test目录
+
+    # Add Unit Tests Here
+    add_unit_test(TestName test/testMain.cpp src/a.cpp)
 endif()
 {% endhighlight %}
