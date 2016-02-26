@@ -12,6 +12,7 @@ categories: Resources
 {% highlight Bash shell scripts %}
 sed -i '/^$/d' filename  # 删除空行
 sed -i '/tags/d' filename  # 删除匹配tags的行
+sed -i '/tags/d' `grep tags -r . -rl`  # 删除所有匹配tags的文件中的相应行，替换文件夹中所有文件
 {% endhighlight %}
 
 ### 2. 去掉某一行开头的 注释井号
