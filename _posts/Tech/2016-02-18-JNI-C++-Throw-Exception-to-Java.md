@@ -9,7 +9,7 @@ categories: Tech
 >  项目中遇到android(java)层用到了C++库，C++抛出的异常需要暴露给java
 [link](http://www.codeproject.com/Articles/17558/Exception-handling-in-JNI)
 
-#### 1. 如何在Jni中Catch Exception
+### 1. 如何在Jni中Catch Exception
 {% highlight C++ %}
 // 该函数负责re-throw异常，稍后定义
 void ThrowJNIException(JNIEnv *env, const char *kpFile, int iLine, const string &type, const string &message);
@@ -33,7 +33,7 @@ try {
 }
 {% endhighlight %}
 
-#### 2. Jni中定义函数Re-throw Exception
+### 2. Jni中定义函数Re-throw Exception
 该函数负责re-throw异常
 {% highlight C++ %}
 void ThrowJNIException(JNIEnv *env, const char *kpFile, int iLine, const string &type, const string &message) {
@@ -46,15 +46,38 @@ void ThrowJNIException(JNIEnv *env, const char *kpFile, int iLine, const string 
                      "\nReason for Exception: " + message + "\n";
   }
 
-  //Find the exception class.
-  jclass tClass = env->FindClass("java/lang/Exception");  // 也可以find特定类型:IOExpection,OutOfMemoryError...
-  if (tClass == NULL) {
-    printf("Not found %s","java/lang/Exception");
-    return;
+  // Find the exception class.
+  jclass tClass = env->FindClass("com/my/project/JNIException");  // java端自定义异常，这样可以与java本身的异常区分
+  if (env->ExceptionCheck()) {  // 检出是否有此定义
+    env->ExceptionDescribe();
+    env->ExceptionClear();  // Make sure to clear it, 否则抛到java层就乱了
+    LOGE("Not found com/my/project/JNIException, will try to find java/lang/Exception");
+    tClass = env->FindClass("java/lang/Exception");  // 也可以find特定类型:IOExpection,OutOfMemoryError...
+    if (tClass == NULL) {
+      LOGE("Not found java/lang/Exception");
+      env->DeleteLocalRef(tClass);
+      return;
+    }
   }
 
   //Throw the exception with error info
   env->ThrowNew(tClass, error_message.c_str());
   env->DeleteLocalRef(tClass);
+}
+{% endhighlight %}
+
+### 3. Android端实现java自定义异常
+JNIException.java定义了jni的异常
+{% highlight Java %}
+package com.my.project;
+
+public class JNIException extends Exception {
+    public JNIException() {
+        super();
+    }
+
+    public JNIException(String message) {
+        super(message);
+    }
 }
 {% endhighlight %}
