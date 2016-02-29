@@ -106,6 +106,10 @@ $ git config core.sparseCheckout true
 $ echo "some/dir/" >> .git/info/sparse-checkout
 $ git pull origin master
 {% endhighlight %}
+另外可用一条命令实现：
+{% highlight Bash shell scripts %}
+$ git checkout -b want-branch --single_branch <repo-url>
+{% endhighlight %}
 
 ####  i. Git Init
 初始化git目录
