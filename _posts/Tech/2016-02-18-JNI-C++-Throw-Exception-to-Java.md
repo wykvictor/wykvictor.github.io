@@ -72,12 +72,30 @@ JNIException.java定义了jni的异常
 package com.my.project;
 
 public class JNIException extends Exception {
-    public JNIException() {
-        super();
-    }
+  public JNIException() {
+      super();
+  }
 
-    public JNIException(String message) {
-        super(message);
-    }
+  public JNIException(String message) {
+      super(message);
+  }
+}
+{% endhighlight %}
+
+### 4. Android端实际调用并catch jni异常
+Jni接口：
+{% highlight Java %}
+public native void process(int pram) throws JNIException;
+{% endhighlight %}
+调用该接口并catch异常：
+{% highlight Java %}
+try {
+  process();
+} catch (JNIException e) {
+  Log.e(LOG_TAG, "JNIException: ", e);  // Better than e.printStackTrace(), can be logged into Logger
+  finish();
+} catch (Exception e) {
+  Log.e(LOG_TAG, "Exception: ", e);
+  finish();
 }
 {% endhighlight %}
