@@ -2,7 +2,7 @@
 layout: post
 title:  "Leetcode-Shell"
 date:   2015-12-01 11:30:00
-tags: [leetcode, shell, tenth line]
+tags: [leetcode, shell, Tenth Line, Valid Phone Numbers, Word Frequency, Transpose File]
 categories: Leetcode
 ---
 
