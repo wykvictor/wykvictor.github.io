@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Leetcode-Shell"
+title:  "Leetcode Shell Problems"
 date:   2015-12-01 11:30:00
-tags: [leetcode, shell, Tenth Line, Valid Phone Numbers, Word Frequency, Transpose File]
-categories: Leetcode
+tags: [algorithm, leetcode, shell, Tenth Line, Valid Phone Numbers, Word Frequency, Transpose File]
+categories: Algorithm
 ---
 
 > Leetcode上增加了4道Shell题目，进行总结
