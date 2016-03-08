@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Getting started with Dynamic Programming(DP)"
-date:   2015-12-01 11:30:00
+date:   2016-03-03 11:30:00
 tags: [algorithm, leetcode, dynamic programming, dp]
 categories: Algorithm
 ---
