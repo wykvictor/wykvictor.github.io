@@ -28,7 +28,7 @@ Bonus point if you are able to do this using only O(n) extra space, where n is t
 {% highlight C++ %}
 void dfs(int x, int y, int sum) {
     if (x == n) {
-        if (sum > best) {womddidddshiyigewokmdskfjklsllldfklsafjkldfjkl;sdfjkl;
+        if (sum > best) {
             best = sum;
         }
         return;
@@ -49,7 +49,7 @@ best = -MAXINT;
 dfs(0, 0, 0);
 {% endhighlight %}
 
-- 1. 如果没解了，就不搜了（可行性剪枝） 不可行
+1. 如果没解了，就不搜了（可行性剪枝） 不可行
 2. 如果解不可能最优，就不搜了（最优性剪枝）  可尝试
 3. 看看有没有重复计算
 
@@ -80,25 +80,29 @@ dfs(1, 1)
 复杂度O(n^2)，所有的点的个数
 
 思路：
+{% highlight C++ %}
 我们设 f[i][j] 代表从顶上走到i,j这个位置的最短路径。
 1
 2 3
 4 5 6
 7 8 9 10
 f[i][j] = min(f[i-1][j-1], f[i-1][j]) + tri[i][j];
+{% endhighlight %}
 
 当第i层状态，只跟i-1有关，就可压缩成一维的。把i-2以前的都扔掉，Two Sequence Dp一般都可以压缩空间；sequence一般不可以，貌似本来就是一维的(后边具体分类).
 
 
-记忆化搜索 -- 动态规划最本质的思想
-Advantage: Easy to think and implement
-Disadvantage: Expensive memory cost.
+**记忆化搜索**--动态规划最本质的思想:
+
+* Advantage: Easy to think and implement
+* Disadvantage: Expensive memory cost.
 
 DP思路：
-state: f[i][j]代表就是从i,j出发，到最底层的最短路
-function: f[i][j] = min(f[i + 1][j], f[i + 1][j + 1]) + a[i][j]
-intialize: f[n][x] = 0; //越界的那一层
-answer: f[0][0]
+
+* state: f[i][j]代表就是从i,j出发，到最底层的最短路
+* function: f[i][j] = min(f[i + 1][j], f[i + 1][j + 1]) + a[i][j]
+* intialize: f[n][x] = 0; //越界的那一层
+* answer: f[0][0]
 
 二维数组代码：
 {% highlight C++ %}
@@ -145,17 +149,21 @@ count or possibility（若求所有的排列，只能全搜，若求排列个数
 * 答案 Answer (最大的那个状态是什么)
 
 ### 4. 大类1: Matrix DP
+
 #### 4.1 [Unique Paths - Leetcode 62](https://leetcode.com/problems/unique-paths/)
+
 ```
 A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
 The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
 How many possible unique paths are there?
 ```
-DP思路：
- *  state: f[i][j] 代表了，从起点到达i,j这个点的路径方案之和 
- *  function: f[i][j] = f[i - 1][j] + f[i][j - 1] 
- *  intialize: f[i][0] 和 f[0][i] = 1, f[1][1] = 1 二维的矩阵的这种题目，一般初始化两条边
- *  answer: f[n][m]
+
+DP思路:
+
+*  state: f[i][j] 代表了，从起点到达i,j这个点的路径方案之和 
+*  function: f[i][j] = f[i - 1][j] + f[i][j - 1] 
+*  intialize: f[i][0] 和 f[0][i] = 1, f[1][1] = 1 二维的矩阵的这种题目，一般初始化两条边
+*  answer: f[n][m]
 
 二维代码：
 {% highlight C++ %}
@@ -262,12 +270,15 @@ int minPathSum(vector<vector<int> > &grid) {
 {% endhighlight %}
 
 ### 5. 大类2: Sequence Dp，一个序列，只考虑前i个
+
 #### 5.1 [Climbing Stairs - Leetcode 70](https://leetcode.com/problems/climbing-stairs/)
+
 ```
 You are climbing a stair case. It takes n steps to reach to the top.
 
 Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
 ```
+
 * state: f[i]代表"前"i层楼梯，走到了第i层楼梯的方案数
 * function: f[i] = f[i - 1] + f[i - 2]
 * intialize: f[0] = 1
@@ -298,6 +309,7 @@ int climbStairs(int n) {
 {% endhighlight %}
 
 #### 5.2 [Decode Ways - Leetcode 91](https://leetcode.com/problems/decode-ways/)
+
 ```
 A message containing letters from A-Z is being encoded to numbers using the following mapping:
 
@@ -340,6 +352,7 @@ int numDecodings(string s) {
 {% endhighlight %}
 
 #### 5.3 [Jump Game - Leetcode 55](https://leetcode.com/problems/jump-game/)
+
 ```
 Given an array of non-negative integers, you are initially positioned at the first index of the array.
 
@@ -387,6 +400,7 @@ bool canJump(int A[], int n) {
 {% endhighlight %}
 
 #### 5.4 [Jump Game II - Leetcode 45](https://leetcode.com/problems/jump-game-ii/)
+
 ```
 Given an array of non-negative integers, you are initially positioned at the first index of the array.
 
