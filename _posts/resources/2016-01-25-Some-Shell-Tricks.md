@@ -48,3 +48,17 @@ else
     NDK_ROOT="${1:-${NDK_ROOT}}"  # ":-"表示 存在则：默认更新为传入的$1，否则还等于原值
 fi
 {% endhighlight %}
+
+### 6. for循环的用法
+{% highlight Bash shell scripts %}
+#!/bin/bash
+for((i=1; i<=10; i++));do echo $(expr $i \* 4);done
+for i in {1..5}
+for i in $(seq 2 $n)
+awk 'BEGIN{for(i=1; i<=10; i++) print i}'  # AWK中的for写法和C语言一样
+
+list=($@)  # get input parameter's list
+for i in ${list[@]}; do  # loop over the parameters
+  echo "Processing $i..."
+done
+{% endhighlight %}

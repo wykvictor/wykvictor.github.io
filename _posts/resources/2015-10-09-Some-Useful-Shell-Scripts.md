@@ -36,7 +36,6 @@ for j in cat dog person plane bike bird boat bottle bus car chair cow table hors
   done; 
 done
 {% endhighlight %}
-(Note: for循环的另一种常用写法：for i in {1..5})
 
 ### 2. 等待脚本：一旦某个条件符合，就执行特定操作
 用GPU训练Caffe Model的时候，因为跟大家共享GPU资源，因此很多时候内存不够用，需要等待。简单写了个等待脚本，一旦发现GPU使用量有变化，就开始执行自己的task：
