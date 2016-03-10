@@ -530,6 +530,31 @@ string longestPalindromeCore(const string &s, int mid, int length) {
 }
 {% endhighlight %}
 DP方法：
+{% highlight C++ %}
+string longestPalindrome(string s) {
+    //方法2: DP F(i,j) = F(i+1,j-1) if s[i] == s[j].其中F(i,j)被定义为子串s[i...j]是否是回文
+    //所以枚举长度从1~N的子串(O(n2))，再判断是否为回文(O(1)).总体时间复杂度O(n2), 空间复杂度O(n2)。
+    string ret;
+    int length = s.size();
+    if(length <= 1) return s;
+    
+    bool isPalindrome[1000][1000] = {false};
+    int max_len = 1, start = 0; // 最长回文子串的长度，起点
+    for(int i=0; i<length; i++) {
+        isPalindrome[i][i] = true;
+        for(int j=0; j<i; j++) { //[j][i]是否是回文  相当于下三角  或者j=i，j<length
+            if(s[j] == s[i] && (i-j < 2 || isPalindrome[j+1][i-1])) {   //只有这样，j，i才是回文
+                isPalindrome[j][i] = true; //从小到大
+                if(max_len < i-j+1){
+                    max_len = i-j+1;
+                    start = j;
+                }
+            }
+        }
+    }
+    return s.substr(start, max_len);
+}
+{% endhighlight %}
 
 d.3, 给定一个字符串，最少插入多少字符，变成回文串
 for (i = n - 1; i >= 0; --i) {      //倒着来，否则i+1没算出来
