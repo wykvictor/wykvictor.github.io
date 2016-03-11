@@ -20,7 +20,11 @@ protoc --java_out=./  com/sh/process/myproto.proto  # 编译出java文件, copy�
 {% highlight C++ %}
 jbyteArray JNIEXPORT JNICALL Java_com_sh_process(JNIEnv *env, jobject thiz) {
   MyProto res = GetProtobufFromC();
+  jbyteArray res_byte;
+
   int size = res.ByteSize();
+  if(size <= 0)   return res_byte;  // Android 6.0 will throw exception when calling SetByteArrayRegion if size=0
+
   void *buffer = malloc(size);
   res.SerializeToArray(buffer, size);  // 序列化
 
