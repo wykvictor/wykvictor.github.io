@@ -6,9 +6,10 @@ tags: [shell, scripts, 脚本]
 categories: Resources
 ---
 
+### 1. 将20类的图片按照类别copy到相应的文件夹
+
 > 最近在用Deep learning工具[caffe](http://caffe.berkeleyvision.org/)，基于数据集[VOC](http://host.robots.ox.ac.uk/pascal/VOC/)做一些实验，里边有20个Object Class，所以得到结果后经常会遇到重复处理20遍文件。因此写了一些脚本，用来执行重复操作。
 
-### 1. 将20类的图片按照类别copy到相应的文件夹
 a. 以训练(Train)图片为例，首先根据每一类的初始列表如cat_trainval.txt(20个相同类型文件):
 
 000005 0
@@ -165,4 +166,43 @@ ps aux|grep name|grep -v grep|awk '{print $2}'|xargs kill -9
 lsb_release -a
 cat /etc/issue
 uname -a
+{% endhighlight %}
+
+### 14. 下载并安装某包
+{% highlight Bash shell scripts %}
+#!/usr/bin/env bash
+
+LINK="http://.../download/gflags-2.1.2.tar.gz"
+TARBALL=gflags_v2.1.2.tar.gz
+WD=$(readlink -f "`dirname $0`/")
+DOWNLOAD_DIR=${WD}/download
+GFLAGS_ROOT=${WD}/gflags-2.1.2
+INSTALL_DIR=${WD}/../build/
+BUILD_DIR=${INSTALL_DIR}/build_gflags/
+
+N_JOBS=8
+
+[ ! -d ${DOWNLOAD_DIR} ] && mkdir -p ${DOWNLOAD_DIR}
+
+cd ${DOWNLOAD_DIR}
+if [ ! -f ${TARBALL} ]; then
+    wget ${LINK} -O ${TARBALL}
+fi
+cd ${WD}
+
+rm -rf ${GFLAGS_ROOT}
+cd ${GFLAGS_ROOT}
+tar zxf "${DOWNLOAD_DIR}/${TARBALL}"
+
+mkdir -p "${BUILD_DIR}"
+cd "${BUILD_DIR}"
+
+cmake -D... \
+      ${GFLAGS_ROOT}
+
+make -j${N_JOBS}
+rm -rf "${INSTALL_DIR}/gflags"
+make install/strip
+
+cd "${WD}"
 {% endhighlight %}
