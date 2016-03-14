@@ -22,9 +22,12 @@ $ if [[ $platform == "arm" ]];  # not match
 $ if [[ $platform == *"arm"* ]];  # match
 {% endhighlight %}
 
-### 3. 判断目录是否存在，不存在创建
+### 3. 判断目录是否存在，不存在Do sth
 {% highlight Bash shell scripts %}
 [ ! -d ${INSTALL_DIR} ] && mkdir -p ${INSTALL_DIR}
+# ln is very tricky:
+[ ! -d apk ] && ln -s src/android/app/build/outputs/apk apk  # link dir, if dir exists will create apk/apk WRONG!
+ln -s ../src/android/app/build/outputs/apk/app-arm64-debug.apk apk/app-arm64-debug.apk  # above is better
 {% endhighlight %}
 
 ### 4. pushd popd进某目录做事再返回
