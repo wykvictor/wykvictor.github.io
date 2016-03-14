@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Setup an SSH daemon service in Docker"
+title:  "Setup SSH service in Docker"
 date:   2016-03-13 16:00:00
 tags: [docker, ssh, network]
 categories: Tech
@@ -9,7 +9,7 @@ categories: Tech
 ### 1. Log into ssh service using passwd
 Please refer to [docker doc](https://docs.docker.com/engine/examples/running_ssh_service/)
 
-### 2. Log into ssh service without passwd inter-docker-containers(ssh-key)
+### 2. Without passwd between inter-docker-containers(ssh-key)
 Dockerfile:
 {% highlight Bash shell scripts %}
 FROM ubuntu:14.04
@@ -31,7 +31,12 @@ CMD ["/usr/sbin/sshd", "-D"]
 {% endhighlight %}
 Then test it:
 {% highlight Bash shell scripts %}
-docker build -t blog_sshd .
-docker run -d --name ssh-1 blog_sshd
-docker run -d --name ssh-1 blog_sshd
+$ docker build -t blog_sshd .
+$ docker run -d -h host-ssh --name ssh-1 blog_sshd  # hostname is host-ssh, rather than ab09325101ec
+# use link to export hostname; bash -c to execute multi-commands within one line
+$ docker run --link ssh-1:link-host-ssh blog_sshd bash -c "hostname && ssh link-host-ssh hostname"
+c122ce37b8d0
+Warning: Permanently added 'link-host-ssh,172.17.0.4' (ECDSA) to the list of known hosts.
+host-ssh
+# 此时查询env, 有 LINK_HOST_SSH_NAME=/c122ce37b8d0/link-host-ssh
 {% endhighlight %}
