@@ -33,10 +33,13 @@ Then test it:
 {% highlight Bash shell scripts %}
 $ docker build -t blog_sshd .
 $ docker run -d -h host-ssh --name ssh-1 blog_sshd  # hostname is host-ssh, rather than ab09325101ec
-# use link to export hostname; bash -c to execute multi-commands within one line
-$ docker run --link ssh-1:link-host-ssh blog_sshd bash -c "hostname && ssh link-host-ssh hostname"
+# [use link to export hostname](https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/) 
+# bash -c to execute multi-commands within one line
+$ docker run --rm --link ssh-1:link-host-ssh blog_sshd bash -c "hostname && ssh link-host-ssh hostname"
 c122ce37b8d0
 Warning: Permanently added 'link-host-ssh,172.17.0.4' (ECDSA) to the list of known hosts.
 host-ssh
 # 此时查询env, 有 LINK_HOST_SSH_NAME=/c122ce37b8d0/link-host-ssh
 {% endhighlight %}
+
+### 3. Containers on different hosts need to export port and then ssh via host

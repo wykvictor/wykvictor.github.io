@@ -10,6 +10,7 @@ categories: Resources
 {% highlight Bash shell scripts %}
 docker version
 docker info
+docker inspect -f '{{ .NetworkSettings.IPAddress }}' name  # lookup the container's IP
 {% endhighlight %}
 
 ### 2. 操作docker image
@@ -75,16 +76,4 @@ docker build -t whale-yk . # 当前目录找dockerfile
 另，Dockerfile中每一条命令是一个step，在image中新加一层（新建一个container，然后操作，然后rm掉container，得到一个加一层的image）
 所以修改某一条命令后，之前的Cache，之后的丢掉重新建
 
-### 6. Container网络配置
-[[reference]](http://www.infoq.com/cn/articles/docker-network-and-pipework-open-source-explanation-practice/)
-docker run创建容器时，可以用--net选项指定网络模式，有以下4种：
-
-* host模式，--net=host：无独立的Network Namespace，不虚拟网卡，使用宿主机的IP和端口(最简单的直接上网的办法)
-* container模式，--net=container:NAME_or_ID : 与上种类似，只是与其他的某个容器共享网络资源
-* none模式，--net=none：独立Network Namespace，但是并不进行任何网络配置，需添加网卡、配置IP等
-* bridge模式，--net=bridge，默认设置
-
-*bridge模式*
-为每一个容器分配Network Namespace、设置IP等，并将一个主机上的Docker容器连接到一个虚拟网桥上：
-![docker-network](http://7xno5y.com1.z0.glb.clouddn.com/docker-network.png)
 
