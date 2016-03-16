@@ -8,7 +8,7 @@ categories: Tech
 
 >  项目中遇到android(java)层用到了C++库，C++返回protobuf结构给java
 
-#### 1. Protobuf环境[安装](https://github.com/google/protobuf)
+### 1. Protobuf环境[安装](https://github.com/google/protobuf)
 {% highlight Bash shell scripts %}
 cd path-to-source-into-java
 mvn install  # 编译出jar包, copy到java工程的jniLib目录
@@ -16,7 +16,7 @@ protoc --java_out=./  com/sh/process/myproto.proto  # 编译出java文件, copy�
 (Note: .proto文件中package com.sh.process.proto, 代表最终生成的目录和java中的package信息，需要匹配)
 {% endhighlight %}
 
-#### 2. In jni: protobuf->byte[]
+### 2. In jni: protobuf->byte[]
 {% highlight C++ %}
 jbyteArray JNIEXPORT JNICALL Java_com_sh_process(JNIEnv *env, jobject thiz) {
   MyProto res = GetProtobufFromC();
@@ -35,7 +35,7 @@ jbyteArray JNIEXPORT JNICALL Java_com_sh_process(JNIEnv *env, jobject thiz) {
 }
 {% endhighlight %}
 
-#### 3. In java: byte[]->protobuf
+### 3. In java: byte[]->protobuf
 {% highlight Java %}
 byte[] res_byte = process();
 MyProto res = MyProto.parseFrom(res_byte);  // 反序列化
