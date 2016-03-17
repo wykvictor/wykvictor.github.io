@@ -23,6 +23,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)  # 设置 LIBRARY �
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)  # 设置 RUNTIME 目标的输出路径
 set(CMAKE_CXX_STANDARD 11)  #  initialize the CXX_FLAGS on all targets, -std=c++11，一些C++高级特性
 
+# [option](https://cmake.org/cmake/help/v3.4/command/option.html?highlight=option)
+option(DEBUG "To log messges for debugging" 1)
+if(DEBUG)
+  add_definitions(-DDEBUG)
+endif()
+# Then, we can use "DEBUG=${DEBUG:-1}, cmake -DDEBUG=${DEBUG}" to turn on/off the flag
+
 if(UNIX OR APPLE)  # UNIX-like 的系统，包括 Apple OS X 和 CygWin 或  Apple 系统
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall -DUSE_OPENCV=1")
 endif()
