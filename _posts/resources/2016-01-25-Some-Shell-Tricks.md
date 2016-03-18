@@ -65,3 +65,15 @@ for i in ${list[@]}; do  # loop over the parameters
   echo "Processing $i..."
 done
 {% endhighlight %}
+
+### 7. 使用cat<<EOF代替echo -e进行多行输出
+{% highlight Bash shell scripts %}
+cat << EOF >> a.txt  # 输出到a.txt, 或者直接打印到屏幕
+      Usage:
+      1. For master:
+      	 \$var
+      	 ...
+      2. For slave:
+         ...
+EOF  # 当然也不必用EOF，用AAA等也可以，只是个标识
+{% endhighlight %}
