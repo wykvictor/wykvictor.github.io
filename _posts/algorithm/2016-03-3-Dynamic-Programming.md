@@ -8,7 +8,7 @@ categories: Algorithm
 
 > Learn the basics on DP througe some examples
 
-### 1. Why use DP - [Triangle](https://leetcode.com/problems/triangle/)
+### 1. Why use DP - [Triangle - Leetcode 120](https://leetcode.com/problems/triangle/)
 ```
 Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.
 
@@ -24,7 +24,7 @@ The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).
 Note:
 Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle.
 ```
-原始的解法, 爆炸性复杂度2^n:
+1) 原始的解法, 爆炸性复杂度2^n, 伪代码:
 {% highlight C++ %}
 void dfs(int x, int y, int sum) {
     if (x == n) {
@@ -34,7 +34,7 @@ void dfs(int x, int y, int sum) {
         return;
     }
     
-    if (max[x][y] != -1) {    //自顶向下的优化方式
+    if (max[x][y] != -1) {    //尝试最优性剪枝：自顶向下的优化方式
         if (max[x][y] <= sum) {
             return;
         }
@@ -48,19 +48,18 @@ void dfs(int x, int y, int sum) {
 best = -MAXINT;
 dfs(0, 0, 0);
 {% endhighlight %}
-
-1. 如果没解了，就不搜了（可行性剪枝） 不可行
-2. 如果解不可能最优，就不搜了（最优性剪枝）  可尝试
-3. 看看有没有重复计算
-
+2) 此类方法的优化：
+    1. 如果没解了，就不搜了（可行性剪枝） 不可行
+    2. 如果解不可能最优，就不搜了（最优性剪枝）  可尝试
+    3. 看看有没有重复计算, 伪代码如下：
 {% highlight C++ %}
-// 代表了从xy出发，走到最底层的最短路是多少 , 变化，有返回值了
+// 代表了从xy出发，走到最底层的最短路是多少. 变化：有返回值了
 int dfs(int x, int y) {    
     if (x == n) {
         return 0;
     }
     
-    if (flag[x][y]) {
+    if (flag[x][y]) {  //重复计算。标记算过了
         return hash[x][y];
     }
     flag[x][y] = true;
@@ -69,40 +68,29 @@ int dfs(int x, int y) {
 }
  
 dfs(0, 0)
-dfs(1, 1)
- 
 0,0 -> (1,0), (1,1)
- 
 (1,0) -> (2,0), (2,1)
 (1,1) -> (2,1), (2,2)
 {% endhighlight %}
+复杂度O(n^2)，n为所有的点的个数，求出了每个点到所有点的距离
 
-复杂度O(n^2)，所有的点的个数
-
-思路：
+3) 动态规划，思路：
 {% highlight C++ %}
-我们设 f[i][j] 代表从顶上走到i,j这个位置的最短路径。
 1
 2 3
 4 5 6
 7 8 9 10
-f[i][j] = min(f[i-1][j-1], f[i-1][j]) + tri[i][j];
+
+state: f[i][j]代表就是从i,j出发，到最底层的最短路
+function: f[i][j] = min(f[i + 1][j], f[i + 1][j + 1]) + a[i][j]
+intialize: f[n][x] = 0; //越界的那一层
+answer: f[0][0]
 {% endhighlight %}
-
-当第i层状态，只跟i-1有关，就可压缩成一维的。把i-2以前的都扔掉，Two Sequence Dp一般都可以压缩空间；sequence一般不可以，貌似本来就是一维的(后边具体分类).
-
 
 **记忆化搜索**--动态规划最本质的思想:
 
 * Advantage: Easy to think and implement
 * Disadvantage: Expensive memory cost.
-
-DP思路：
-
-* state: f[i][j]代表就是从i,j出发，到最底层的最短路
-* function: f[i][j] = min(f[i + 1][j], f[i + 1][j + 1]) + a[i][j]
-* intialize: f[n][x] = 0; //越界的那一层
-* answer: f[0][0]
 
 二维数组代码：
 {% highlight C++ %}
@@ -120,6 +108,8 @@ int minimumTotal(vector<vector<int> > &triangle) {
 {% endhighlight %}
 
 压缩空间：
+当第i层状态，只跟i-1有关，就可压缩成一维的。把i-2以前的都扔掉
+Two Sequence Dp一般都可以压缩空间；sequence一般不可以，貌似本来就是一维的(后边具体分析).
 {% highlight C++ %}
 int minimumTotal(vector<vector<int> > &triangle) {
     int size = triangle.size();
@@ -128,7 +118,7 @@ int minimumTotal(vector<vector<int> > &triangle) {
     vector<int> dp(triangle[size-1]);   //用最后一行初始化!
     for(int i=size-2; i>=0; i--) {
         for(int j=0; j<=i; j++)
-            dp[j] = min(dp[j], dp[j+1]) + triangle[i][j];
+            dp[j] = min(dp[j], dp[j+1]) + triangle[i][j];  //从前往后，不会覆盖需要的
     }
     return dp[0];
 }
@@ -138,8 +128,7 @@ int minimumTotal(vector<vector<int> > &triangle) {
 * Can not sort.
 * Find a maximum/minimum result
 * Decide whether something is possible or not
-* Count all possbile solutions
-*problem doesn’t care about the solution details, only care about the
+* Count all possbile solutions: problem doesn’t care about the solution details, only care about the
 count or possibility（若求所有的排列，只能全搜，若求排列个数，可以有方程fn fn-1关系）
 
 ### 3. 动态规划的**4点要素**
@@ -148,7 +137,7 @@ count or possibility（若求所有的排列，只能全搜，若求排列个数
 * 初始化 Intialization (最极限的小状态是什么)
 * 答案 Answer (最大的那个状态是什么)
 
-### 4. 大类1: Matrix DP
+### 4. DP问题大类1: Matrix DP
 
 #### 4.1 [Unique Paths - Leetcode 62](https://leetcode.com/problems/unique-paths/)
 
