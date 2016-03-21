@@ -17,15 +17,20 @@ HEAD指向当前分支的最后一次commit。通过移动HEAD，就可以变更
 图中HEAD~指定HEAD之前的第几次提交记录。HEAD^指定使用哪个父节点
 
 ####  b. Git Stash
-还未提交的修改留在索引区或工作树的情况下：切换分支时修改内容会*随身带到目标分支*，可以add并commit；
+还未提交的修改留在索引区或工作树的情况下：
+切换分支时修改内容会*随身带到目标分支*，可以add并commit；
+
 但如果在checkout的目标分支中相同的文件也有后来的修改(即hash值不同)，checkout会失败。这时要么先提交commit修改内容，要么用stash暂时保存修改内容后再checkout。
+
 stash是临时保存文件修改内容的区域。可以暂时保存**工作树和索引**里还没提交的修改内容，可以事后再取出暂存的修改，应用到原先的分支或其他的分支上。
 
 ####  c. Git commit \-\-amend
 git add添加新内容后，执行commit \-\-amend，会修改上次的commit合并为1个。
+
 使用场合：
-1.  添加最近那次commit时，漏掉add的内容
-2.  修改最近那次commit的comments(也就是commit后立马执行amend)
+
+* 添加最近那次commit时，漏掉add的内容
+* 修改最近那次commit的comments(也就是commit后立马执行amend)
 
 ####  d. Cherry-pick
 从其他分支复制*指定*的commit，merge进来：
@@ -42,6 +47,7 @@ Merge会生成一个新提交，master分支的HEAD会移动到该提交上
 ![git-Merge](http://7xno5y.com1.z0.glb.clouddn.com/git-merge.png)
 
 另，一个有用的命令，把另一个branch的某个file，checkout到本分支上来:
+
 ```
 git checkout other-branch-name -- want-file-name
 ```
@@ -52,10 +58,13 @@ rebase bugfix分支到master分支, bugfix分支的历史记录会添加在maste
 ![git-Rebase](http://7xno5y.com1.z0.glb.clouddn.com/git-rebase.png)
 
 如图，历史记录成一条线很整洁。这时移动提交X和Y有可能会发生冲突，需要修改各自的提交时发生冲突的部分。另：
+
 ```
 git rebase HEAD^ --onto master 自己的上一个commit不要了，rebase master上的(onto指定upstream)
+
 git rebase -i hash 可以汇合几个commit，或者改写某个commit。
 ```
+
 用的不多，具体参照 [教程](http://backlogtool.com/git-guide/cn/stepup/stepup7_5.html)和[汇总](http://backlogtool.com/git-guide/cn/reference/log.html)。
 
 实例：
@@ -84,6 +93,7 @@ $ git log --graph --oneline  # 之后的状态如下，工作区test.txt结果�
 
 ####  g. Tag
 标签是为了更方便地参考提交而给它标上易懂的名称。
+
 Git可以使用2种标签：轻标签（本地暂时使用）和注解标签（需添加注解或签名，发布用）
 {% highlight Bash shell scripts %}
 $ git tag tag-1  # 添加轻标签
