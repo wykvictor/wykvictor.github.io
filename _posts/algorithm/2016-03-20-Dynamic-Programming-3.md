@@ -12,8 +12,8 @@ categories: Algorithm
 
 ```
 You are climbing a stair case. It takes n steps to reach to the top.
-
-Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+Each time you can either climb 1 or 2 steps.
+In how many distinct ways can you climb to the top?
 ```
 
 * state: f[i]代表"前"i层楼梯，走到了第i层楼梯的方案数
@@ -31,7 +31,7 @@ int climbStairs(int n) {
      return dp[n];
 }
 {% endhighlight %}
-省空间的方法：因为只前2个数有用，所以不需要n的数组
+压缩空间：因为只前2个数有用，所以不需要n的数组
 {% highlight C++ %}
 int climbStairs(int n) {
      if(n <= 1) return n;
@@ -63,7 +63,7 @@ Given encoded message "12", it could be decoded as "AB" (1 2) or "L" (12).
 The number of ways decoding "12" is 2.
 ```
 
-类似前 一道题，记录cur前2个的种类数，一直遍历到最后：
+类似前一题，记录cur前2个的种类数，一直遍历到最后：
 {% highlight C++ %}
 int numDecodings(string s) {
     int n = s.size();
@@ -88,18 +88,16 @@ int numDecodings(string s) {
 }
 {% endhighlight %}
 
-#### 5.3 [Jump Game - Leetcode 55](https://leetcode.com/problems/jump-game/)
+### 3. [Jump Game - Leetcode 55](https://leetcode.com/problems/jump-game/)
 
 ```
 Given an array of non-negative integers, you are initially positioned at the first index of the array.
-
 Each element in the array represents your maximum jump length at that position.
 
 Determine if you are able to reach the last index.
 
 For example:
 A = [2,3,1,1,4], return true.
-
 A = [3,2,1,0,4], return false.
 ```
 
@@ -124,7 +122,8 @@ bool canJump(int A[], int n) {
 DP：
 {% highlight C++ %}
 bool canJump(int A[], int n) {
-    //另，之前的贪心方法，也可用动态规划 f[i] = max(f[i-1],A[i-1])-1,i>0 (表示，走到A[i]时，剩余的还能走的最大步数) 
+    //另，之前的贪心方法，也可用动态规划
+    //想到该方程难：f[i] = max(f[i-1],A[i-1])-1,i>0 (表示，走到A[i]时，剩余的还能走的最大步数) 
     //时间复杂度 O(n)，空间复杂度 O(n)
     vector<int> f(n, 0);
     f[0] = A[0]; //initialize
@@ -136,11 +135,10 @@ bool canJump(int A[], int n) {
 }
 {% endhighlight %}
 
-#### 5.4 [Jump Game II - Leetcode 45](https://leetcode.com/problems/jump-game-ii/)
+### 4. [Jump Game II - Leetcode 45](https://leetcode.com/problems/jump-game-ii/)
 
 ```
 Given an array of non-negative integers, you are initially positioned at the first index of the array.
-
 Each element in the array represents your maximum jump length at that position.
 
 Your goal is to reach the last index in the minimum number of jumps.
@@ -192,231 +190,23 @@ int jump(int A[], int n) {
 }
 {% endhighlight %}
 
-#### 5.5 [Palindrome Partitioning II - Leetcode 132- 边界很难](https://leetcode.com/problems/palindrome-partitioning-ii/)
+### 5. [Longest Increasing Subsequence  LIS 子序列](http://www.lintcode.com/en/problem/longest-increasing-subsequence/
+)
 ```
-Given a string s, partition s such that every substring of the partition is a palindrome.
-
-Return the minimum cuts needed for a palindrome partitioning of s.
-
-For example, given s = "aab",
-Return 1 since the palindrome partitioning ["aa","b"] could be produced using 1 cut.
-```
-* state: f[i] "前i"个字符，用最少几次cut能分割为若干回文子串
-* function: f[i] = min{f[j] + 1, j < i && j+1 ~ i 是一个回文子串}(找“最后”一次cut的位置) ，粗体部分也是DP可以用二维数组记录一下
-* intialize: f[i] = i-1
-* answer: f[s.length()]，因为第0个留出来了
-
-{% highlight C++ %}
-//所以需DP的方法 时间复杂度 O(n^2)，空间复杂度 O(n^2)
-int minCut(string s) {
-    int n = s.size();
-    vector<vector<bool> > isPalindrome(n, vector<bool>(n, false));  //都是false
-    vector<int> dp(n+1, 0); //"前i"个字符，用最少几次cut能分割为若干回文子串
-    //initialize
-    for(int i = 0; i <= n; i++)
-        dp[i] = i-1;  //第一个f[0]=-1,f1=0
-    
-    for(int i=1; i<=n; i++) {   //从第2个字符开始，边界情况很麻烦
-        for(int j=0; j<i; j++) {   //1个字符也算
-            if(s[j] == s[i-1] && (i-j<3 || isPalindrome[j+1][i-2])) {
-                isPalindrome[j][i-1] = true;
-                dp[i] = min(dp[j]+1, dp[i]);  //是j-1之前的，加上1
-            }
-        }
-    }
-    return dp[n];
-}
-{% endhighlight %}
-
-#### 5.5 [Longest Palindromic Substring - Leetcode 5](https://leetcode.com/problems/longest-palindromic-substring/)
-```
-Given a string S, find the longest palindromic substring in S. You may assume that the maximum length of S is 1000, and there exists one unique longest palindromic substring.
-```
-传统方法：
-{% highlight C++ %}
-string longestPalindrome(string s) {
-    //从中间往2边扩散的方法(比从2边向中间走强!走的地方都是有用的)
-    //并且回文串有2N-1(N N-1)个这样的中心（中心或者在任意一个字符或者在任意两个字符的之间）n^2
-    string ret;
-    int length = s.size();
-    if(length <= 1) return s;
-    for(int i=0; i<length-1; i++) { //1个或者2个字符，开始2边扩散! 扫一遍，所有的情况就都包括了
-        string res = longestPalindromeCore(s, i, length);
-        if(res.size() > ret.size())
-            ret = res;
-    }
-    return ret;
-}
-string longestPalindromeCore(const string &s, int mid, int length) {
-    int i;
-    //单点扩散
-    for(i=1; mid-i>=0 && mid+i<length; i++) {
-        if(s[mid-i] != s[mid+i])
-            break;
-    }
-    string midstr1(s, mid-i+1, 2*(i-1)+1);   //初始化为mid,从mid往2边搜索.注意这里的下标。最后一个参数是长度!!
-    if(s[mid] != s[mid+1])
-        return midstr1;
-    //若该点和下个相同，则双点扩散
-    for(i=1; mid-i>=0 && mid+1+i<length; i++) {
-        if(s[mid-i] != s[mid+1+i])
-            break;
-    }
-    string midstr2(s, mid-i+1, 2*i);
-    return (midstr1.size()>midstr2.size()) ? midstr1 : midstr2;
-}
-{% endhighlight %}
-DP方法：
-{% highlight C++ %}
-string longestPalindrome(string s) {
-    //方法2: DP F(i,j) = F(i+1,j-1) if s[i] == s[j].其中F(i,j)被定义为子串s[i...j]是否是回文
-    //所以枚举长度从1~N的子串(O(n2))，再判断是否为回文(O(1)).总体时间复杂度O(n2), 空间复杂度O(n2)。
-    string ret;
-    int length = s.size();
-    if(length <= 1) return s;
-    
-    bool isPalindrome[1000][1000] = {false};
-    int max_len = 1, start = 0; // 最长回文子串的长度，起点
-    for(int i=0; i<length; i++) {
-        isPalindrome[i][i] = true;
-        for(int j=0; j<i; j++) { //[j][i]是否是回文  相当于下三角  或者j=i，j<length
-            if(s[j] == s[i] && (i-j < 2 || isPalindrome[j+1][i-1])) {   //只有这样，j，i才是回文
-                isPalindrome[j][i] = true; //从小到大
-                if(max_len < i-j+1){
-                    max_len = i-j+1;
-                    start = j;
-                }
-            }
-        }
-    }
-    return s.substr(start, max_len);
-}
-{% endhighlight %}
-
-d.3, 给定一个字符串，最少插入多少字符，变成回文串
-for (i = n - 1; i >= 0; --i) {      //倒着来，否则i+1没算出来
-    for (j = i; j < n; ++j) {
-        if (s[i] == s[j]) ans[i][j] = ans[i + 1][j - 1];//如果两个游标所指字符相同，向中间缩小范围
-        else ans[i][j] = 1 + MIN(ans[i][j - 1], ans[i + 1][j]);//如果不同，典型的状态转换方程
-    }
-}
-printf("%d\n", ans[0][n - 1]);
-
-e, Word Break - Leetcode - 同样注意边界
-
-Given a string s and a dictionary of words dict, determine if s can be segmented into a space-separated sequence of one or more dictionary words.
-
-For example, given
-s = "leetcode",
-dict = ["leet", "code"].
-
-Return true because "leetcode" can be segmented as "leet code".
-
-代码：
-bool wordBreak(string s, unordered_set<string> &dict) {
-    //DP[i]代表，s[0,i) 是否可以分词
-    //方程dp[i] = dp[j] && j+1~i属于dict
-    int n = s.size();
-    vector<bool> dp(n+1, false); //初始化，长度为 n 的字符串有 n+1 个隔板
-    dp[0] = true;   //这样是为了减少0位置的判断,空字符串
-    for(int i=1; i<=n; i++) {
-        for(int j=0; j<i; j++) {
-            if(dp[j] && dict.find(s.substr(j, i-j))!=dict.end()) {  //从j开始算的
-                dp[i] = true;
-                break;
-            }
-        }
-    }
-    return dp[n];
-}
-
-e.2, Word Break II - Leetcode
-
-Given a string s and a dictionary of words dict, add spaces in s to construct a sentence where each word is a valid dictionary word.
-
-Return all such possible sentences. ==>这种题目，不能用DP，只能DFS
-
-For example, given
-s = "catsanddog",
-dict = ["cat", "cats", "and", "sand", "dog"].
-
-A solution is ["cats and dog", "cat sand dog"].
-DFS原始代码会超时：
-vector<string> wordBreak(string s, unordered_set<string> &dict) {
-    vector<string> res;
-    DFS(s, 0, dict, "", res);
-    return res;
-}
-void DFS(string s, int index, unordered_set<string> &dict, string path, vector<string> &res) {
-    if(index == s.size()) {
-        res.push_back(path);
-        return;     //string path恢复原状
-    }
-    for(int i=index; i<s.size(); i++) {
-        if(dict.find(s.substr(index, i-index+1)) != dict.end()) {
-            path += (path=="") ? "" : " ";  //是否有空格
-            path += s.substr(index, i-index+1);  //有漏洞，需要完事儿 减去这个，否则重复了san还有sand都算进去了
-            DFS(s, i+1, dict, path, res);
-        }
-    }
-}
-优化：重复计算太多，可以借鉴DP，存储所有的合法的单词 - 难!!
-vector<string> wordBreak(string s, unordered_set<string> &dict) {
-    //先用1的方法得到结果的组数，再分别求结果
-    vector<vector<bool> > prev(s.length(), vector<bool>(s.length()+1, false));//prev[i][j]表示s[i, j)是一个合法单词,可以从j处切开
-    vector<bool> dp(s.size() + 1, false);   //初始化为false!
-    dp[0] = true; // 空字符串
-    for(int i=1; i<=s.size(); i++)
-        for(int j=i-1; j>=0; j--) {
-            if(dp[j] && dict.find(s.substr(j, i-j))!=dict.end()) {
-                dp[i] = true;
-                prev[j][i] = true;
-            }
-        }
-    vector<string> result;
-    if(!dp[s.size()])   return result;
-    gen_path(s, prev, 0, "", result);
-    reverse(result.begin(), result.end());
-    return result;
-}
-// DFS 遍历树，生成路径
-void gen_path(string s, const vector<vector<bool> > &prev, int cur, string path, vector<string> &result) {
-    if(cur == s.size()) {   //找到，存入
-        result.push_back(path);
-        return;  //string path恢复原状
-    }   
-    for(int i=cur+1; i<=s.size(); i++) {  //找从cur开始的，可行的解!
-        if(prev[cur][i]) {
-            path += (path=="") ? "" : " ";  //是否有空格
-            path += s.substr(cur, i-cur);
-            gen_path(s, prev, i, path, result); //这里还是i!
-            path = path.substr(0, path.size()-i+cur);
-            if(path != "")  path = path.substr(0, path.size()-1);
-        }
-    }
-}
-
-f，Longest Increasing Subsequence  LIS 子序列
-
-http://www.lintcode.com/en/problem/longest-increasing-subsequence/
-
 Given a sequence of integers, find the longest increasing subsequence (LIS).
-
 You code should return the length of the LIS.
-Example
 
+Example: 
 For [5, 4, 1, 2, 3], the LIS  is [1, 2, 3], return 3
-
 For [4, 2, 4, 5, 3, 7], the LIS is [4, 4, 5, 7], return 4
- 
-state: f[i]表示[前i]个数字中，以[第i]个数为结尾的LIS最长是多少
-function: f[i] = max{f[i], f[j] + 1, j < i && nums[j] <= nums[i]}
-intialize: f[0..n-1] = 1   ，变化
-answer: max(f[0..n-1])，变化，所有的点都是终点。
+```
 
-代码：
+* state: f[i]表示[前i]个数字中，以[第i]个数为结尾的LIS最长是多少
+* function: f[i] = max{f[i], f[j] + 1, j < i && nums[j] <= nums[i]}
+* intialize: f[0..n-1] = 1, 变化
+* answer: max(f[0..n-1]), 变化，所有的点都可能是终点。
+{% highlight C++ %}
 int longestIncreasingSubsequence(vector<int> nums) {
-    //write your code here
     int n = nums.size();
     vector<int> res(n, 1);  //initialize with 1,代表[前i]个数字中，以[第i]个数为结尾的LIS最长是多少
     int maxLen = 1;
@@ -434,9 +224,9 @@ void main()
     int A[5] = {5,4,1,2,3};
     cout << longestIncreasingSubsequence(vector<int>(A, A+5));
 }
-另外的，O(nlogn)的算法：
-http://blog.csdn.net/yorkcai/article/details/8651895
-贪心 + 二分搜索：
+{% endhighlight %}
+另外，[O(nlogn)的算法](http://blog.csdn.net/yorkcai/article/details/8651895), 贪心 + 二分搜索：
+{% highlight C++ %}
 int lis_greedy(int seq[], int n) {
     int top = 0;
     int* stack = new int[n];
@@ -457,366 +247,17 @@ int lis_greedy(int seq[], int n) {
     delete[] stack;
     return top + 1;
 }
-求出序列：用另外的数组记录前一个节点的位置
-http://prismoskills.appspot.com/lessons/Dynamic_Programming/Chapter_06_-_Max_increasing_subsequence.jsp
+{% endhighlight %}
+注意：当出现1，5，8，2这种情况时，栈内最后的数是1，2，8不是正确的序列
 
-注意：当出现1，5，8，2这种情况时，栈内最后的数是1，2，8不是正确的序列，难道错了？
+分析一下，我们可以看出，虽然有些时候这样得不到正确的序列，但最后算出来的个数是没错的
 
-分析一下，我们可以看出，虽然有些时候这样得不到正确的序列，但最后算出来的个数是没错的，为什么呢？
-
-想想，当a[i]>top时，总个数直接加1，这肯定没错；但当a[i]<top时呢？ 这时a[i]会替换栈里面的某一个元素，大小不变，就是说一个小于栈顶的元素加入时，总个数不变。
+当a[i]>top时，总个数直接加1，这肯定没错；但当a[i]<top时呢？这时a[i]会替换栈里面的某一个元素，大小不变，就是说一个小于栈顶的元素加入时，总个数不变。
 
 这两种情况的分析可以看出，如果只求个数的话，这个算法比较高效；但如果要求打印出序列时，就只能用动态规划了。
 
-6，Two Sequence Dp，一个序列，只考虑前i个
-a, Longest Common Subsequence  LCS - lintcode
-http://www.lintcode.com/en/problem/longest-common-subsequence/
+若要求出序列：[用另外的数组记录前一个节点的位置](http://prismoskills.appspot.com/lessons/Dynamic_Programming/Chapter_06_-_Max_increasing_subsequence.jsp)
 
-Given two strings, find the longest comment subsequence (LCS).
-
-Your code should return the length of LCS.
-Example
-
-For "ABCD" and "EDCA", the LCS is "A" (or D or C), return 1
-
-For "ABCD" and "EACB", the LCS is "AC", return 2
-
-
-state: f[i][j] 第一个字符串的前i个字符匹配上第二个字符串的前j个字符，所能找到的LCS的长度是什么
-
-function: f[i][j] = f[i-1][j-1] + 1 // a[i] == b[j]
-
-                  = max(f[i-1][j], f[i][j-1]) // a[i] != b[j]
-
-intialize: f[0][i] = 0, f[i][0] = 0        类似二维matrix的，初始化两边
-
-answer: f[a.length()][b.length()]
-
-代码：
-int longestCommonSubsequence(int *a, int m, int*b, int n) {
-    vector<vector<int> > dp(m+1, vector<int>(n+1, 0));    //initialize with 0，因为边界，多一个搞
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            if(a[i-1] == b[j-1])
-                dp[i][j] = dp[i-1][j-1] + 1;
-            else
-                dp[i][j] = max(dp[i][j-1], dp[i-1][j]);
-        }
-    }
-    return dp[m][n]; 
-}
-压缩后，感觉有点问题，不是只跟i-1有关, 需要变量保存i-1,j-1
-int longestCommonSubsequence2(int *a, int m, int*b, int n) {
-    vector<int> dp(n+1, 0); //initialize with 0，因为边界，多一个搞
-    int lastDp=0;
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            int temp = dp[j];
-            if(a[i-1] == b[j-1])
-                dp[j] = lastDp + 1;
-            else
-                dp[j] = max(dp[j-1], dp[j]);  //dp[j]相当于dp[i-1][j], 而dp[j-1]相当于dp[i][j-1]
-            lastDp = temp;
-        }
-    }
-    return dp[n]; 
-}
-
-
-若是连续子序列：阿里笔试题目
-int longestCommonSubstring(string query, string text)
-{
-    int m = query.size();
-    int n = text.size();
-    int maxLen = 0;
-    vector<vector<int> > dp(m+1, vector<int>(n+1, 0));  //初始化，都是0
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            dp[i][j] = (query[i-1] != text[j-1]) ? 0 : (dp[i-1][j-1] + 1);
-            maxLen = maxLen < dp[i][j] ? dp[i][j] : maxLen;
-        }
-    }
-    return maxLen;
-}
-压缩后：
-int longestCommonSubstring(string query, string text)
-{
-    int m = query.size();
-    int n = text.size();
-    int maxLen = 0;
-    vector<int> dp(n+1, 0);  //初始化，都是0
-    for(int i=1; i<=m; i++) {
-        for(int j=n; j>0; j--) {
-            dp[j] = (query[i-1] != text[j-1]) ? 0 : (dp[j-1] + 1);
-            maxLen = maxLen < dp[j] ? dp[j] : maxLen;
-        }
-    }
-    return maxLen;
-}
-
-
-b，Edit Distance - 和上题很类似！ - Leetcode
-
-Given two words word1 and word2, find the minimum number of steps required to convert word1 to word2. (each operation is counted as 1 step.)
-
-You have the following 3 operations permitted on a word:
-
-a) Insert a character
-b) Delete a character
-c) Replace a character
-
-
-state: f[i][j] 第一个字符串的前i个字符匹配上第二个字符串的前j个字符，最少编辑距离
-
-function: f[i][j] = f[i-1][j-1] // a[i] == b[j]
-
-                  = min(f[i-1][j], f[i][j-1], f[i-1][j-1]) + 1 // a[i] != b[j]
-
-intialize: f[0][i] = i, f[i][0] = i
-
-answer: f[a.length()][b.length()]
-
-
-int minDistance(string word1, string word2) {
-    int m=word1.size(), n=word2.size();
-    vector<vector<int> > dp(m+1, vector<int>(n+1, INT_MAX));    
-    for(int i=0; i<=m; i++)     //初始化,有0个
-        dp[i][0] = i;
-    for(int i=0; i<=n; i++)     //初始化
-        dp[0][i] = i;
-         
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            if(word1[i-1] == word2[j-1])
-                dp[i][j] = dp[i-1][j-1];
-            else
-                dp[i][j] = min(min(dp[i][j-1], dp[i-1][j]), dp[i-1][j-1]) + 1;
-        }
-    }
-    return dp[m][n];
-}
-压缩一维: 注意保存i-1 j-1
-int minDistance(string word1, string word2) {
-    int m=word1.size(), n=word2.size();
-    vector<int> dp(n+1, INT_MAX);    
-    for(int i=0; i<=n; i++)     //初始化
-        dp[i] = i;
-     
-    int lastDp=0;           //额外用一个变量记录 f[i-1][j-1]    
-    for(int i=1; i<=m; i++) {
-        lastDp = dp[0]; //每次初始化为第一个
-        dp[0] = i;
-        for(int j=1; j<=n; j++) {
-            int temp = dp[j];
-            if(word1[i-1] == word2[j-1])
-                dp[j] = lastDp;
-            else
-                dp[j] = min(min(dp[j-1], dp[j]), lastDp) + 1;
-            lastDp = temp;
-        }
-    }
-    return dp[n];
-}
-
-
-c，Interleaving String - Leetcode
-
-Given s1, s2, s3, find whether s3 is formed by the interleaving of s1 and s2.
-
-For example,
-Given:
-s1 = "aabcc",
-s2 = "dbbca",
-
-When s3 = "aadbbcbcac", return true.
-When s3 = "aadbbbaccc", return false.
-
-state: f[i][j]第一个字符串的前i个字符，匹配上第二个字符串的前j个字符，能否交错构成第三个字符串的前i+j个字符
-
-function: f[i][j] = f[i-1][j] // if a[i] == c[i+j]   再看一下？
-
-                 || f[i][j-1] // if b[j] == c[i+j]
-
-intialize: f[i][0]=a的前i个字符=c的前i个字符。f[0][i]=同理可得
-
-answer: f[a.length()][b.length()]
-
-
-代码：
-bool isInterleave(string s1, string s2, string s3) {
-    if (s3.length() != s1.length() + s2.length())   //直接错误
-        return false;
-    int m=s1.length(), n=s2.length();
-    vector<vector<bool>> dp(m+1, vector<bool>(n+1, false));
-    //初始化，2条边
-    dp[0][0] = true;
-    for(int i = 1; i <= m; i++) {
-        if(s1[i-1] == s3[i-1])  dp[i][0] = true;
-        else    break;  //只要有1个不等于，就break
-    }
-    for(int i = 1; i <= n; i++) {
-        if(s2[i-1] == s3[i-1])  dp[0][i] = true;
-        else    break;  //只要有1个不等于，就break
-    }
-    //开始算
-    for (int i = 1; i <= m; i++) {
-        for(int j = 1; j <= n; j++) {
-            dp[i][j] = ((s1[i-1] == s3[i+j-1]) && dp[i-1][j])
-                    || ((s2[j-1] == s3[i+j-1]) && dp[i][j-1]);
-        }
-    }
-    return dp[m][n];
-}
-压缩：
-稍微复杂，以后再说，pdf中有答案
-string longestPalindrome(string s) {
-    //方法2: DP F(i,j) = F(i+1,j-1) if s[i] == s[j].其中F(i,j)被定义为子串s[i...j]是否是回文
-    //所以枚举长度从1~N的子串(O(n2))，再判断是否为回文(O(1)).总体时间复杂度O(n2), 空间复杂度O(n2)。
-    string ret;
-    int length = s.size();
-    if(length <= 1) return s;
-     
-    bool isPalindrome[1000][1000] = {false};
-    int max_len = 1, start = 0; // 最长回文子串的长度，起点
-    for(int i=0; i<length; i++) {
-        isPalindrome[i][i] = true;
-        for(int j=0; j<i; j++) {
-            if(s[j] == s[i] && (i-j < 2 || isPalindrome[j+1][i-1])) {   //只有这样，j，i才是回文
-                isPalindrome[j][i] = true;  //从小到大
-                if(max_len < i-j+1){
-                    max_len = i-j+1;
-                    start = j;
-                }
-            }
-        }
-    }
-    return s.substr(start, max_len);
-}
-
-e，Distinct Subsequence
-
-Given a string S and a string T, count the number of distinct subsequences of T in S.
-
-A subsequence of a string is a new string which is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (ie, "ACE" is a subsequence of "ABCDE" while "AEC" is not).
-
-Here is an example:
-S = "rabbbit", T = "rabbit"
-
-Return 3.
-
-state: f[i][j]第一个字符串的前i个字符，匹配上第二个字符串的前j个字符，有多少个distinct subseqs
-
-function: f[i][j] = f[i-1][j] + f[i-1][j-1] // a[i] == b[j]
-
-                  = f[i-1][j] // a[i] != b[j]  没有删除j的这种情况了
-
-intialize: f[i][0]=1, f[0][i] = 0 (i>0)
-
-answer: f[a.length()][b.length()]
-
-代码：
-int numDistinct(string S, string T) {
-    //dfs做，大数据会超时；题目意思，S中怎么删除，能变到T；用DP
-    int M=S.size(), N=T.size();
-    if(M == 0 && N == 0)    return 1;
-    else if(M < N)  return 0;
-     
-    vector<vector<int> > dp(M+1, vector<int>(N+1, 0));
-    for(int i=0; i<=M; i++)   //初始化
-        dp[i][0] = 1;
-    for(int i=1; i<=N; i++) //0,0是1!!
-        dp[0][i] = 0;
-    for (int i = 1; i <= M; i++) {
-        for (int j = 1; j <= N; j++) {
-            if (S[i-1] == T[j-1])   //若 S[i]==T[j]，则可以使用 S[i]，是二者的和
-                dp[i][j] = dp[i-1][j] + dp[i-1][j-1];
-            else
-                dp[i][j] = dp[i-1][j];  //不能使用S[i]，则等于i-1到j的种类数
-        }
-    }
-    return dp[M][N];
-}
-压缩一维： 不太好理解
-int numDistinct(string S, string T) {
-    int M=S.size(), N=T.size();
-    if(M == 0 && N == 0)    return 1;
-    else if(M < N)  return 0;
-    vector<int> dp(N+1, 0);
-    dp[0] = 1;
-    for (int i = 0; i < M; i++) {
-        for (int j = N-1; j >= 0; j--) {    //压缩后，从后往前，避免覆盖
-            if (S[i] == T[j])   //若 S[i]==T[j]，则可以使用 S[i]，是二者的和
-                dp[j+1] = dp[j] + dp[j+1];
-        }
-    }
-    return dp[N];
-}
-
-
-7，Interval DP 区间内动态规划 -- 不掌握也可以，考的少
-
-a，Merge Stone
-
-http://wikioi.com/problem/1048/
-
-有n堆石子排成一列，每堆石子有一个重量w[i], 每次合并可以合并相邻的两堆石子，一次合并的代价为两堆石子的重量和w[i]+w[i+1]。问安排怎样的合并顺序，能够使得总合并代价达到最小。
-
-4 1 1 4
-
---- ---
-
- 5 5 --- 10
-
-------
-
- 10  --- 10
-
-          = 20
-
-         
-
-4 1 1 4
-
-  ---
-
-   2       2 + 6+ 10 = 18
-
-   ----
-
-     6
-
-------
-
-   10
-
-
-state: f[i][j]代表了从i合并到j的最小代价是什么
-
-function: f[i][j] = min(f[i][k] + f[k+1][j] + sum[i][j])，sum是一定的，从k中找最小的
-
-intialize: f[i][i] = 0
-
-answer: f[1][n]
-
-for(int len=1; len<n; len++)
-{
-    for(int i=1; i+len<=n; i++)
-    {
-        int end = i+len;
-        int tmp = INF;
-        int k = 0;
-        for(int j=p[i][end-1]; j<=p[i+1][end]; j++)
-        {
-            if(dp[i][j] + dp[j+1][end] + sum[end] - sum[i-1] < tmp)
-            {
-                tmp = dp[i][j] + dp[j+1][end] + sum[end] - sum[i-1];
-                k = j;
-            }
-        }
-        dp[i][end] = tmp;
-        p[i][end] = k;
-    }
-}
 
 8，群里讨论：
 
