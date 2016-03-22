@@ -7,6 +7,7 @@ categories: Algorithm
 ---
 
 > mid = left + ((right-left)>>1);  // 移位快；防止移除；运算符优先级>>is lower than +/-
+
 > 注意区间问题: 用mid赋值是否步进，要考虑死循环和提前跳出
 
 ### 1. [Find Peak Element - Leetcode 162 - 边界Hard](https://leetcode.com/problems/find-peak-element/)
@@ -45,6 +46,7 @@ public int findPeakElement(int[] nums) {
 }
 {% endhighlight %}
 后2个else合成一个：
+{% highlight Java %}
 public int findPeakElement(int[] nums) {
     int len = nums.length;
     if(len == 1) return 0;
