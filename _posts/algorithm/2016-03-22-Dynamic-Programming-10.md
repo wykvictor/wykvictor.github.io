@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Basics on Dynamic Programming(DP) 8 - Others"
+title:  "Basics on Dynamic Programming(DP) 10 - Others"
 date:   2016-03-22 18:30:00
 tags: [algorithm, leetcode, dynamic programming, dp]
 categories: Algorithm

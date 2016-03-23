@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Basics on Dynamic Programming(DP) 8 - Backpack"
+title:  "Basics on Dynamic Programming(DP) 9 - Backpack"
 date:   2016-03-22 17:30:00
 tags: [algorithm, leetcode, dynamic programming, dp, backpack]
 categories: Algorithm
