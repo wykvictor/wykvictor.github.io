@@ -55,7 +55,7 @@ public int findPeakElement(int[] nums) {
     while(i <= j) {   // 这样的话，下边是m+1,m-1
         if(i == j)  return i;
         int m = i + ((j-i)>>1);
-        if(m == 0)  return nums[0] < nums[1] ? 1 : 0;;  // 防止越界
+        if(m == 0)  return nums[0] < nums[1] ? 1 : 0;  // 防止越界
         if(m == len-1)  return nums[m] > nums[m-1] ? len-1 : len-2;
         if(nums[m] > nums[m-1] && nums[m] > nums[m+1]) {
         	return m;
@@ -82,5 +82,33 @@ public int findPeakElement(int[] nums) {
         }
     }
     return i;
+}
+{% endhighlight %}
+
+### 2. find first index
+```
+For a given sorted array (ascending order) and a target number, find the first index of this number in O(log n) time complexity.
+If the target number does not exist in the array, return -1.
+
+Example
+If the array is [1, 2, 3, 3, 4, 5, 10], for given target 3, return 2.
+```
+{% highlight C++ %}
+int binarySearch(vector<int> &array, int target) {
+    // write your code here
+    int begin=0, end=array.size()-1;
+    which(begin <= end) {
+        int mid = start + ((end - start) >> 1);
+        if(A[mid] == target) {
+            if(mid == 0 || A[mid-1] != target)
+                return mid;
+            end = mid - 1;
+        } else if(A[mid] < target) {
+            begin = mid + 1;
+        } else {
+            end = mid - 1;
+        }
+    }
+    return -1;
 }
 {% endhighlight %}
