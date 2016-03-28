@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Combination and Permutation 4 - Real Problem"
-date:   2016-03-22 10:30:00
+date:   2016-03-23 10:30:00
 tags: [algorithm, leetcode, DFS, combination, permutation]
 categories: Algorithm
 ---

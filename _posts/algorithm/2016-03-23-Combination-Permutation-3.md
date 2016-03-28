@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Combination and Permutation 3 - Permutations"
-date:   2016-03-22 9:30:00
+date:   2016-03-23 9:30:00
 tags: [algorithm, leetcode, DFS, permutation]
 categories: Algorithm
 ---
@@ -41,7 +41,7 @@ void permuteCore(vector<vector<int> > &res, vector<int> &path, vector<int> &num,
 }
 {% endhighlight %}
 其他方法：
-1，swap方法
+a. swap方法
 {% highlight C++ %}
 vector<vector<int> > permute(vector<int> &num) {
     vector<vector<int> > res;
@@ -61,7 +61,7 @@ void permuteCore(vector<vector<int> > &res, vector<int> &num, int start) {
     }
 }
 {% endhighlight %}
-2, STL法
+b. STL法
 {% highlight C++ %}
 vector<vector<int> > permute(vector<int> &num) {
     //利用STL中std::next_permutation()，时间复杂度O(n!)，空间复杂度 O(1)
@@ -73,7 +73,7 @@ vector<vector<int> > permute(vector<int> &num) {
     return res;
 }
 {% endhighlight %}
-3, 插入法,迭代：推荐方法
+c. 插入法,迭代：推荐方法
 {% highlight C++ %}
 vector<vector<int> > permute(vector<int> &num) {
     //插入法，迭代
@@ -171,11 +171,50 @@ void nextPermutation(vector<int> &num) {
         index1--;
     }
     if(index1 > 0) {
-        while(index2>=index1 && num[index2]<=num[index1-1]){    //注意相同的情况1,1,5-> 5,1,1
+        // 注意相同的情况1,1,5-> 5,1,1
+        while(index2>=index1 && num[index2]<=num[index1-1]){
             index2--;
         }
         swap(num[index1-1], num[index2]);
     }
     reverse(num.begin()+index1, num.end());
+}
+{% endhighlight %}
+
+### 4. [Permutation Sequence - Leetcode 60](https://leetcode.com/problems/permutation-sequence/)
+```
+The set [1,2,3,…,n] contains a total of n! unique permutations.
+
+By listing and labeling all of the permutations in order,
+We get the following sequence (ie, for n = 3):
+"123"
+"132"
+"213"
+"231"
+"312"
+"321"
+Given n and k, return the kth permutation sequence.
+Note: Given n will be between 1 and 9 inclusive.
+```
+
+通用模板会超时，找规律并计算
+{% highlight Java %}
+public String getPermutation(int n, int k) {
+    ArrayList<Integer> nums = new ArrayList<Integer>();
+    int factorial = 1;
+    for (int i = 1; i <= n; i++) {
+        nums.add(i);
+        factorial = factorial * i;  // n!
+    }
+    String result = "";
+    k--;  // Don`t foget, begin from 1th!
+    for (int i = 0; i < n; i++)
+        factorial /= n-i;
+        int cur = k / factorial;
+        k = k % factorial;
+        result += nums.get(cur);
+        nums.remove(cur);
+    }
+    return result;
 }
 {% endhighlight %}
