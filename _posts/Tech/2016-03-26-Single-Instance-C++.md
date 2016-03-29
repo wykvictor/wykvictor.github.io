@@ -6,28 +6,24 @@ tags: [single instance, c++, tech]
 categories: Tech
 ---
 
+### 1. Header
 {% highlight C++ %}
-// .h
 class SingleInstance {
   public:
     ~SingleInstance();
-
     static shared_ptr<SingleInstance> Get();
     static shared_ptr<SingleInstance> GetInstance(const string &para);
-
     void Do() const;
     bool IsInstanceSame(const string &para) const;
-
   private:
     SingleInstance(const string &para);
-
     static shared_ptr<SingleInstance> single_instance_;
     const string para_;
 };
 {% endhighlight %}
 
+### 2. Implenmentation
 {% highlight C++ %}
-// .cpp
 shared_ptr<SingleInstance> SingleInstance::single_instance_ = NULL;
 
 shared_ptr<SingleInstance> SingleInstance::Get() {
@@ -61,6 +57,7 @@ SingleInstance::~SingleInstance() {
 bool SingleInstance::IsInstanceSame(const string &para) const {
  return para_ == para;
 }
+
 void SingleInstance::Do() const {
   ... // do the main work
 }
