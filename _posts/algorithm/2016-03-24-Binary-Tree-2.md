@@ -28,8 +28,9 @@ TreeNode* closestBST(TreeNode* root, int val){
 ### 2. Find k nearest neightbours in BST - 好题，中序遍历
 {% highlight C++ %}
 void findKnn(TreeNode* node, int k, int target, deque<int>& out){ 
-    if (!node) return; 
-    findKnn(node->left, k, target, out);     //先扫左边的：相当于一个大的滑动窗口，所以用queue实现
+    if (!node) return;
+    // 先扫左边的：相当于一个大的滑动窗口，所以用queue实现
+    findKnn(node->left, k, target, out);
     if (out.size() < k) 
         out.push_back(node->val); 
     else if(out.size() == k){ 
@@ -52,11 +53,14 @@ The right subtree of a node contains only nodes with keys greater than the node'
 Both the left and right subtrees must also be binary search trees
 ```
 
+先序，递归
 {% highlight C++ %}
 bool isValidBST(TreeNode *root) {
+    // 若测试用例有INT_MIN节点，则此方法不可行！
     return isValidBSTCore(root, INT_MIN, INT_MAX);
 }
-bool isValidBSTCore(TreeNode *root, int minval, int maxval) {  //不需要加&，从上往下传
+// 不需要加&，从上往下传
+bool isValidBSTCore(TreeNode *root, int minval, int maxval) {
     if(root == NULL)    //注意空的情况
         return true;
     if(root->val <= minval || root->val >= maxval)  //包括 ==
@@ -65,11 +69,11 @@ bool isValidBSTCore(TreeNode *root, int minval, int maxval) {  //不需要加&�
             && isValidBSTCore(root->right, root->val, maxval);
 }
 {% endhighlight %}
-迭代的方案： 从中序出发 --> 也可以用中序递归写法啊，简单 bool isValidBST(TreeNode *root, int &prevVal)
+迭代的方案： 从中序出发
 {% highlight C++ %}
 bool isValidBST(TreeNode *root) {
     //迭代法：中序遍历，始终记录上一个值
-    int prevVal = INT_MIN;
+    int prevVal = INT_MIN;  // also wrong: need use treenode to record
     stack<TreeNode*> s;
     TreeNode *node = root;
     while(!s.empty() || node) {
@@ -90,17 +94,34 @@ bool isValidBST(TreeNode *root) {
     return true;
 }
 {% endhighlight %}
+也可以用中序递归写法，简单
+{% highlight Java %}
+private Integer prevVal = null;  // INT_MIN is the coner case!
+public boolean isValidBST(TreeNode root) {
+    if(root == null)    return true;
+    return isValidBSTCore(root);
+}
+private boolean isValidBSTCore(TreeNode root) {
+    if(root == null)    return true;
+    if(!isValidBSTCore(root.left))  return false;
+    if(prevVal != null && prevVal >= root.val)  return false;
+    prevVal = root.val;
+    return isValidBSTCore(root.right);
+}
+{% endhighlight %}
 
 ### 4. [Recover BST - Leetcode 99](https://leetcode.com/problems/recover-binary-search-tree/)
 ```
 Two elements of a binary search tree (BST) are swapped by mistake.
 Recover the tree without changing its structure.
 Note:
-A solution using O(n) space is pretty straight forward. Could you devise a constant space solution?
+A solution using O(n) space is pretty straight forward.
+Could you devise a constant space solution?
 ```
 {% highlight C++ %}
 void recoverTree(TreeNode *root) {
-    // O(n)空间，中序遍历，用一个vector保存所有的节点值==》转化问题为 在数组中找逆序的一对数字
+    // O(n)空间，中序遍历，用一个vector保存所有的节点值
+    // ==》转化问题为 在数组中找逆序的一对数字
     vector<TreeNode*> index;
     inTraverse(root, index);
     int left=0, right=index.size()-1;
@@ -120,7 +141,7 @@ void inTraverse(TreeNode* node, vector<TreeNode*> &index) {
     inTraverse(node->right, index);
 }
 {% endhighlight %}
-空间O（1）的方法： - 难
+空间O（1）的方法：- Hard
 {% highlight C++ %}
 void recoverTree(TreeNode *root) {
     // O(1)空间的话，就是在中序遍历的时候，直接保存逆序的2个数字
@@ -128,14 +149,15 @@ void recoverTree(TreeNode *root) {
     inTraverse(root, pre, left, right); //找到这样的两个点
     swap(left->val, right->val);
 }
-void inTraverse(TreeNode *node, TreeNode *&pre, TreeNode *&left, TreeNode *&right) { //取地址！才能返回
+void inTraverse(TreeNode *node, TreeNode *&pre, TreeNode *&left, TreeNode *&right) { //取地址&才能返回
     if(node == NULL)
         return;
-    inTraverse(node->left, pre, left, right);   //就这 2行中间有变化
+    inTraverse(node->left, pre, left, right);   //就这2行中间有变化
     if(pre != NULL && pre->val > node->val){
         if(left == NULL)
             left = pre;     //left的话，是pre有问题!!
-        right = node;   //right的话，是node，而且一直在更新!!!一直到真正找到第二个!
+        //right的话，是node，立马赋值为node，但之后很可能会更新，一直真正找到!
+        right = node;
     }
     pre = node;
     inTraverse(node->right, pre, left, right);
@@ -186,14 +208,15 @@ TreeNode *sortedListToBSTCore(ListNode *head, int size) {   //有几个元素
     }
     TreeNode *root = new TreeNode(pToMid->val);    //初始化
     root->left = sortedListToBSTCore(head, mid);   //前一半是 mid 的长度
-    root->right = sortedListToBSTCore(pToMid->next, size - mid - 1); //从pToMid->next开始，注意计算好 -1
+    // 从pToMid->next开始，注意计算好-1
+    root->right = sortedListToBSTCore(pToMid->next, size - mid - 1);
     return root;
 }
 {% endhighlight %}
-自底向上建树法，难，不考虑掌握
+自底向上建树法，very hard
 {% highlight C++ %}
 TreeNode *sortedListToBST(ListNode *head) {
-    //由于链表不能随机读取，因而用上题的解决方案不是很便捷，这里考虑从底向上建树 timeO(n) spaceO(logn)
+    //链表不能随机读取，用上题的解决方案不便捷，考虑从底向上建树timeO(n),spaceO(logn)
     int len = 0;
     ListNode *p = head;
     while(p) {
@@ -202,11 +225,13 @@ TreeNode *sortedListToBST(ListNode *head) {
     }
     return sortedListToBST_aux(head, 0, len - 1);
 }
-TreeNode *sortedListToBST_aux(ListNode *&root, int begin, int end) {    //注意，&！！！
+//注意! &
+TreeNode *sortedListToBST_aux(ListNode *&root, int begin, int end) {
     if(begin > end)
         return NULL;
     int mid = (begin + end) / 2;
-    TreeNode *leftNode = sortedListToBST_aux(root, begin, mid - 1); //注意，这几句的顺序，root被带回新的节点值了!
+    // 注意，这几句的顺序，root被带回新的节点值了!
+    TreeNode *leftNode = sortedListToBST_aux(root, begin, mid - 1);
     TreeNode *parent = new TreeNode(root->val);
     parent->left = leftNode;
     root = root->next;
@@ -218,7 +243,8 @@ TreeNode *sortedListToBST_aux(ListNode *&root, int begin, int end) {    //注意
 ### 7. Saving a Binary Search Tree to a File
 ```
 和前序，中序建树类似。但该方法简洁些
-Describe an algorithm to save a Binary Search Tree (BST) to a file in terms of run-time and disk space complexity. You must be able to restore to the exact original BST using the saved format.
+Describe an algorithm to save a Binary Search Tree (BST) to a file in terms of run-time and disk space complexity.
+You must be able to restore to the exact original BST using the saved format.
 Assume we have the following BST:
    _30_ 
    /    \    
@@ -226,11 +252,20 @@ Assume we have the following BST:
  /     /  \
 10    35  50
 Pre-order traversal:
-Pre-order traversal is the perfect algorithm for making a copy of a BST. The output of a pre-order traversal of the BST above is 30 20 10 40 35 50. Please note the following important observation:
+Pre-order traversal is the perfect algorithm for making a copy of a BST.
+The output of a pre-order traversal of the BST above is 30 20 10 40 35 50.
+
+Please note the following important observation:
 A node’s parent is always output before itself.
-Therefore, when we read the BST back from the file, we are always able to create the parent node before creating its child nodes. The code for writing a BST to a file is exactly the same as pre-order traversal.
+Therefore, when we read the BST back from the file, we are always able to create the parent node before creating its child nodes.
+The code for writing a BST to a file is exactly the same as pre-order traversal.
 30 20 10 40 35 50.
-We pass the valid range of the values from the parent node to its child nodes. When we are about to insert a node, we will check if the insert value is in the valid range. If it is, this is the right space to insert. If it is not, we will try the next empty space. Reconstructing the whole BST from a file will take only O(n) time.
+
+We pass the valid range of the values from the parent node to its child nodes.
+When we are about to insert a node, we will check if the insert value is in the valid range.
+If it is, this is the right space to insert.
+If it is not, we will try the next empty space.
+Reconstructing the whole BST from a file will take only O(n) time.
 ```
 
 {% highlight C++ %}
@@ -240,7 +275,8 @@ void readBSTHelper(int min, int max, int &insertVal,
     int val = insertVal;
     p = new BinaryTree(val);
     if (fin >> insertVal) {
-      readBSTHelper(min, val, insertVal, p->left, fin);    //一直读到10，然后发现40不合适，就一直返回，直到执行到
+      // 一直读到10，然后发现40不合适，就一直返回，直到执行到
+      readBSTHelper(min, val, insertVal, p->left, fin);
       readBSTHelper(val, max, insertVal, p->right, fin);
     }
   }
@@ -280,10 +316,10 @@ Given n, how many structurally unique BST's (binary search trees) that store val
 For example,
 Given n = 3, there are a total of 5 unique BST's.
    1        3    3     2     1
-    \       /     /      / \      \
+    \      /    /     / \     \
      3    2    1     1   3     2
-    /     /       \                 \
-   2    1        2                3
+    /    /      \               \
+   2    1        2               3
 ```
 
 {% highlight C++ %}
@@ -306,10 +342,10 @@ Given n, generate all structurally unique BST's (binary search trees) that store
 For example,
 Given n = 3, your program should return all 5 unique BST's shown below.
    1        3    3     2     1
-    \       /     /      / \      \
+    \      /    /     / \     \
      3    2    1     1   3     2
-    /     /       \                 \
-   2    1        2                3
+    /    /      \               \
+   2    1        2               3
 ```
 
 {% highlight C++ %}
@@ -326,7 +362,8 @@ vector<TreeNode *> generateTreesCore(int left, int right) {
     for(int i=left; i<=right; i++) {
         vector<TreeNode *> leftTree = generateTreesCore(left, i-1);
         vector<TreeNode *> rightTree = generateTreesCore(i+1, right);
-        for(int j=0; j<leftTree.size(); j++) { //左右子树，排列组合起来构成结果
+        // 左右子树，排列组合起来构成结果
+        for(int j=0; j<leftTree.size(); j++) {
             for(int k=0; k<rightTree.size(); k++){
                 TreeNode *head = new TreeNode(i);   //头
                 head->left = leftTree[j];
