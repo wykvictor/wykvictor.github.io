@@ -60,10 +60,10 @@ TreeNode *buildTreeCore(vector<int> &inorder, vector<int> &postorder,
 ```
 Assume we have a binary tree below:
     _30_ 
-    /    \    
+    /   \    
   10    20
-  /      /  \ 
-50   45  35
+  /    /  \ 
+ 50   45  35
 Using pre-order traversal, the algorithm should write the following to a file:
 30 10 50 # # # 20 45 # # 35 # #
 ```
