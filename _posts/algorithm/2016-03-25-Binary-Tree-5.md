@@ -53,7 +53,7 @@ bool isPairPresent(struct node *root, int target)
     // traversals is complete
     while (1){
         while (done1 == false) {    //控制是否做这个循环
-            if (curr1 != NULL){
+            if (curr1 != NULL){  // 中序遍历迭代版本
                 push(s1, curr1);
                 curr1 = curr1->left;
             } else {
@@ -95,7 +95,8 @@ bool isPairPresent(struct node *root, int target)
 }
 {% endhighlight %}
 
-### 2. Binary Tree Maximum Path Sum  略难
+### 2. [Binary Tree Maximum Path Sum - Leetcode 124 Hard](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
+```
 Given a binary tree, find the maximum path sum.
 The path may start and end at any node in the tree.
 For example:
@@ -104,24 +105,34 @@ Given the below binary tree,
       / \
      2   3
 Return 6.
+```
+
+{% highlight C++ %}
 int maxPathSum(TreeNode *root) {
-    //高级DFS，不一定都是正数，难!
+    //高级DFS，node存的不一定都是正数，难!
     int max_sum = INT_MIN;
     dfs(root, max_sum);
     return max_sum;
 }
-int dfs(TreeNode *root, int &max_sum) {  //返回单个方向路径的最大值，max_sum一定是引用!
+//函数返回单个方向路径的最大值，max_sum则是引用 返回了整体的值!
+int dfs(TreeNode *root, int &max_sum) {
     if(root == NULL)
         return 0;
     int lLen = dfs(root->left, max_sum);
     int rLen = dfs(root->right, max_sum);
-    int sum = (lLen>0?lLen:0) + (rLen>0?rLen:0) + root->val;    //只有大于，才加!!! 注意优先级!!!
+    // 只有大于，才加!!! 注意优先级!!!
+    int sum = (lLen>0?lLen:0) + (rLen>0?rLen:0) + root->val;
     max_sum = max(max_sum, sum);
-    return max(lLen, rLen) > 0 ? max(lLen, rLen) + root->val : root->val;   //若大于，才加进去
+    // 若大于，才加进去
+    return max(lLen, rLen) > 0 ? max(lLen, rLen) + root->val : root->val;
 }
+{% endhighlight %}
 
-### 3. Path Sum
-Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.
+### 3. [Path Sum - Leetcode 112](https://leetcode.com/problems/path-sum/)
+```
+Given a binary tree and a sum, determine if the tree has a root-to-leaf path
+such that adding up all the values along the path equals the given sum.
+
 For example:
 Given the below binary tree and sum = 22,
               5
@@ -132,15 +143,19 @@ Given the below binary tree and sum = 22,
          /  \      \
         7    2      1
 return true, as there exist a root-to-leaf path 5->4->11->2 which sum is 22.
+```
+{% highlight C++ %}
 bool hasPathSum(TreeNode *root, int sum) {
-    if(root == NULL)    return false;   //这样，只有一边有叶子的话，也包括进来了!
+    if(root == NULL)    return false;
     if(root->left==NULL && root->right==NULL) //到了叶子
         return (sum == root->val);
-    //if(root->left!=NULL && root->right!=NULL)  这样也包括进来了
+    //if(root->left!=NULL && root->right!=NULL) 开头那句包括了这种情况
     return hasPathSum(root->left, sum-root->val) || hasPathSum(root->right, sum-root->val);
 }
+{% endhighlight %}
 
-### 4. Path Sum II
+### 4. [Path Sum II - Leetcode 113](https://leetcode.com/problems/path-sum-ii/)
+```
 Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
 For example:
 Given the below binary tree and sum = 22,
@@ -156,6 +171,8 @@ return
    [5,4,11,2],
    [5,8,4,5]
 ]
+```
+{% highlight C++ %}
 vector<vector<int> > pathSum(TreeNode *root, int sum) {
     //求所有的，所以找到之后，不能返回，接着找 
     vector<vector<int> > res;
@@ -170,15 +187,17 @@ void pathSumCore(TreeNode *root, int sum, vector<vector<int> > &res, vector<int>
     if(root->left==NULL && root->right==NULL) {
         if(sum == root->val)
             res.push_back(line);
-        line.pop_back();    //弹出来
+        line.pop_back();    // 弹出来!
         return;
     }
     pathSumCore(root->left, sum - root->val, res, line);  //接着找
     pathSumCore(root->right, sum - root->val, res, line);
     line.pop_back();
 }
-方法2，非递归：- 难，不考虑
-//当年写剑指offer25题的时候，我自己发明的非递归，后序遍历解法!!!
+{% endhighlight %}
+方法2，非递归：- hard，不考虑此方法
+{% highlight C++ %}
+//当年写剑指offer25题的时候，自己发明的非递归，后序遍历解法
 vector<vector<int> > pathSum(TreeNode *root, int sum) {
     vector<vector<int> > res;
     std::vector<int> path;
@@ -191,18 +210,19 @@ vector<vector<int> > pathSum(TreeNode *root, int sum) {
             path.push_back(p->val);
             currentSum += p->val;
         }
-        while(p!=NULL && (p->right==NULL || p->right==q)) {  //当前节点不空，没有右子树或右子树根节点已经访问过
-            currentSum += p->val;  //后序遍历中的，访问节点
+        // 当前节点不空，没有右子树或右子树根节点已经访问过
+        while(p!=NULL && (p->right==NULL || p->right==q)) {
+            currentSum += p->val;  // 后序遍历中的，访问节点
             path.push_back(p->val);
             if(p->right==NULL && p->left==NULL) {//叶节点
-                if(currentSum == sum)     //若注释掉，打印的就是所有的根到叶节点的路径!!!
+                if(currentSum == sum)     //若注释掉，打印的就是所有的根到叶节点的路径!
                     res.push_back(path);
             }
             currentSum -= path.back();        //该节点，算完sum，不保留，弹出去
             path.pop_back();
  
             q = p;        //记录上一次访问过的节点
-            if(s.empty())       //结束!!!，总体来说，有2个叶节点的父节点都被压入了2次
+            if(s.empty())     //结束!总体来说，有2个叶节点的父节点都被压入了2次
                 return res;
             //若栈空，结束，否则取出栈顶节点作为当前节点
             p = s.top();
@@ -215,15 +235,17 @@ vector<vector<int> > pathSum(TreeNode *root, int sum) {
         //push后，相应压path
         path.push_back(p->val);
         currentSum += p->val;
-        p = p->right;      //将当前节点的右子树的根节点设为当前节点，一直走到最下边
+        p = p->right; //将当前节点的右子树的根节点设为当前节点，一直走到最下边
     }
     return res;
 }
-
+{% endhighlight %}
 拓展：若不需要root起点，且不需要leaf终点：CC150 4.9
-递归，对于每个访问到的点node，回溯搜一遍node到root的路径，加里边的和，看是否有以node结尾的这样的path
 
-### 5. Sum Root to Leaf Numbers
+递归解法，对于每个访问到的点node，回溯搜一遍node到root的路径，加里边的和，看是否有以node结尾的这样的path
+
+### 5. [Sum Root to Leaf Numbers - Leetcode 129](https://leetcode.com/problems/sum-root-to-leaf-numbers/)
+```
 Given a binary tree containing digits from 0-9 only, each root-to-leaf path could represent a number.
 An example is the root-to-leaf path 1->2->3 which represents the number 123.
 Find the total sum of all root-to-leaf numbers.
@@ -234,6 +256,8 @@ For example,
 The root-to-leaf path 1->2 represents the number 12.
 The root-to-leaf path 1->3 represents the number 13.
 Return the sum = 12 + 13 = 25.
+```
+{% highlight C++ %}
 int sumNumbers(TreeNode *root) {
     //DFS即可，可以统计
     int res=0, path=0;
@@ -241,14 +265,14 @@ int sumNumbers(TreeNode *root) {
     sumNumbersCore(root, path, res);
     return res;
 }
-void sumNumbersCore(TreeNode *root, int path, int &res) { //path是中间结果，res是最终结果且需要&
+//path是中间结果，res是最终结果且需要&
+void sumNumbersCore(TreeNode *root, int path, int &res) {
     path = 10 * path + root->val;
     if(root->left==NULL && root->right==NULL) { //叶子节点
         res += path;
         return;
     }   //若不是叶子节点
-    if(root->left)
-        sumNumbersCore(root->left, path, res);
-    if(root->right)
-        sumNumbersCore(root->right, path, res);    
+    if(root->left)  sumNumbersCore(root->left, path, res);
+    if(root->right)  sumNumbersCore(root->right, path, res);    
 }
+{% endhighlight %}
