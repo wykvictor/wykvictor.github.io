@@ -18,6 +18,7 @@ for(int i=0; i<N; i++) { //在执行i次循环后(此时已经处理i个物品)�
 cout << dp[M];
 {% endhighlight %}
 TODO 背包相关：
+[背包问题九讲](http://love-oriented.com/pack/)
 [backpack](http://www.lintcode.com/zh-cn/problem/backpack/)
 [minimum-adjustment-cost](http://www.lintcode.com/zh-cn/problem/minimum-adjustment-cost/)
 [k-sum](http://www.lintcode.com/zh-cn/problem/k-sum/)
