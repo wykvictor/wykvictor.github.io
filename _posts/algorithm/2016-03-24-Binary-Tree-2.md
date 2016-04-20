@@ -375,3 +375,220 @@ vector<TreeNode *> generateTreesCore(int left, int right) {
     return res;
 }
 {% endhighlight %}
+
+### 11. [Insert Node in a BST](http://www.lintcode.com/en/problem/insert-node-in-a-binary-search-tree/)
+一直找到最边上，也不用交换节点啥的，就在尾部连接, 递归法
+{% highlight C++ %}
+TreeNode* insertNode(TreeNode* root, TreeNode* node) {
+    if(root == NULL || node == NULL)
+        return node;  // if root is {}, return {node}
+    if(root->val < node->val) {
+        if(root->right == NULL)
+            root->right = node;
+        else
+            insertNode(root->right, node);
+    } else {
+        if(root->left == NULL)
+            root->left = node;
+        else
+            insertNode(root->left, node);
+    }
+    return root;
+}
+{% endhighlight %}
+迭代：
+{% highlight C++ %}
+TreeNode* insertNode(TreeNode* root, TreeNode* node) {
+    // write your code here
+    if(root == NULL || node == NULL)
+        return node;
+    TreeNode* p = root;
+    while(p != NULL) {
+        if(p->val < node->val) {
+            if(p->right == NULL) {
+                p->right = node;
+                break;
+            }
+            p = p->right;
+        } else {
+            if(p->left == NULL) {
+                p->left = node;
+                break;
+            }
+            p = p->left;
+        }
+    }
+    return root;
+}
+{% endhighlight %}
+
+### 12. [Remove Node in a BST - Hard](http://www.lintcode.com/en/problem/remove-node-in-binary-search-tree/)
+```
+Given a root of Binary Search Tree with unique value for each node.
+Remove the node with given value.
+If there is no such a node with given value, do nothing. 
+```
+
+[solution-1](http://www.mathcs.emory.edu/~cheung/Courses/171/Syllabus/9-BinTree/BST-delete.html)
+[solution-2](http://www.mathcs.emory.edu/~cheung/Courses/171/Syllabus/9-BinTree/BST-delete2.html)
+{% highlight C++ %}
+TreeNode* removeNode(TreeNode* root, int value) {
+    // write your code here
+    TreeNode dummyNode(-1);  // in case delete root
+    dummyNode.right = root;
+    deleteNode(root, value, &dummyNode);
+    return dummyNode.right;
+}
+// helper function
+void deleteNode(TreeNode* root, int value, TreeNode* parent) {
+    if(root == NULL)  return;
+    if(root->val < value) {
+        deleteNode(root->right, value, root);
+        return;
+    }
+    if(root->val > value) {
+        deleteNode(root->left, value, root);
+        return;
+    }
+    // find and delete
+    // case 1: leaf node
+    if(root->left==NULL && root->right==NULL) {
+        if(parent->left == root) {
+            parent->left = NULL;
+        } else {
+            parent->right = NULL;
+        }
+        delete root;
+        return;
+    }
+    // case 2: only one child
+    if(root->left==NULL || root->right==NULL) {
+        if(parent->left == root) {
+            parent->left = root->left ? root->left : root->right;
+        } else {
+            parent->right = root->right ? root->right : root->left;
+        }
+        delete root;
+        return;
+    }
+    // case 3: 2 children
+    // step1: find the smallest of the right
+    TreeNode *minNode = root->right;
+    while(minNode->left != NULL) {
+        parent = minNode;
+        minNode = minNode->left;
+    }
+    // step 2: copy the val
+    root->val = minNode->val;
+    // step 3: delete it
+    parent->left = NULL;
+    delete minNode;
+}
+{% endhighlight %}
+合并case 1 and case 2
+{% highlight C++ %}
+// helper function
+void deleteNode(TreeNode* root, int value, TreeNode* parent) {
+    if(root == NULL)  return;
+    if(root->val < value) {
+        deleteNode(root->right, value, root);
+        return;
+    }
+    if(root->val > value) {
+        deleteNode(root->left, value, root);
+        return;
+    }
+    // find and delete
+    // case 1: leaf node and case 2: only one child
+    if(root->left==NULL || root->right==NULL) {
+        if(parent->left == root) {
+            parent->left = root->left ? root->left : root->right;
+        } else {
+            parent->right = root->right ? root->right : root->left;
+        }
+        delete root;
+        return;
+    }
+    // case 3: 2 children
+    // step1: find the smallest of the right
+    TreeNode *minNode = root->right;
+    while(minNode->left != NULL) {
+        parent = minNode;
+        minNode = minNode->left;
+    }
+    // step 2: copy the val
+    root->val = minNode->val;
+    // step 3: delete it
+    parent->left = NULL;
+    delete minNode;
+}
+{% endhighlight %}
+
+### 13. [Search Range in Binary Search Tree](http://www.lintcode.com/en/problem/search-range-in-binary-search-tree/)
+```
+Given two values k1 and k2 (where k1 < k2) and a root pointer to a BST.
+Find all the keys of tree in range k1 to k2. i.e. print all x such that k1<=x<=k2 and x is a key of given BST. Return all the keys in ascending order.
+```
+{% highlight C++ %}
+vector<int> searchRange(TreeNode* root, int k1, int k2) {
+    vector<int> res;
+    DFS(res, root, k1, k2);
+    return res;
+}
+void DFS(vector<int> &res, TreeNode* root, int k1, int k2) {
+    if(root == NULL)  return;
+    if(root->val >= k1) { //优化，如果超出范围，剪枝！
+        DFS(res, root->left, k1, k2);
+    }
+    if(root->val >= k1 && root->val <= k2) {
+        res.push_back(root->val);
+    }
+    if(root->val <= k2) {
+        DFS(res, root->right, k1, k2);
+    }
+}
+{% endhighlight %}
+
+### 14. [Binary Search Tree Iterator](http://www.lintcode.com/en/problem/binary-search-tree-iterator/)
+```
+next() and hasNext() queries run in O(1) time in average.
+Challenge: Extra memory usage O(h), h is the height of the tree.
+Super Star: Extra memory usage O(1)
+```
+{% highlight C++ %}
+/**
+ * Example of iterate a tree:
+ * BSTIterator iterator = BSTIterator(root);
+ * while (iterator.hasNext()) {
+ *    TreeNode * node = iterator.next();
+ *    do something for node
+ */
+class BSTIterator {
+public:
+    stack<TreeNode*> s;
+    TreeNode *cur;
+    //@param root: The root of binary tree.
+    BSTIterator(TreeNode *root): cur(root) {
+        /*while(cur != NULL) { //init to left-most
+            s.push(cur);
+            cur = cur->left;
+        }*/ //comment out: next() has the same function
+    }
+    //@return: True if there has next node, or false
+    bool hasNext() {
+        return (cur != NULL) || (!s.empty());
+    }
+    //@return: return next node
+    TreeNode* next() {
+        // find cur->next before return cur
+        while(cur != NULL) { //go to left-most
+            s.push(cur);
+            cur = cur->left;
+        }
+        TreeNode* nxt = s.top();
+        s.pop();
+        cur = nxt->right;
+        return nxt;
+    }
+};
+{% endhighlight %}
