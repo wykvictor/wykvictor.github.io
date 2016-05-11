@@ -74,6 +74,8 @@ set(project_src a.cpp b.cpp c.cpp)
 
 # 用于指定从一组源文件中编译出一个库文件 libproject.so
 add_library(project ${OTHER_SRCS} ${project_src})
+# 有STATIC/SHARED/OBJECT等方式(https://cmake.org/cmake/help/v3.4/command/add_library.html?highlight=add_library)
+# OBJECT方式不创建实际的lib文件，跟直接src放进去相同，会初始化objs中的全局变量
 # 用于指定project需要链接的库, 这里target必须已被创建，链接的item可以是已经存在的target（依赖关系会自动添加）
 TARGET_LINK_LIBRARIES(project
         ${project_lib}
