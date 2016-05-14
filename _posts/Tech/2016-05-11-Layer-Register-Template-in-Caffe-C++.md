@@ -1,14 +1,14 @@
 ---
 layout: post
-title:  "Design Pattern(factory) / Template in Caffe(c++)"
+title:  "Global initialization / Template in Caffe(c++)"
 date:   2016-05-11 10:00:00
-tags: [design pattern, factory, template, c++, caffe, tech]
+tags: [global initialize, register, template, c++, caffe, tech]
 categories: Tech
 ---
 
-> 本文重点分析深度学习平台(Caffe)中注册layer的相关代码[layer_factory.hpp](https://github.com/wykvictor/caffe/blob/master/include/caffe/layer_factory.hpp)
+> 本文重点分析深度学习平台(Caffe)中注册(register layer)的相关代码[layer_factory.hpp](https://github.com/wykvictor/caffe/blob/master/include/caffe/layer_factory.hpp)
 
-### 1. LayerRegistry - 工厂
+### 1. LayerRegistry - 功能模板类
 {% highlight C++ %}
 template <typename Dtype>  // 模板类(caffe中，预知是float或double)
 class LayerRegistry {
@@ -31,7 +31,7 @@ class LayerRegistry {
     // 如果map.count(key)为0，则代表不存在key(multimap可以有0,1之外的其他值)
     CHECK_EQ(registry.count(type), 0)
         << "Layer type " << type << " already registered.";
-    registry[type] = creator;
+    registry[type] = creator;  // 实际的add动作
   }
 
   // Get a layer using a LayerParameter.
@@ -43,14 +43,16 @@ class LayerRegistry {
     CreatorRegistry& registry = Registry();
     CHECK_EQ(registry.count(type), 1) << "Unknown layer type: " << type
         << " (known types: " << LayerTypeListString() << ")";
-    return registry[type](param);  //同样拿到registry, 通过这个map拿到layer指针
+    return registry[type](param);  // 同样拿到registry, 通过这个map拿到layer指针
   }
 
   static vector<string> LayerTypeList() {
     CreatorRegistry& registry = Registry();
     vector<string> layer_types;
     // 遍历这个map
-    // typename?
+    // typename必须: type names nested into dependent types(depend on template type)
+    // need to be prepended with the typename keyword.
+    // 如果CreatorRegistry实例化为int，则不需要typename了
     for (typename CreatorRegistry::iterator iter = registry.begin();
          iter != registry.end(); ++iter) {
       layer_types.push_back(iter->first);
@@ -66,14 +68,16 @@ class LayerRegistry {
 {% endhighlight %}
 
 ### 2. LayerRegisterer - 注册
+实际的注册接口
 {% highlight C++ %}
 template <typename Dtype>
 class LayerRegisterer {
  public:
+  // 构造函数，接受type + 函数指针
   LayerRegisterer(const string& type,
                   shared_ptr<Layer<Dtype> > (*creator)(const LayerParameter&)) {
     // LOG(INFO) << "Registering layer type: " << type;
-    LayerRegistry<Dtype>::AddCreator(type, creator);
+    LayerRegistry<Dtype>::AddCreator(type, creator); // 实际添加
   }
 };
 
@@ -81,16 +85,19 @@ class LayerRegisterer {
   static LayerRegisterer<float> g_creator_f_##type(#type, creator<float>);     \
   static LayerRegisterer<double> g_creator_d_##type(#type, creator<double>)    \
 
-#define REGISTER_LAYER_CLASS(type)                                             \
+#define REGISTER_LAYER_CLASS(type)
+// 首先定义这个函数                                                            \
   template <typename Dtype>                                                    \
   shared_ptr<Layer<Dtype> > Creator_##type##Layer(const LayerParameter& param) \
   {                                                                            \
-    return shared_ptr<Layer<Dtype> >(new type##Layer<Dtype>(param));           \
-  }                                                                            \
+    return shared_ptr<Layer<Dtype> >(new type##Layer<Dtype>(param));//!实际new \
+  }
+// 随后作为第二个参数，传入上边的define(##:嵌入string, #:转化为string类型)     \
   REGISTER_LAYER_CREATOR(type, Creator_##type##Layer)
 {% endhighlight %}
 
 ### 3. INSTANTIATE_CLASS - 模板类实例化
+// template的另一个问题：通过实例化，解决实现模板在.cpp与.h的分离
 {% highlight C++ %}
 // Instantiate a class with float and double specifications.
 #define INSTANTIATE_CLASS(classname) \
@@ -98,6 +105,7 @@ class LayerRegisterer {
   template class classname<float>; \
   template class classname<double>
 {% endhighlight %}
+经过实例化，编译器会生成相应type的代码, 否则cpp中并不知道实例化成float或什么
 
 ### 4. SetUP Layer - 使用
 例如新添加DispatchLayer层，在dispatch_layer.cpp底部需添加如下宏
@@ -105,16 +113,20 @@ class LayerRegisterer {
 INSTANTIATE_CLASS(DispatchLayer);
 REGISTER_LAYER_CLASS(Dispatch);
 {% endhighlight %}
-其编译后变成如下代码:
+其#define经过编译后变成如下代码:
 {% highlight C++ %}
 template <typename Dtype>
 shared_ptr<Layer<Dtype> > Creator_DispatchLayer(const LayerParameter& param) {
   return shared_ptr<Layer<Dtype> >(new DispatchLayer<Dtype>(param));
 }
+// 因为有全局静态变量的定义，在其初始化时自动完成了create layer，即new出了指向layer的pointer
 static LayerRegisterer<float> g_creator_f_Dispatch("Dispatch", Creator_DispatchLayer<float>);
+// 上述一行调用了LayerRegisterer类型的构造函数，其中调用了AddCreator
+// AddCreator完成了注册Register：将上述的pointer存入map: registry[type] = creator
 {% endhighlight %}
 在net.cpp中通过以下代码，将上述实例化对象添加到layers_中进行管理
 {% highlight C++ %}
+// 调用了registry[type](param)，取出了pointer
 layers_.push_back(LayerRegistry<Dtype>::CreateLayer(layer_param));
 {% endhighlight %}
 If the layer is going to be created by another creator function, 可以直接调用REGISTER_LAYER_CREATOR
@@ -123,43 +135,21 @@ If the layer is going to be created by another creator function, 可以直接调
 template <typename Dtype>
 shared_ptr<Layer<Dtype> > GetConvolutionLayer(
     const LayerParameter& param) {
-  ConvolutionParameter conv_param = param.convolution_param();
-  ConvolutionParameter_Engine engine = conv_param.engine();
-#ifdef USE_CUDNN
-  bool use_dilation = false;
-  for (int i = 0; i < conv_param.dilation_size(); ++i) {
-    if (conv_param.dilation(i) > 1) {
-      use_dilation = true;
-    }
-  }
-#endif
-  if (engine == ConvolutionParameter_Engine_DEFAULT) {
-    engine = ConvolutionParameter_Engine_CAFFE;
-#ifdef USE_CUDNN
-    if (!use_dilation) {
-      engine = ConvolutionParameter_Engine_CUDNN;
-    }
-#endif
-  }
+  ...
   if (engine == ConvolutionParameter_Engine_CAFFE) {
     return shared_ptr<Layer<Dtype> >(new ConvolutionLayer<Dtype>(param));
 #ifdef USE_CUDNN
   } else if (engine == ConvolutionParameter_Engine_CUDNN) {
-    if (use_dilation) {
-      LOG(FATAL) << "CuDNN doesn't support the dilated convolution at Layer "
-                 << param.name();
-    }
     return shared_ptr<Layer<Dtype> >(new CuDNNConvolutionLayer<Dtype>(param));
 #endif
   } else {
     LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
   }
 }
-
 REGISTER_LAYER_CREATOR(Convolution, GetConvolutionLayer);
 {% endhighlight %}
 
-### 4. Targets.cmake - 编译
+### 5. Targets.cmake - 编译
 {% highlight Bash shell scripts %}
 # Defines global Caffe_LINK flag, This flag is required to prevent linker from excluding
 # some objects which are not addressed directly but are registered via static constructors
@@ -168,6 +158,7 @@ macro(caffe_set_caffe_link)
     set(Caffe_LINK caffe)
   else()
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    //-force_load，可以防止编译优化: 否则全局没有调用过的变量，如g_creator_f_Dispatch可能不会被编译
       set(Caffe_LINK -Wl,-force_load caffe)
     elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
       set(Caffe_LINK -Wl,--whole-archive caffe -Wl,--no-whole-archive)
