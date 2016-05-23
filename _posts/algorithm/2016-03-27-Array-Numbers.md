@@ -17,7 +17,6 @@ categories: Algorithm
 Given a sorted integer array without duplicates, return the summary of its ranges.
 For example, given [0,1,2,4,5,7], return ["0->2","4->5","7"].
 ```
-
 {% highlight C++ %}
 vector<string> summaryRanges(vector<int>& nums) {
     vector<string> res;
@@ -40,11 +39,15 @@ vector<string> summaryRanges(vector<int>& nums) {
 {% endhighlight %}
  
 ### 2. [Remove duplicates from sorted array - Leetcode 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)
-Given a sorted array, remove the duplicates in place such that each element appear only once and return the new length.
+```
+Given a sorted array, remove the duplicates in place such that each element
+appear only once and return the new length.
 Do not allocate extra space for another array, you must do this in place with constant memory.
 For example,
 Given input array A = [1,1,2],
 Your function should return length = 2, and A is now [1,2].
+```
+{% highlight C++ %}
 int removeDuplicates(int A[], int n) {
     //2个指针，从前往后
     if(n == 0)  return 0;
@@ -56,12 +59,16 @@ int removeDuplicates(int A[], int n) {
     }
     return i+1;
 }
+{% endhighlight %}
 
-2，[Remove duplicates from sorted array II - Leetcode 80](https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/)
+### 3. [Remove duplicates from sorted array II - Leetcode 80](https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/)
+```
 What if duplicates are allowed at most twice?
 For example,
 Given sorted array A = [1,1,1,2,2,3],
 Your function should return length = 5, and A is now [1,1,2,2,3].
+```
+{% highlight C++ %}
 int removeDuplicates(int A[], int n) {
     if(n < 3)  return n;    //这里不同
     int i=1, j=2;       //初始化值不同
@@ -72,7 +79,9 @@ int removeDuplicates(int A[], int n) {
     }
     return i+1;
 }
+{% endhighlight %}
 其实下边这样写最好：
+{% highlight C++ %}
 int removeDuplicates(int A[], int n) {
     if(n<3)     return n;   //1或2个元素，直接返回
     //另一种，简单方法!!
@@ -84,8 +93,9 @@ int removeDuplicates(int A[], int n) {
     }
     return index;
 }
-
+{% endhighlight %}
 九章课的好懂的算法：
+{% highlight C++ %}
 //用课上的，int dup实现下
 int removeDuplicates(int A[], int n) {
     if(n<3)     return n;   //1或2个元素，直接返回
@@ -104,10 +114,13 @@ int removeDuplicates(int A[], int n) {
     }
     return index+1; //注意，返回的是个数+1
 }
+{% endhighlight %}
 
-3，[Longest substring without repeating characters - Leetcode 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+### 4. [Longest substring without repeating characters - Leetcode 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+```
 Given a string, find the length of the longest substring without repeating characters. For example, the longest substring without repeating letters for "abcabcbb" is "abc", which the length is 3. For "bbbbb" the longest substring is "b", with the length of 1.
-常规思路：2
+```
+常规思路:
 int lengthOfLongestSubstring(string s) {
     //用bool数组记录是否出现过，因为一出现重复就需要重新计算i之前的数组，所以复杂度高
     bool hash[256] = {false};  //for(int k=0; k<256; k++)   hash[k] = false; 貌似不需要!
