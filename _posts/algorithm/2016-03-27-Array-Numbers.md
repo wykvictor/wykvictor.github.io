@@ -118,15 +118,19 @@ int removeDuplicates(int A[], int n) {
 
 ### 4. [Longest substring without repeating characters - Leetcode 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
 ```
-Given a string, find the length of the longest substring without repeating characters. For example, the longest substring without repeating letters for "abcabcbb" is "abc", which the length is 3. For "bbbbb" the longest substring is "b", with the length of 1.
+Given a string, find the length of the longest substring without repeating characters.
+For example, the longest substring without repeating letters for "abcabcbb" is "abc", which the length is 3.
+For "bbbbb" the longest substring is "b", with the length of 1.
 ```
+
 常规思路:
+{% highlight C++ %}
 int lengthOfLongestSubstring(string s) {
     //用bool数组记录是否出现过，因为一出现重复就需要重新计算i之前的数组，所以复杂度高
-    bool hash[256] = {false};  //for(int k=0; k<256; k++)   hash[k] = false; 貌似不需要!
+    bool hash[256] = {false}; // for(int k=0; k<256; k++) hash[k] = false; 貌似不需要!
     int maxLen = 0;
-    int i=0, j=0;   //一前，一后指针
-    for(; j<s.size(); j++){
+    int i=0, j=0;   // 一前，一后指针
+    for(; j<s.size(); j++) {
         if(hash[s[j]]) {
             maxLen = max(maxLen, j-i);
             while(s[i] != s[j]) {   //efabcabc 第1个a之前清除标志
@@ -135,11 +139,13 @@ int lengthOfLongestSubstring(string s) {
             }
             i++;
         }
-        hash[s[j]] = true;      //不管如何，都需要记录下标；或放到else里，上一种情况，记录了其实
+        hash[s[j]] = true; //不管如何，都需要记录下标；或放到else里，上一种情况，记录了其实
     }
-    return max(maxLen, j-i);    //必须最后再比较一下，防止最后一次的遗漏!
+    return max(maxLen, j-i); //必须最后再比较一下，防止最后一次的遗漏!
 }
-优化：用int hash记录位置，这样不需要回头搞，记录一个上次start开始的位置就可以  3
+{% endhighlight %}
+优化：用int hash记录位置，这样不需要回头搞，记录一个上次start开始的位置就可以
+{% highlight C++ %}
 int lengthOfLongestSubstring(string s) {
     //更新后，时间复杂度 O(n)，空间复杂度 O(1)，因为i不往回倒退了，只走一遍!!
     int hash[256];   //为了记录位置，所以用int
@@ -156,11 +162,17 @@ int lengthOfLongestSubstring(string s) {
     }
     return max(maxLen, j-i);  //必须最后再比较一下，防止最后一次的遗漏!
 }
+{% endhighlight %}
 
-4，[Container With Most Water - Leetcode 11](https://leetcode.com/problems/container-with-most-water/)
-Given n non-negative integers a1, a2, ..., an, where each represents a point at coordinate (i, ai). n vertical lines are drawn such that the two endpoints of line i is at (i, ai) and (i, 0). Find two lines, which together with x-axis forms a container, such that the container contains the most water.
-Note: You may not slant the container.
-自己想到的 1
+### 5. [Container With Most Water - Leetcode 11](https://leetcode.com/problems/container-with-most-water/)
+```
+Given n non-negative integers a1, a2, ..., an, where each represents a point at coordinate (i, ai).
+n vertical lines are drawn such that the two endpoints of line i is at (i, ai) and (i, 0).
+Find two lines, which together with x-axis forms a container, such that the container contains the most water.
+```
+
+自己想到的:
+{% highlight C++ %}
 int maxArea(vector<int> &height) {
     //两个指针，扫。注意，一前一后扫
     int start=0, end=height.size()-1;
@@ -177,7 +189,9 @@ int maxArea(vector<int> &height) {
     }
     return maxW;
 }
-优化：end不需要归位了，且抽取area计算到if else的外边  2
+{% endhighlight %}
+优化：end不需要归位了，且抽取area计算到if else的外边
+{% highlight C++ %}
 int maxArea(vector<int> &height) {
     //两个指针，扫。注意，以前以后扫
     int start=0, end=height.size()-1;
@@ -192,14 +206,16 @@ int maxArea(vector<int> &height) {
     }
     return maxW;
 }
+{% endhighlight %}
 
-12, [Trapping Rain Water - Leetcode 42](https://leetcode.com/problems/trapping-rain-water/)
+### 6. [Trapping Rain Water - Leetcode 42](https://leetcode.com/problems/trapping-rain-water/)
 Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it is able to trap after raining.
 For example, 
 Given [0,1,0,2,1,0,1,3,2,1,2,1], return 6.
 
 The above elevation map is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water (blue section) are being trapped. 
-扫两边，常规解法 1
+扫两边，常规解法
+{% highlight C++ %}
 int trap(int A[], int n) {
     //每根柱子分割开来，找到左、右边最高的，就能知道它上部能放多少水
     vector<int> left(n, 0);
@@ -218,7 +234,9 @@ int trap(int A[], int n) {
     }
     return res;
 }
-方法2，找中间最高 2
+{% endhighlight %}
+方法2，找中间最高
+{% highlight C++ %}
 int trap(int A[], int n) {
     //扫描一遍，找到最高的柱子，这个柱子将数组分为两半；再分别处理左右2边
     int maxIndex=0;
@@ -235,6 +253,7 @@ int trap(int A[], int n) {
     }
     return res;
 }
+{% endhighlight %}
 
 5，[Two Sum - Leetcode 1](https://leetcode.com/problems/two-sum/)
 Given an array of integers, find two numbers such that they add up to a specific target number.
@@ -242,8 +261,9 @@ The function twoSum should return indices of the two numbers such that they add 
 You may assume that each input would have exactly one solution.
 Input: numbers={2, 7, 11, 15}, target=9
 Output: index1=1, index2=2
-常规解法 1
-bool mycompare(const pair<int, int> &num1, const pair<int, int> &num2) { //注意，这么写! 而且该函数，要写到class外边!!!
+常规解法
+{% highlight C++ %}
+bool mycompare(const pair<int, int> &num1, const pair<int, int> &num2) { //注意，这么写! 而且该函数，要写到class外边!
     return num1.first < num2.first; //不需要考虑相等的情况，因为each input would have exactly one solution
 }
 vector<int> twoSum(vector<int> &numbers, int target) {
@@ -268,7 +288,9 @@ vector<int> twoSum(vector<int> &numbers, int target) {
     }
     return res;
 }
-优化数据结构解法 2
+{% endhighlight %}
+优化数据结构解法
+{% highlight C++ %}
 vector<int> twoSum(vector<int> &numbers, int target) {
     //用一个哈希表hash，存储每个数对应的下标，复杂度 O(n)
     vector<int> res;
@@ -286,6 +308,7 @@ vector<int> twoSum(vector<int> &numbers, int target) {
     }
     return res;
 }
+{% endhighlight %}
 
 6，[3 Sum - Leetcode 15](https://leetcode.com/problems/3sum/)
 Given an array S of n integers, are there elements a, b, c in S such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
@@ -296,7 +319,8 @@ The solution set must not contain duplicate triplets.
     A solution set is:
     (-1, 0, 1)
     (-1, -1, 2)
-常规解法 2 先排序，再左右夹逼，将n^2降为nlogn
+常规解法 先排序，再左右夹逼，将n^2降为nlogn
+{% highlight C++ %}
 //这个方法可以推广到k-sum，先排序，然后做k-2次循环，在最内层循环左右夹逼，时间复杂度是O(max{nlogn,n^k-1})
 vector<vector<int> > threeSum(vector<int> &num) {
     //先排序nlogn，再左右夹逼,两层循环n^2
@@ -325,7 +349,9 @@ vector<vector<int> > threeSum(vector<int> &num) {
     }
     return res;
 }
+{% endhighlight %}
 超时的，简洁的解法
+{% highlight C++ %}
 vector<vector<int> > threeSum(vector<int> &num) {
     //先排序nlogn，再左右夹逼,两层循环n^2 中途不判重的话，最后统一去也行
     vector<vector<int> > res;
@@ -350,11 +376,14 @@ vector<vector<int> > threeSum(vector<int> &num) {
     res.erase(unique(res.begin(), res.end()), res.end());   //unique返回排除重复后的结尾，erase删除以后的
     return res;
 }
+{% endhighlight %}
+
 7，[3 Sum closest - Leetcode 16](https://leetcode.com/problems/3sum-closest/)
 Given an array S of n integers, find three integers in S such that the sum is closest to a given number, target. Return the sum of the three integers. You may assume that each input would have exactly one solution.
 For example, given array S = {-1 2 1 -4}, and target = 1.
 The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
-常规解法 1
+常规解法
+{% highlight C++ %}
 int threeSumClosest(vector<int> &num, int target) {
     //思路一样 题目说有且只有1个答案，所以边界不用判断
     sort(num.begin(), num.end());
@@ -377,6 +406,8 @@ int threeSumClosest(vector<int> &num, int target) {
     }
     return res;
 }
+{% endhighlight %}
+
 8，[4 Sum - Leetcode 18](https://leetcode.com/problems/4sum/)
 Given an array S of n integers, are there elements a, b, c, and d in S such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
 Note:
@@ -387,7 +418,8 @@ For example, given array S = {1 0 -1 0 -2 2}, and target = 0.
     (-1,  0, 0, 1)
     (-2, -1, 1, 2)
     (-2,  0, 0, 2)
-常规解法 1
+常规解法
+{% highlight C++ %}
 vector<vector<int> > fourSum(vector<int> &num, int target) {
     //和3sum很类似啊 n^3
     vector<vector<int> > res;
@@ -418,7 +450,9 @@ vector<vector<int> > fourSum(vector<int> &num, int target) {
     }
     return res;
 }
-同样的，简洁的解法，最后统一去重 2
+{% endhighlight %}
+同样的，简洁的解法，最后统一去重
+{% highlight C++ %}
 vector<vector<int> > fourSum(vector<int> &num, int target) {
     //最后统一去重
     vector<vector<int> > res;
@@ -445,7 +479,9 @@ vector<vector<int> > fourSum(vector<int> &num, int target) {
     res.erase(unique(res.begin(), res.end()), res.end());
     return res;
 }
+{% endhighlight %}
 牛一点的解法，不太建议用，也是用了hash：
+{% highlight C++ %}
 vector<vector<int> > fourSum(vector<int> &num, int target) {
     //高级方法 用一个 hashmap 先缓存两个数的和
     //时间复杂度，平均 O(n^2)，最坏 O(n^4)，空间复杂度 O(n^2)
@@ -485,12 +521,15 @@ O(N^2)
     res.erase(unique(res.begin(), res.end()), res.end());
     return res;
 }
+{% endhighlight %}
+
 9，[Merge sorted array - Leetcode 88](https://leetcode.com/problems/merge-sorted-array/) 
 Given two sorted integer arrays A and B, merge B into A as one sorted array.
 Note:
 You may assume that A has enough space (size that is greater or equal to m + n) to hold additional elements from B. 
 The number of elements initialized in A and B are m and n respectively.
-简洁解法!
+简洁解法
+{% highlight C++ %}
 void merge(int A[], int m, int B[], int n) {
     //分别一个指针，扫. 为了省空间，从后往前赋值 时间复杂度 O(m+n)，空间复杂度 O(1)
     int i=m-1, j=n-1, index=m+n-1;  //需要有个index指针
@@ -501,11 +540,14 @@ void merge(int A[], int m, int B[], int n) {
         A[index--] = B[j--];
     }
 }
+{% endhighlight %}
+
 10, [Implement strStr - Leetcode 28](https://leetcode.com/problems/implement-strstr/)
 Returns a pointer to the first occurrence of needle in haystack, or null if needle is not part of haystack.
 常规解法 算法课Java版本:
 
-C++解法 2
+C++解法
+{% highlight C++ %}
 char *strStr(char *haystack, char *needle) {
     //暴力解法，时间复杂度 O(N*M)，空间复杂度 O(1),大集合超时
     //优化：实际上只需要循环n-m+1次，因为长度不够m的时候肯定不可能匹配
@@ -526,7 +568,9 @@ char *strStr(char *haystack, char *needle) {
     }
     return NULL; //到结尾
 }
+{% endhighlight %}
 C++解法 简化求长度
+{% highlight C++ %}
 char *strStr(char *haystack, char *needle) {
     //暴力解法，时间复杂度 O(N*M)，空间复杂度 O(1),大集合超时
     //优化：实际上只需要循环n-m+1次，因为长度不够m的时候肯定不可能匹配
@@ -545,6 +589,8 @@ char *strStr(char *haystack, char *needle) {
     }
     return NULL; //到结尾
 }
+{% endhighlight %}
+
 11, [Substring with Concatenation of All Words - Leetcode 30](https://leetcode.com/problems/substring-with-concatenation-of-all-words/)
 You are given a string, S, and a list of words, L, that are all of the same length. Find all starting indices of substring(s) in S that is a concatenation of each word in L exactly once and without any intervening characters.
 For example, given:
@@ -553,6 +599,7 @@ L: ["foo", "bar"]
 You should return the indices: [0,9].
 (order does not matter)
 这个主要用map这样的数据结构 略难
+{% highlight C++ %}
 vector<int> findSubstring(string S, vector<string> &L) {
     //主要考察数据结构的使用
     int wLen = L.front().size();    //用front!
@@ -581,6 +628,7 @@ vector<int> findSubstring(string S, vector<string> &L) {
     }
     return res;
 }
+{% endhighlight %}
 
 13, [Valid palindrome - Leetcode 125](https://leetcode.com/problems/valid-palindrome/)
 Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
@@ -591,6 +639,7 @@ Note:
 Have you consider that the string might be empty? This is a good question to ask during an interview.
 For the purpose of this problem, we define empty string as valid palindrome.
 常规解法，代码已极度精简
+{% highlight C++ %}
 bool isPalindrome(string s) {
     //正常逻辑处理，先过滤字符，后判断
     string ss;
@@ -605,6 +654,8 @@ bool isPalindrome(string s) {
     }
     return true;    //we define empty string as valid palindrome
 }
+{% endhighlight %}
+
 14, [Reverse Integer - Leetcode 7](https://leetcode.com/problems/reverse-integer/)
 Reverse digits of an integer.
 Example1: x = 123, return 321
@@ -616,6 +667,7 @@ If the integer's last digit is 0, what should the output be? ie, cases such as 1
 Did you notice that the reversed integer might overflow? Assume the input is a 32-bit integer, then the reverse of 1000000003 overflows. How should you handle such cases?
 Throw an exception? Good, but what if throwing an exception is not an option? You would then have to re-design the function (ie, add an extra parameter).
 没考虑溢出的，极度精简的代码：
+{% highlight C++ %}
 int reverse(int x) {
     //时间复杂度 O(lgn)，空间复杂度 O(1),短小代码!
     int res=0;
@@ -624,7 +676,9 @@ int reverse(int x) {
     }
     return res; //负数，也是对的，不需要单独处理.  这里只是要提一下，溢出怎么办?
 }
+{% endhighlight %}
 溢出，这个更建议在面试的时候写：
+{% highlight C++ %}
 int reverse(int x) {
     //考虑溢出
     double res=0;   //这样的话，不会溢出
@@ -635,6 +689,8 @@ int reverse(int x) {
     if(res > INT_MAX)   return INT_MAX;
     return (int)res;
 }
+{% endhighlight %}
+
 15, [Palindrome Number - Leetcode 9](https://leetcode.com/problems/palindrome-number/)
 Determine whether an integer is a palindrome. Do this without extra space.
 click to show spoilers.
@@ -644,6 +700,7 @@ If you are thinking of converting the integer to string, note the restriction of
 You could also try reversing an integer. However, if you have solved the problem "Reverse Integer", you know that the reversed integer might overflow. How would you handle such case?
 There is a more generic way of solving this problem.
 若直接用reverse，会溢出，所以下面直接首尾比较，靠谱
+{% highlight C++ %}
 bool isPalindrome(int x) {
     //参考reverse的方法，直接一个一个比呗
     if(x < 0)   return false;    //若负数，也算Palindrome的话==>问面试官
@@ -657,6 +714,8 @@ bool isPalindrome(int x) {
     }
     return true;
 }
+{% endhighlight %}
+
 16, [Minimum window substring - Leetcode 76 Hard](https://leetcode.com/problems/minimum-window-substring/)
 Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
 For example,
@@ -667,6 +726,7 @@ Note:
 If there is no such window in S that covers all characters in T, return the emtpy string "".
 If there are multiple such windows, you are guaranteed that there will always be only one unique minimum window in S.
 双指针的使用，right一直往前，left在count到的情况下收缩
+{% highlight C++ %}
 string minWindow(string S, string T) {
     //用hash记录T，然后扫S，2个指针典型的题
     int lenT = T.size();
@@ -697,6 +757,8 @@ string minWindow(string S, string T) {
     }
     return res;
 }
+{% endhighlight %}
+
 17, [Sort colors - Leetcode 75](https://leetcode.com/problems/sort-colors/)
 Given an array with n objects colored red, white or blue, sort them so that objects of the same color are adjacent, with the colors in the order red, white and blue.
 Here, we will use the integers 0, 1, and 2 to represent the color red, white, and blue respectively.
@@ -706,6 +768,7 @@ Follow up:
 A rather straight forward solution is a two-pass algorithm using counting sort.
 First, iterate the array counting number of 0's, 1's, and 2's, then overwrite array with total number of 0's, then 1's and followed by 2's.
 Could you come up with an one-pass algorithm using only constant space?
+{% highlight C++ %}
 void sortColors(int A[], int n) {
     //Follow up中的方案:排序的范围就3个数，用桶排序呗==>O(n)时间，O(1)空间
     int timesofA[3]={0};    //初始化!! 否则Runtime Error
@@ -716,7 +779,9 @@ void sortColors(int A[], int n) {
         while(timesofA[i]-- > 0)
             A[index++] = i;
 }
+{% endhighlight %}
 
+{% highlight C++ %}
 void sortColors(int A[], int n) {
     //更好的方法，一遍遍历就解决，3个指针
     int last=n-1, first=0; //反正就3种数字,前后交换呗,两边往中间走
@@ -731,7 +796,9 @@ void sortColors(int A[], int n) {
         }
     }        
 }
+{% endhighlight %}
 
+{% highlight C++ %}
 void sortColors(int A[], int n) {
     //利用快速排序里partition的思想，第一次将数组按0分割，第二次按1分割，排序完毕
     //可以推广到 n种颜色，每种颜色有重复元素的情况。
@@ -752,12 +819,15 @@ int partition(int A[], int start, int end, int pivot) { //稍微变形，传入p
     }
     return low; //low肯定是对的
 }
+{% endhighlight %}
+
 18, [First Missing Positive - Leetcode 41](https://leetcode.com/problems/first-missing-positive/)
 Given an unsorted integer array, find the first missing positive integer.
 For example,
 Given [1,2,0] return 3,
 and [3,4,-1,1] return 2.
 Your algorithm should run in O(n) time and uses constant space.
+{% highlight C++ %}
 int firstMissingPositive(int A[], int n) {
     //用标记数组bool，出现的true，第一个没出现的就是答案，但是空间O(n)，不靠谱!
     //有个方法，各就各位:每当 A[i]!= i+1 的时候，将 A[i] 与 A[A[i]-1] 交换，直到无法交换为止
@@ -772,10 +842,12 @@ int firstMissingPositive(int A[], int n) {
     }
     return n+1;
 }
+{% endhighlight %}
 另，类似的题Find missing number，已经排序了，用二分
 You have an array a[] and the length n, the array should filled from 0 to n-1 but now one 
 number missed. Find the missing number. 
 For example, to the array {0,1,3,4,5,6,7}, the missing number is 2. 
+{% highlight C++ %}
 int findMissing(int a[], int n){ 
   int left = 0; 
   int right = n-1; 
@@ -796,11 +868,13 @@ int findMissing(int a[], int n){
   } 
   return -1; 
 } 
+{% endhighlight %}
 
 19, [Remove Element - Leetcode 27](https://leetcode.com/problems/remove-element/)
 Given an array and a value, remove all instances of that value in place and return the new length.
 The order of elements can be changed. It doesn't matter what you leave beyond the new length. 
 自己的笨办法：类似快排partition，其实这样拷贝的次数少，时间比较优化，但是代码冗余
+{% highlight C++ %}
 int removeElement(int A[], int n, int elem) {
     int left=0, right=n-1;
     while(left <= right) {
@@ -815,7 +889,9 @@ int removeElement(int A[], int n, int elem) {
     }
     return left;
 }
+{% endhighlight %}
 快慢指针法：
+{% highlight C++ %}
 int removeElement(int A[], int n, int elem) {
     int low=0, high=0;
     for(; high<n; high++) {
@@ -824,3 +900,4 @@ int removeElement(int A[], int n, int elem) {
     }
     return low;
 }
+{% endhighlight %}
