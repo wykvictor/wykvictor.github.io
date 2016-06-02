@@ -209,11 +209,12 @@ int maxArea(vector<int> &height) {
 {% endhighlight %}
 
 ### 6. [Trapping Rain Water - Leetcode 42](https://leetcode.com/problems/trapping-rain-water/)
+```
 Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it is able to trap after raining.
 For example, 
 Given [0,1,0,2,1,0,1,3,2,1,2,1], return 6.
+```
 
-The above elevation map is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water (blue section) are being trapped. 
 扫两边，常规解法
 {% highlight C++ %}
 int trap(int A[], int n) {
@@ -255,16 +256,21 @@ int trap(int A[], int n) {
 }
 {% endhighlight %}
 
-5，[Two Sum - Leetcode 1](https://leetcode.com/problems/two-sum/)
+### 7. [Two Sum - Leetcode 1](https://leetcode.com/problems/two-sum/)
+```
 Given an array of integers, find two numbers such that they add up to a specific target number.
 The function twoSum should return indices of the two numbers such that they add up to the target, where index1 must be less than index2. Please note that your returned answers (both index1 and index2) are not zero-based.
 You may assume that each input would have exactly one solution.
 Input: numbers={2, 7, 11, 15}, target=9
 Output: index1=1, index2=2
+```
+
 常规解法
 {% highlight C++ %}
-bool mycompare(const pair<int, int> &num1, const pair<int, int> &num2) { //注意，这么写! 而且该函数，要写到class外边!
-    return num1.first < num2.first; //不需要考虑相等的情况，因为each input would have exactly one solution
+//注意，这么写! 而且该函数，要写到class外边!
+bool mycompare(const pair<int, int> &num1, const pair<int, int> &num2) { 
+    //不需要考虑相等的情况，因为each input would have exactly one solution
+    return num1.first < num2.first;
 }
 vector<int> twoSum(vector<int> &numbers, int target) {
     //先排序，然后左右夹逼，排序 O(n log n)，左右夹逼 O(n)，最终 O(n log n)。但是注意，这题需要返回的是下标,需pair
@@ -300,7 +306,8 @@ vector<int> twoSum(vector<int> &numbers, int target) {
     }
     for (int i = 0; i < numbers.size(); i++) {
         const int gap = target - numbers[i];
-        if (mapping.find(gap) != mapping.end() && mapping[gap] != (i+1)) {   //主要是这个查找，时间近似为O(1)
+        // 主要是这个查找，时间近似为O(1)
+        if (mapping.find(gap) != mapping.end() && mapping[gap] != (i+1)) {
             res.push_back(i + 1);
             res.push_back(mapping[gap]); //gap对应的下标
             break;
@@ -310,7 +317,8 @@ vector<int> twoSum(vector<int> &numbers, int target) {
 }
 {% endhighlight %}
 
-6，[3 Sum - Leetcode 15](https://leetcode.com/problems/3sum/)
+### 8. [3 Sum - Leetcode 15](https://leetcode.com/problems/3sum/)
+```
 Given an array S of n integers, are there elements a, b, c in S such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
 Note:
 Elements in a triplet (a,b,c) must be in non-descending order. (ie, a ≤ b ≤ c)
@@ -319,6 +327,8 @@ The solution set must not contain duplicate triplets.
     A solution set is:
     (-1, 0, 1)
     (-1, -1, 2)
+```
+
 常规解法 先排序，再左右夹逼，将n^2降为nlogn
 {% highlight C++ %}
 //这个方法可以推广到k-sum，先排序，然后做k-2次循环，在最内层循环左右夹逼，时间复杂度是O(max{nlogn,n^k-1})
@@ -327,7 +337,7 @@ vector<vector<int> > threeSum(vector<int> &num) {
     vector<vector<int> > res;
     if(num.size() < 3)
         return res;
-    sort(num.begin(), num.end());   //注意，该函数若num为空，会崩溃!!!
+    sort(num.begin(), num.end()); // 注意，该函数若num为空，会崩溃!!!
     for(int i=0; i<num.size()-2 && num[i]<=0; i++) {   //最外层，从左到右; 而且一旦i大于0了，没必要再找了直接退出
         if(i!=0 && num[i]==num[i-1])    //防止重复
             continue;
@@ -378,10 +388,13 @@ vector<vector<int> > threeSum(vector<int> &num) {
 }
 {% endhighlight %}
 
-7，[3 Sum closest - Leetcode 16](https://leetcode.com/problems/3sum-closest/)
+### 9. [3 Sum closest - Leetcode 16](https://leetcode.com/problems/3sum-closest/)
+```
 Given an array S of n integers, find three integers in S such that the sum is closest to a given number, target. Return the sum of the three integers. You may assume that each input would have exactly one solution.
 For example, given array S = {-1 2 1 -4}, and target = 1.
 The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+```
+
 常规解法
 {% highlight C++ %}
 int threeSumClosest(vector<int> &num, int target) {
@@ -408,7 +421,8 @@ int threeSumClosest(vector<int> &num, int target) {
 }
 {% endhighlight %}
 
-8，[4 Sum - Leetcode 18](https://leetcode.com/problems/4sum/)
+### 10. [4 Sum - Leetcode 18](https://leetcode.com/problems/4sum/)
+```
 Given an array S of n integers, are there elements a, b, c, and d in S such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
 Note:
 Elements in a quadruplet (a,b,c,d) must be in non-descending order. (ie, a ≤ b ≤ c ≤ d)
@@ -418,6 +432,8 @@ For example, given array S = {1 0 -1 0 -2 2}, and target = 0.
     (-1,  0, 0, 1)
     (-2, -1, 1, 2)
     (-2,  0, 0, 2)
+```
+
 常规解法
 {% highlight C++ %}
 vector<vector<int> > fourSum(vector<int> &num, int target) {
@@ -523,11 +539,14 @@ O(N^2)
 }
 {% endhighlight %}
 
-9，[Merge sorted array - Leetcode 88](https://leetcode.com/problems/merge-sorted-array/) 
+### 11. [Merge sorted array - Leetcode 88](https://leetcode.com/problems/merge-sorted-array/) 
+```
 Given two sorted integer arrays A and B, merge B into A as one sorted array.
 Note:
 You may assume that A has enough space (size that is greater or equal to m + n) to hold additional elements from B. 
 The number of elements initialized in A and B are m and n respectively.
+```
+
 简洁解法
 {% highlight C++ %}
 void merge(int A[], int m, int B[], int n) {
@@ -542,11 +561,12 @@ void merge(int A[], int m, int B[], int n) {
 }
 {% endhighlight %}
 
-10, [Implement strStr - Leetcode 28](https://leetcode.com/problems/implement-strstr/)
+### 12. [Implement strStr - Leetcode 28](https://leetcode.com/problems/implement-strstr/)
+```
 Returns a pointer to the first occurrence of needle in haystack, or null if needle is not part of haystack.
-常规解法 算法课Java版本:
+```
 
-C++解法
+常规解法
 {% highlight C++ %}
 char *strStr(char *haystack, char *needle) {
     //暴力解法，时间复杂度 O(N*M)，空间复杂度 O(1),大集合超时
@@ -569,7 +589,7 @@ char *strStr(char *haystack, char *needle) {
     return NULL; //到结尾
 }
 {% endhighlight %}
-C++解法 简化求长度
+简化求长度
 {% highlight C++ %}
 char *strStr(char *haystack, char *needle) {
     //暴力解法，时间复杂度 O(N*M)，空间复杂度 O(1),大集合超时
@@ -591,13 +611,16 @@ char *strStr(char *haystack, char *needle) {
 }
 {% endhighlight %}
 
-11, [Substring with Concatenation of All Words - Leetcode 30](https://leetcode.com/problems/substring-with-concatenation-of-all-words/)
+### 13. [Substring with Concatenation of All Words - Leetcode 30](https://leetcode.com/problems/substring-with-concatenation-of-all-words/)
+```
 You are given a string, S, and a list of words, L, that are all of the same length. Find all starting indices of substring(s) in S that is a concatenation of each word in L exactly once and without any intervening characters.
 For example, given:
 S: "barfoothefoobarman"
 L: ["foo", "bar"]
 You should return the indices: [0,9].
 (order does not matter)
+```
+
 这个主要用map这样的数据结构 略难
 {% highlight C++ %}
 vector<int> findSubstring(string S, vector<string> &L) {
@@ -630,7 +653,8 @@ vector<int> findSubstring(string S, vector<string> &L) {
 }
 {% endhighlight %}
 
-13, [Valid palindrome - Leetcode 125](https://leetcode.com/problems/valid-palindrome/)
+### 14. [Valid palindrome - Leetcode 125](https://leetcode.com/problems/valid-palindrome/)
+```
 Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
 For example,
 "A man, a plan, a canal: Panama" is a palindrome.
@@ -638,6 +662,8 @@ For example,
 Note:
 Have you consider that the string might be empty? This is a good question to ask during an interview.
 For the purpose of this problem, we define empty string as valid palindrome.
+```
+
 常规解法，代码已极度精简
 {% highlight C++ %}
 bool isPalindrome(string s) {
@@ -656,7 +682,8 @@ bool isPalindrome(string s) {
 }
 {% endhighlight %}
 
-14, [Reverse Integer - Leetcode 7](https://leetcode.com/problems/reverse-integer/)
+### 15. [Reverse Integer - Leetcode 7](https://leetcode.com/problems/reverse-integer/)
+```
 Reverse digits of an integer.
 Example1: x = 123, return 321
 Example2: x = -123, return -321
@@ -666,6 +693,8 @@ Here are some good questions to ask before coding. Bonus points for you if you h
 If the integer's last digit is 0, what should the output be? ie, cases such as 10, 100.
 Did you notice that the reversed integer might overflow? Assume the input is a 32-bit integer, then the reverse of 1000000003 overflows. How should you handle such cases?
 Throw an exception? Good, but what if throwing an exception is not an option? You would then have to re-design the function (ie, add an extra parameter).
+```
+
 没考虑溢出的，极度精简的代码：
 {% highlight C++ %}
 int reverse(int x) {
@@ -691,7 +720,7 @@ int reverse(int x) {
 }
 {% endhighlight %}
 
-15, [Palindrome Number - Leetcode 9](https://leetcode.com/problems/palindrome-number/)
+16, [Palindrome Number - Leetcode 9](https://leetcode.com/problems/palindrome-number/)
 Determine whether an integer is a palindrome. Do this without extra space.
 click to show spoilers.
 Some hints:
