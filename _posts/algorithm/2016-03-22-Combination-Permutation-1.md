@@ -29,9 +29,9 @@ If S = [1,2,3], a solution is:
 通用模板： 时间复杂度 O(2^n)，空间复杂度 O(n)
 {% highlight C++ %}
 vector<vector<int> > subsets(vector<int> &S) {
-    sort(S.begin(), S.end());   //could change S or not?
     vector<vector<int> > res;
     if(S.empty())   return res;
+    sort(S.begin(), S.end());   //could change S or not?
     vector<int> path;
     subsetsCore(S, res, path, 0);  // Don't need for combination! vector<bool> visited(S.size(), false);
     return res;
@@ -53,10 +53,10 @@ vector<vector<int> > subsets(vector<int> &S) {
     //时间复杂度 O(2^n)，空间复杂度 O(1)
     //这种方法最巧妙。因为它不仅能生成子集，还能方便的表示集合的并、交、差等集合运算
     //设两个集合的位向量分别为B和B，则B | B ;B & B ;B ^ B 分别对应集合的并、交、对称差
-    sort(S.begin(), S.end());
     vector<vector<int> > res;
     int len = S.size();
     if(len == 0)    return res;
+    sort(S.begin(), S.end());
     int times = 1 << len;
     for(int i=0; i<times; i++) {
         vector<int> path;
