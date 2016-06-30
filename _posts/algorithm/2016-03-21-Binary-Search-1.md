@@ -6,13 +6,11 @@ tags: [algorithm, leetcode, binary search]
 categories: Algorithm
 ---
 
-### 1. Level 1 - Knows the template
-4 tips:
-
-> start + 1 < end
-> start + (end - start) / 2
-> A[mid] ==, <, >
-> A[start] A[end] ? target
+### 1. Level 1 - Knows the template - 4 tips
+* start + 1 < end
+* start + (end - start) / 2
+* A[mid] ==, <, >
+* A[start] A[end] ? target
 
 ### 2. Binary Search Template
 Last Position of Target:    
