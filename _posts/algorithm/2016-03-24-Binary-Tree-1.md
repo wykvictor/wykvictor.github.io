@@ -6,6 +6,31 @@ tags: [algorithm, leetcode, binary tree, traversal]
 categories: Algorithm
 ---
 
+> 二叉树问题: 考虑整棵树在该问题上的结果 和左右儿子在该问题上结果的联系
+
+> DFS 总结：
+
+![DFS-1](http://7xno5y.com1.z0.glb.clouddn.com/DFS-1.jpg)
+
+<table border="2" frame="box" cellspacing="0px" style="border-collapse:collapse" valign="center">
+    <tr bgcolor="lightgreen">
+        <th align="center">   Traverse   </th>
+        <th align="center">Divide Conquer</th>
+    </tr>
+    <tr>
+        <td align="center">Recursion Algorithm</td>
+        <td align="center">Also Recursion</td>
+    </tr>
+    <tr>
+        <td align="center">Result in parameter</td>
+        <td align="center">Result in return value</td>
+    </tr>
+    <tr>
+        <td align="center">Top down</td>
+        <td align="center">Bottom up</td>
+    </tr>
+</table>
+
 ### 1. Binary Tree Preorder Traversal
 Recurse(Traverse) - Template：
 {% highlight C++ %}
