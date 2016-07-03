@@ -7,163 +7,178 @@ categories: Algorithm
 ---
 
 ### 1. Binary Tree Preorder Traversal
-递归：
+Recurse(Traverse) - Template：
 {% highlight C++ %}
 vector<int> preorderTraversal(TreeNode *root) {
-    vector<int> res;
-    preorderTraversalCore(root, res);
-    return res;
+  vector<int> res;
+  preorderTraversalCore(root, res);
+  return res;
 }
+// 递归的三要素：定义，把root为跟的preorder加入res里面
 void preorderTraversalCore(TreeNode *root, vector<int> &res) {
-    if(root == NULL)
-        return;
-    res.push_back(root->val);
-    preorderTraversalCore(root->left, res);
-    preorderTraversalCore(root->right, res);
+  // 三要素：递归结束
+  if(root == NULL) // 比判断叶子节点要简洁些
+      return;
+  // 三要素：如何拆分问题（规模变小，问题相同）
+  res.push_back(root->val);
+  preorderTraversalCore(root->left, res); // res顺序添加，这2句不可并行
+  preorderTraversalCore(root->right, res);
 }
 {% endhighlight %}
-迭代_先序独特的方案：
+Recurse, version 2：Divide & Conquer
 {% highlight C++ %}
 vector<int> preorderTraversal(TreeNode *root) {
-    vector<int> res;
-    if(root == NULL)    return res;
-    stack<TreeNode *> s;
-    s.push(root);
-    while(!s.empty()) {
-        TreeNode *node = s.top();
-        res.push_back(node->val);
-        s.pop();
-        if(node->right)     // 先序的简单的方案：先压右，后压左
-            s.push(node->right);
-        if(node->left)
-            s.push(node->left);
-    }
-    return res;
+  vector<int> res;
+  if(root == NULL)  return res;
+  // Divide：好处，这2句可以并行
+  vector<int> left = preorderTraversal(root->left);
+  vector<int> right = preorderTraversal(root->right);
+  // Conquer
+  res.push_back(root->val);
+  // 内存的copy，O(n)时间
+  res.insert(res.end(), left.begin(), left.end());
+  res.insert(res.end(), right.begin(), right.end());
+  return res;
+}
+{% endhighlight %}
+迭代_先序独特的方案，好：
+{% highlight C++ %}
+vector<int> preorderTraversal(TreeNode *root) {
+  vector<int> res;
+  if(root == NULL)    return res;
+  stack<TreeNode *> s;
+  s.push(root);
+  while(!s.empty()) {
+    TreeNode *node = s.top();
+    res.push_back(node->val);
+    s.pop();
+    if(node->right)     // 先序的简单的方案：先压右，后压左
+      s.push(node->right);
+    if(node->left)
+      s.push(node->left);
+  }
+  return res;
 }
 {% endhighlight %}
 迭代2_几种遍历通用的方案，不大好理解：
 {% highlight C++ %}
 vector<int> preorderTraversal(TreeNode *root) {
-    vector<int> res;
-    stack<TreeNode *> s;
-    TreeNode *node = root;
-    while(!s.empty() || node) {  // s不空，或node有值
-        if(node) {  // 只要node有，就访问，并转向左子树
-            res.push_back(node->val);
-            s.push(node);
-            node = node->left;
-        } else {    // 说明左边访问完了，转向右边
-            node = s.top();  // stack弹出，不为访问，为跟踪到右边
-            s.pop();
-            node = node->right;
-        }
+  vector<int> res;
+  stack<TreeNode *> s;
+  TreeNode *node = root;
+  while(!s.empty() || node) {  // s不空，或node有值
+    if(node) {  // 只要node有，就访问，并转向左子树
+      res.push_back(node->val);
+      s.push(node);
+      node = node->left;
+    } else {    // 说明左边访问完了，转向右边
+      node = s.top();  // stack弹出，不为访问，为跟踪到右边
+      s.pop();
+      node = node->right;
     }
-    return res;
+  }
+  return res;
 }
 {% endhighlight %}
 
 ### 2. Binary Tree Inorder Traversal
 递归：
-{% highlight C++ %}
 完全同上，只是把res.push_back(root->val);放到left和right中间
-{% endhighlight %}
-迭代_几种遍历通用的方案：
+
+迭代_几种遍历通用的方案，最重要：
 {% highlight C++ %}
 vector<int> inorderTraversal(TreeNode *root) {
-    vector<int> res;
-    stack<TreeNode *> s;
-    TreeNode *node = root;
-    while(!s.empty() || node) {
-        if(node) {  //如果node有
-            s.push(node);
-            node = node->left;      //一直到最左边
-        } else {
-            node = s.top();
-            s.pop();
-            res.push_back(node->val);   //在else里访问，就这一句位置不同
-            node = node->right;
-        }
+  vector<int> res;
+  stack<TreeNode *> s;
+  TreeNode *node = root;
+  while(!s.empty() || node) {
+    if(node) {  //如果node有
+      s.push(node);
+      node = node->left;      //一直到最左边
+    } else {
+      node = s.top();
+      s.pop();
+      res.push_back(node->val);   //在else里访问，就这一句位置不同
+      node = node->right;
     }
-    return res;
+  }
+  return res;
+}
+{% endhighlight %}
+另一种写法，更推荐：
+{% highlight C++ %}
+vector<int> inorderTraversal(TreeNode *root) {
+  vector<int> res;
+  if(root == NULL)  return res;
+  stack<TreeNode *> s;
+  TreeNode *node = root;
+  while(node != NULL || !s.empty()) {
+    // go to the leftest
+    while(node != NULL) {
+      s.push(node);
+      node = node->left;
+    }
+    node = s.top();
+    s.pop();
+    res.push_back(node->val);
+    node = node->right;
+  }
+  return res;
 }
 {% endhighlight %}
 
 ### 3. Binary Tree Postorder Traversal  - Hard
 递归：
-{% highlight C++ %}
 完全同上，只是把res.push_back(root->val);放到left和right最后
-{% endhighlight %}
-迭代_几种遍历通用的方案，更复杂一点
+
+迭代_几种遍历通用的方案，更复杂一点，不很重要
 {% highlight C++ %}
 vector<int> postorderTraversal(TreeNode *root) {
     vector<int> res;
     stack<TreeNode *> s;
-    TreeNode *prevVisit=NULL, *cur=root;
+    TreeNode *preVisit=NULL, *cur=root;
     while(!s.empty() || cur) {
-        for(; cur->left; cur = cur->left)   //一直找到最左边
-            s.push(cur);
-        //当前节点为空，且右子树不用访问了==>那么访问该节点
-        while(cur && (cur->right == NULL || cur->right == prevVisit)) {
-            res.push_back(cur->val);
-            prevVisit = cur; //记录一下
-            if(s.empty())   //结束!!，总体来说，有2个叶节点的父节点都被压入了2次
-                return res;
-            cur = s.top();  //搞个新的出来,之前需要判断下
-            s.pop();
-        }
-        s.push(cur);    //则依次访问右边的
+      //go to leftest
+      while(cur != NULL) {
+        s.push(cur);
+        cur = cur->left;
+      }
+      cur = s.top(); // take the leftest out, but not pop yet
+      // 右子树为空，或者访问过了
+      if(cur->right == NULL || cur->right == preVisit) {
+        res.push_back(cur->val);  // then take it
+        preVisit = cur;
+        s.pop();  // pop it
+        cur = NULL;  // very Important!
+      } else {
         cur = cur->right;
+      }
     }
     return res;
-}
+  }
 {% endhighlight %}
-改变了输入树的结构，做标记。但是代码思路简洁：
-{% highlight C++ %}
-vector<int> postorderTraversal(TreeNode *root) {
-    vector<int> res;
-    stack<TreeNode *> s;
-    if(root == NULL)    return res;
-    s.push(root);
-    while(!s.empty()) {
-        TreeNode *cur = s.top();
-        if(cur->left==NULL && cur->right==NULL) {   //真是叶节点，或者之前做过标记了
-            res.push_back(cur->val);
-            s.pop();
-        }
-        if(cur->right != NULL) {    //先放右，同时置为NULL，做标记
-            s.push(cur->right);
-            cur->right = NULL;
-        }
-        if(cur->left != NULL) {
-            s.push(cur->left);
-            cur->left = NULL;
-        }
-    }
-    return res;
-}
-{% endhighlight %}
-**Better solution**
+**Better solution**!!!
 
 pre-order traversal is root-left-right, and post order is left-right-root.
 
 Modify the code for pre-order to make it root-right-left, and then reverse the output so that we can get left-right-root：
 {% highlight C++ %}
 vector<int> postorderTraversal(TreeNode *root) {
-    vector<int> res;
-    if(root == NULL)    return res;
-    stack<TreeNode *> s;
-    s.push(root);
-    while(!s.empty()) {
-        TreeNode *node = s.top();
-        res.push_back(node->val);
-        s.pop();
-        if(node->left)     //先序的简单的方案改编：先压左，后压右
-            s.push(node->left);
-        if(node->right)
-            s.push(node->right);
-    }
-    reverse(res.begin(), res.end());    //反转 根右左 变成 左右根
-    return res;
+  vector<int> res;
+  if(root == NULL)    return res;
+  stack<TreeNode *> s;
+  s.push(root);
+  while(!s.empty()) {
+    TreeNode *node = s.top();
+    res.push_back(node->val);
+    s.pop();
+    if(node->left)     //先序的简单的方案改编：先压左，后压右
+      s.push(node->left);
+    if(node->right)
+      s.push(node->right);
+  }
+  reverse(res.begin(), res.end()); //反转 根右左 变成 左右根
+  return res;
 }
 {% endhighlight %}
 
