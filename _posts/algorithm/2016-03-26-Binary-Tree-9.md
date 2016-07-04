@@ -49,28 +49,25 @@ c) 上述2个函数，也可以用到求树中2个节点的距离：先求最低
 {% endhighlight %}
 方法2，O(1) Space的方案
 {% highlight C++ %}
-
+// 在root为根的二叉树中找A,B的LCA:
+// 如果找到了就返回这个LCA
+// 如果只碰到A，就返回A
+// 如果只碰到B，就返回B
+// 如果都没有，就返回null
+TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *A, TreeNode *B) {
+  if(root == NULL || root == A || root == B) {
+    return root;  // 如果是A是B的父节点这种情况，返回A即可
+  }
+  TreeNode *left = lowestCommonAncestor(root->left, A, B);
+  TreeNode *right = lowestCommonAncestor(root->right, A, B);
+  if(left != NULL && right != NULL) {
+    return root;  // 左右各有1个点，找到了，返回这个LCA; 并且可以一直返回到根root
+  }
+  if(left == NULL && right == NULL) {
+    return NULL;  // 左右都没有
+  }
+  return left ? left : right;  // 只碰到了A，B中的某一个，返回它
+}
 {% endhighlight %}
 
-### 2. [Binary Tree Level Order Traversal II - Leetcode 107](https://leetcode.com/problems/binary-tree-level-order-traversal-ii/)
-```
-Given a binary tree, return the bottom-up level order traversal of its nodes' values. (ie, from left to right, level by level from leaf to root).
-For example:
-Given binary tree {3,9,20,#,#,15,7},
-    3
-   / \
-  9  20
-    /  \
-   15   7
-return its bottom-up level order traversal as:
-[
-  [15,7],
-  [9,20],
-  [3]
-]
-```
-{% highlight C++ %}
-Same solution，只多下面一行：
-reverse(res.begin(), res.end());
-{% endhighlight %}
 
