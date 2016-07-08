@@ -53,60 +53,78 @@ The right subtree of a node contains only nodes with keys greater than the node'
 Both the left and right subtrees must also be binary search trees
 ```
 
-先序，递归
+错误解法：需要得到右子树的最小值,只比较right不对
+{% highlight C++ %}
+// wrong case: {10,5,15,#,#,6,20}
+bool isValidBST(TreeNode *root) {
+  if(root == NULL) {
+    return true;
+  }
+  if(root->left && root->left->val >= root->val)
+    return false;
+  if(root->right && root->right->val <= root->val)
+    return false;
+  return isValidBST(root->left) && isValidBST(root->right);
+}
+{% endhighlight %}
+先序，递归，core函数较难想到, traverse方法：
 {% highlight C++ %}
 bool isValidBST(TreeNode *root) {
-    // 若测试用例有INT_MIN节点，则此方法不可行！
-    return isValidBSTCore(root, INT_MIN, INT_MAX);
+  // 若测试用例有INT_MIN节点，则此方法不可行！
+  return isValidBSTCore(root, INT_MIN, INT_MAX);
 }
 // 不需要加&，从上往下传
 bool isValidBSTCore(TreeNode *root, int minval, int maxval) {
-    if(root == NULL)    //注意空的情况
-        return true;
-    if(root->val <= minval || root->val >= maxval)  //包括 ==
-        return false;
-    return isValidBSTCore(root->left, minval, root->val) 
-            && isValidBSTCore(root->right, root->val, maxval);
+  if(root == NULL)    //注意空的情况
+    return true;
+  if(root->val <= minval || root->val >= maxval)  //包括 ==
+    return false;
+  return isValidBSTCore(root->left, minval, root->val) 
+        && isValidBSTCore(root->right, root->val, maxval);
 }
 {% endhighlight %}
-迭代的方案： 从中序出发
+也可以用中序递归写法，推荐方法，traverse方法：
+{% highlight C++ %}
+bool isValidBSTHelper(TreeNode *root, TreeNode * &prev) {
+  if(root == NULL) {
+    return true;
+  }
+  if(!isValidBSTHelper(root->left, prev))
+    return false;
+  if(prev != NULL &&　prev->val >= root->val) {
+    //cout << prev->val << " " << root->val << endl;
+    return false;
+  }
+  prev = root;
+  return isValidBSTHelper(root->right, prev);
+}
+bool isValidBST(TreeNode *root) {
+  TreeNode *prev = NULL; //!不能直接传入NULL，需要声明这个4字节的指针，然后才能取引用
+  return isValidBSTHelper(root, prev);
+}
+{% endhighlight %}
+迭代的方案： 中序
 {% highlight C++ %}
 bool isValidBST(TreeNode *root) {
-    //迭代法：中序遍历，始终记录上一个值
-    int prevVal = INT_MIN;  // also wrong: need use treenode to record
-    stack<TreeNode*> s;
-    TreeNode *node = root;
-    while(!s.empty() || node) {
-        if(node) {
-            s.push(node);
-            node = node->left;
-        }else { //此时访问
-            node = s.top();
-            s.pop();
-            //就这2行不同
-            if(prevVal >= node->val)
-                return false;
-            prevVal = node->val;
-
-            node = node->right; //转向右子树
-        }
+  //迭代法：中序遍历，始终记录上一个值
+  int prevVal = INT_MIN;  // also wrong: need use treenode to record
+  stack<TreeNode*> s;
+  TreeNode *node = root;
+  while(!s.empty() || node) {
+    if(node) {
+      s.push(node);
+      node = node->left;
+    }else { //此时访问
+      node = s.top();
+      s.pop();
+      //就这2行不同
+      if(prevVal >= node->val)
+          return false;
+      prevVal = node->val;
+      node = node->right; //转向右子树
     }
-    return true;
-}
-{% endhighlight %}
-也可以用中序递归写法，简单
-{% highlight Java %}
-private Integer prevVal = null;  // INT_MIN is the coner case!
-public boolean isValidBST(TreeNode root) {
-    if(root == null)    return true;
-    return isValidBSTCore(root);
-}
-private boolean isValidBSTCore(TreeNode root) {
-    if(root == null)    return true;
-    if(!isValidBSTCore(root.left))  return false;
-    if(prevVal != null && prevVal >= root.val)  return false;
-    prevVal = root.val;
-    return isValidBSTCore(root.right);
+  }
+  return true;
 }
 {% endhighlight %}
 
@@ -380,45 +398,45 @@ vector<TreeNode *> generateTreesCore(int left, int right) {
 一直找到最边上，也不用交换节点啥的，就在尾部连接, 递归法
 {% highlight C++ %}
 TreeNode* insertNode(TreeNode* root, TreeNode* node) {
-    if(root == NULL || node == NULL)
-        return node;  // if root is {}, return {node}
-    if(root->val < node->val) {
-        if(root->right == NULL)
-            root->right = node;
-        else
-            insertNode(root->right, node);
-    } else {
-        if(root->left == NULL)
-            root->left = node;
-        else
-            insertNode(root->left, node);
-    }
-    return root;
+  if(root == NULL || node == NULL)
+    return node;  // if root is {}, return {node}
+  if(root->val < node->val) {
+    if(root->right == NULL)
+      root->right = node;
+    else
+      insertNode(root->right, node);
+  } else {
+    if(root->left == NULL)
+      root->left = node;
+    else
+      insertNode(root->left, node);
+  }
+  return root;
 }
 {% endhighlight %}
 迭代：
 {% highlight C++ %}
 TreeNode* insertNode(TreeNode* root, TreeNode* node) {
-    // write your code here
-    if(root == NULL || node == NULL)
-        return node;
-    TreeNode* p = root;
-    while(p != NULL) {
-        if(p->val < node->val) {
-            if(p->right == NULL) {
-                p->right = node;
-                break;
-            }
-            p = p->right;
-        } else {
-            if(p->left == NULL) {
-                p->left = node;
-                break;
-            }
-            p = p->left;
-        }
+  // write your code here
+  if(root == NULL || node == NULL)
+    return node;
+  TreeNode* p = root;
+  while(p != NULL) {
+    if(p->val < node->val) {
+      if(p->right == NULL) {
+        p->right = node;
+        break;
+      }
+      p = p->right;
+    } else {
+      if(p->left == NULL) {
+        p->left = node;
+        break;
+      }
+      p = p->left;
     }
-    return root;
+  }
+  return root;
 }
 {% endhighlight %}
 
@@ -531,21 +549,24 @@ Find all the keys of tree in range k1 to k2. i.e. print all x such that k1<=x<=k
 ```
 {% highlight C++ %}
 vector<int> searchRange(TreeNode* root, int k1, int k2) {
-    vector<int> res;
-    DFS(res, root, k1, k2);
-    return res;
+  vector<int> res;
+  DFS(res, root, k1, k2);
+  return res;
 }
 void DFS(vector<int> &res, TreeNode* root, int k1, int k2) {
-    if(root == NULL)  return;
-    if(root->val >= k1) { //优化，如果超出范围，剪枝！
-        DFS(res, root->left, k1, k2);
-    }
-    if(root->val >= k1 && root->val <= k2) {
-        res.push_back(root->val);
-    }
-    if(root->val <= k2) {
-        DFS(res, root->right, k1, k2);
-    }
+  if(root == NULL)  return;
+  /*if(root->val > k2 || root->val < k1) {
+        return;  // 错误剪枝,return早了
+  }*/
+  if(root->val >= k1) { //优化，如果超出范围，剪枝！
+    DFS(res, root->left, k1, k2);
+  }
+  if(root->val >= k1 && root->val <= k2) {
+    res.push_back(root->val);
+  }
+  if(root->val <= k2) {
+    DFS(res, root->right, k1, k2);
+  }
 }
 {% endhighlight %}
 
@@ -591,4 +612,56 @@ public:
         return nxt;
     }
 };
+{% endhighlight %}
+
+### 15. [Inorder Successor in Binary Search Tree](http://www.lintcode.com/en/problem/inorder-successor-in-binary-search-tree/)
+```
+Given a binary search tree and a node in it, find the in-order successor of that node in the BST.
+If the given node has no in-order successor in the tree, return null.
+It's guaranteed p is one node in the given tree.
+
+Time Complexity: O(h), where h is the height of the BST.
+```
+{% highlight C++ %}
+// 错误解法：2,1这种树，1的后继为2，是它的父节点，所以递归写法拿不到父节点，不可行
+TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p) {
+  if(root == NULL)  return NULL;
+  if(p == root) {
+    TreeNode* successor = root->right;
+    while(successor->left != NULL) {
+      successor = successor->left;
+    }
+    return successor;
+  }
+  if(p->val > root->val) {
+    return inorderSuccessor(root->right, p);
+  } else {
+    return inorderSuccessor(root->left, p);
+  }
+}
+// 正确：迭代，记录父节点
+TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p) {
+  if(root == NULL)  return NULL;
+  TreeNode* successor = NULL;
+  // find p
+  while(root != p) {
+    //successor = root;  // 记录上一个后继:不是这里记！
+    if(p->val > root->val) {
+      root = root->right;
+    } else {
+      successor = root;  // 记录上一个后继:这里记！往左走的时候
+      root = root->left;
+    }
+  }
+  // if no right child, then return parent
+  if(p->right == NULL) {
+    return successor;
+  }
+  // has right child, then find the leftmost child
+  successor = root->right;
+  while(successor->left != NULL) {
+    successor = successor->left;
+  }
+  return successor;
+}
 {% endhighlight %}
