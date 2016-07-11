@@ -70,4 +70,38 @@ TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *A, TreeNode *B) {
 }
 {% endhighlight %}
 
+### 2. [Lowest Common Ancestor II](http://www.lintcode.com/en/problem/lowest-common-ancestor-ii/)
+```
+The node has an extra attribute parent which point to the father of itself. The root's parent is null.
+```
 
+{% highlight C++ %}
+ParentTreeNode *lowestCommonAncestorII(ParentTreeNode *root,
+                                     ParentTreeNode *A,
+                                     ParentTreeNode *B) {
+  if(root == NULL || root == A || root == B)
+      return root;
+  stack<ParentTreeNode*> pathA;
+  ParentTreeNode *node = A;
+  while(node != NULL) {
+    pathA.push(node);
+    node = node->parent;
+  }
+  stack<ParentTreeNode*> pathB;
+  node = B;
+  while(node != NULL) {
+    pathB.push(node);
+    node = node->parent;
+  }
+  ParentTreeNode *last;
+  while(!pathA.empty() && !pathB.empty()) {
+    if(pathA.top() != pathB.top()) {
+      return last;
+    }
+    last = pathA.top();
+    pathA.pop();
+    pathB.pop();
+  }
+  return last;  // 题目规定肯定有答案，跳出了，说明A是B的父亲
+}
+{% endhighlight %}
