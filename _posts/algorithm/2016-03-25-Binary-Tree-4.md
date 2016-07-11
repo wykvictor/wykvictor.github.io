@@ -80,7 +80,6 @@ bool isSymmetric(TreeNode *root) {
     return true;    //最终都判断完，才true
 }
 {% endhighlight %}
-
 简化一下逻辑，空的也可以压入queue，就和递归思路一样了，里边就不需要判断4个点了，2个就够了：
 {% highlight C++ %}
 bool isSymmetric(TreeNode *root) {
@@ -130,7 +129,6 @@ bool isSameTree(TreeNode *p, TreeNode *q) {
     return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
 }
 {% endhighlight %}
-
 同样的，遍历方案也可：几乎和上边的一模一样
 {% highlight C++ %}
 bool isSameTree(TreeNode *p, TreeNode *q) {
@@ -176,5 +174,23 @@ bool matchTree(TreeNode* t1, TreeNode* t2) { //helper function
     if(!t1 || !t2) return false; 
     if(t1->val != t2->val) return false; 
     return matchTree(t1->left,t2->left) && matchTree(t1->right,t2->right); 
+}
+{% endhighlight %}
+
+### 4. [Tweaked Identical Binary Tree](http://www.lintcode.com/en/problem/tweaked-identical-binary-tree/#)
+```
+Check two given binary trees are identical or not. Assuming any number of tweaks are allowed. A tweak is defined as a swap of the children of one node in the tree.
+```
+{% highlight C++ %}
+bool isTweakedIdentical(TreeNode* a, TreeNode* b) {
+  if(a == NULL && b == NULL)
+    return true;
+  if(a == NULL || b == NULL)
+    return false;
+  if(a->val != b->val)
+    return false;
+  // 一致 或 对称
+  return (isTweakedIdentical(a->left, b->left) && isTweakedIdentical(a->right, b->right))
+    || (isTweakedIdentical(a->left, b->right) && isTweakedIdentical(a->right, b->left));
 }
 {% endhighlight %}
