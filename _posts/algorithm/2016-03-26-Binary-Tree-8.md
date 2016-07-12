@@ -131,47 +131,78 @@ return its zigzag level order traversal as:
 方法1的改编，奇数行前插
 {% highlight C++ %}
 vector<vector<int> > zigzagLevelOrder(TreeNode *root) {
-    vector<vector<int> > res;
-    zigzagLevelOrderCore(root, res, 0);
-    return res;
+  vector<vector<int> > res;
+  zigzagLevelOrderCore(root, res, 0);
+  return res;
 }
 void zigzagLevelOrderCore(TreeNode *root, vector<vector<int> > &res, int level) {
-    if(root == NULL)    return;
-    if(res.size() <= level)
-        res.push_back(vector<int>());  //不够了，所以加
-    //就这里加个判断即可，因为不知道某一行什么时候结束，所以不能最后用reverse，就插入的时候调整就行了
-    if(level % 2 == 0)
-        res[level].push_back(root->val);
-    else
-        res[level].insert(res[level].begin(), root->val);
-    zigzagLevelOrderCore(root->left, res, level+1);
-    zigzagLevelOrderCore(root->right, res, level+1);
+  if(root == NULL)    return;
+  if(res.size() <= level)
+    res.push_back(vector<int>());  //不够了，所以加
+  //就这里加个判断即可，因为不知道某一行什么时候结束，所以不能最后用reverse，就插入的时候调整就行了
+  if(level % 2 == 0)
+    res[level].push_back(root->val);
+  else
+    res[level].insert(res[level].begin(), root->val);
+  zigzagLevelOrderCore(root->left, res, level+1);
+  zigzagLevelOrderCore(root->right, res, level+1);
 }
 {% endhighlight %}
-方法2的改编：
+方法3的改编：
 {% highlight C++ %}
-vector<vector<int> > zigzagLevelOrder(TreeNode *root) {
-    vector<vector<int> > res;
-    queue<TreeNode *> cur;
-    queue<TreeNode *> next;
-    if(root == NULL)    return res;
-    cur.push(root);
-    bool isreversed=false;
-    while(!cur.empty()) {
-        vector<int> line;
-        while(!cur.empty()) {   //两层while，里边处理本行的
-            TreeNode * node = cur.front();
-            cur.pop();
-            line.push_back(node->val);
-            if(node->left)   next.push(node->left);
-            if(node->right)  next.push(node->right);
-        }
-        if(isreversed)
-            reverse(line.begin(), line.end());    //就多这三行
-        isreversed = !isreversed;
-        res.push_back(line);
-        swap(cur, next);
-    }
+vector<vector<int>> zigzagLevelOrder(TreeNode *root) {
+  vector<vector<int> > res;
+  if(root == NULL)
     return res;
+  queue<TreeNode *> cur;    //只用1个就可以
+  cur.push(root); //queue用push就好!
+  bool reversed = false;
+  while(!cur.empty()) {
+      vector<int> path;
+      for(int i=cur.size(); i>0; i--) {   //最开始取出queue里有多少个节点
+        TreeNode *p = cur.front();  //队列
+        cur.pop();
+        path.push_back(p->val);
+        if(p->left)     cur.push(p->left);
+        if(p->right)    cur.push(p->right);
+      }
+      if(reversed) {
+        reverse(path.begin(), path.end());
+      }
+      reversed = !reversed;
+      res.push_back(path);
+  }
+  return res;
+}
+{% endhighlight %}
+用stack，不需要调用reverse了，优化时间,好！
+{% highlight C++ %}
+vector<vector<int>> zigzagLevelOrder(TreeNode *root) {
+  vector<vector<int> > res;
+  if(root == NULL)
+    return res;
+  stack<TreeNode *> cur;
+  stack<TreeNode *> next;
+  cur.push(root);
+  bool reversed = true;
+  while(!cur.empty()) {
+    vector<int> path;
+    while(!cur.empty()) {
+      TreeNode *p = cur.top();
+      cur.pop();
+      path.push_back(p->val);
+      if(reversed) {
+        if(p->left)  next.push(p->left);
+        if(p->right)  next.push(p->right);
+      } else {
+        if(p->right)  next.push(p->right);
+        if(p->left)  next.push(p->left);
+      }
+    }
+    reversed = !reversed;
+    res.push_back(path);
+    swap(cur, next);
+  }
+  return res;
 }
 {% endhighlight %}
