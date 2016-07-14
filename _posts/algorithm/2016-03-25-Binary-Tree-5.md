@@ -95,7 +95,27 @@ bool isPairPresent(struct node *root, int target)
 }
 {% endhighlight %}
 
-### 2. [Binary Tree Maximum Path Sum - Leetcode 124 Hard](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
+### 2. [Binary Tree Maximum Path Sum II](http://www.lintcode.com/en/problem/binary-tree-maximum-path-sum-ii/)
+```
+Given a binary tree, find the maximum path sum from root.
+The path may end at any node in the tree and contain at least one node in it.
+```
+{% highlight C++ %}
+int maxPathSum2(TreeNode *root) {
+  if(root == NULL) {
+    return 0;
+  }
+  int left = maxPathSum2(root->left);
+  int right = maxPathSum2(root->right);
+  if(left <= 0 && right <= 0) {
+    return root->val;
+  }
+  // either of the 2 <isindex></isindex> > 0
+  return root->val + (left > right ? left : right);
+}
+{% endhighlight %}
+
+[Binary Tree Maximum Path Sum - Leetcode 124 Hard](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
 ```
 Given a binary tree, find the maximum path sum.
 The path may start and end at any node in the tree.
@@ -107,24 +127,53 @@ Given the below binary tree,
 Return 6.
 ```
 
+// Use resultType, 推荐方法
+{% highlight C++ %}
+// need to know: root为根，答案是多少；到root最长多少
+struct ResultType {
+  int max_sum; // 从树中任意到任意点的最大路径，这条路径至少包含一个点
+  int single_path; //从root往下走到任意点的最大路径,至少包含一个点root
+  ResultType(int a, int b): max_sum(a), single_path(b) {}
+};
+ResultType maxPathSumHelper(TreeNode *root) {
+  if(root == NULL) {
+      return ResultType(INT_MIN, INT_MIN);
+  }
+  ResultType left = maxPathSumHelper(root->left);
+  ResultType right = maxPathSumHelper(root->right);
+  
+  int single_path = root->val + 
+    max(0, max(left.single_path, right.single_path));
+  int max1 = max(left.max_sum, right.max_sum);
+  int max2 = root->val +
+    (left.single_path>0?left.single_path:0) +
+    (right.single_path>0?right.single_path:0);
+  int max_sum = max(max1, max2);
+  return ResultType(max_sum, single_path);
+}
+int maxPathSum(TreeNode *root) {
+  return maxPathSumHelper(root).max_sum;
+}
+{% endhighlight %}
+取巧的方法，将ResultType拆到了函数参数上
 {% highlight C++ %}
 int maxPathSum(TreeNode *root) {
-    //高级DFS，node存的不一定都是正数，难!
-    int max_sum = INT_MIN;
-    dfs(root, max_sum);
-    return max_sum;
+  //高级DFS，node存的不一定都是正数
+  int max_sum = INT_MIN;
+  dfs(root, max_sum);
+  return max_sum;
 }
 //函数返回单个方向路径的最大值，max_sum则是引用 返回了整体的值!
 int dfs(TreeNode *root, int &max_sum) {
-    if(root == NULL)
-        return 0;
-    int lLen = dfs(root->left, max_sum);
-    int rLen = dfs(root->right, max_sum);
-    // 只有大于，才加!!! 注意优先级!!!
-    int sum = (lLen>0?lLen:0) + (rLen>0?rLen:0) + root->val;
-    max_sum = max(max_sum, sum);
-    // 若大于，才加进去
-    return max(lLen, rLen) > 0 ? max(lLen, rLen) + root->val : root->val;
+  if(root == NULL)
+      return 0;
+  int lLen = dfs(root->left, max_sum);
+  int rLen = dfs(root->right, max_sum);
+  // 只有大于，才加!!! 注意优先级!!!
+  int sum = (lLen>0?lLen:0) + (rLen>0?rLen:0) + root->val;
+  max_sum = max(max_sum, sum);
+  // 若大于，才加进去
+  return max(lLen, rLen) > 0 ? max(lLen, rLen) + root->val : root->val;
 }
 {% endhighlight %}
 
@@ -146,11 +195,11 @@ return true, as there exist a root-to-leaf path 5->4->11->2 which sum is 22.
 ```
 {% highlight C++ %}
 bool hasPathSum(TreeNode *root, int sum) {
-    if(root == NULL)    return false;
-    if(root->left==NULL && root->right==NULL) //到了叶子
-        return (sum == root->val);
-    //if(root->left!=NULL && root->right!=NULL) 开头那句包括了这种情况
-    return hasPathSum(root->left, sum-root->val) || hasPathSum(root->right, sum-root->val);
+  if(root == NULL)    return false;
+  if(root->left==NULL && root->right==NULL) //到了叶子
+      return (sum == root->val);
+  //if(root->left!=NULL && root->right!=NULL) 开头那句包括了这种情况
+  return hasPathSum(root->left, sum-root->val) || hasPathSum(root->right, sum-root->val);
 }
 {% endhighlight %}
 
@@ -181,13 +230,13 @@ vector<vector<int> > pathSum(TreeNode *root, int sum) {
     return res;
 }
 void pathSumCore(TreeNode *root, int sum, vector<vector<int> > &res, vector<int> &line) {
-    if(root == NULL)
+    if(root == NULL)  // 必须判断；否则调用时需判断root->left!=NULL
         return;
-    line.push_back(root->val);
+    line.push_back(root->val);  // !先压再判断
     if(root->left==NULL && root->right==NULL) {
         if(sum == root->val)
             res.push_back(line);
-        line.pop_back();    // 弹出来!
+        line.pop_back();    // 需要弹出来!
         return;
     }
     pathSumCore(root->left, sum - root->val, res, line);  //接着找
