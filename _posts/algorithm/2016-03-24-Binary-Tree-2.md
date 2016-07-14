@@ -542,7 +542,7 @@ void deleteNode(TreeNode* root, int value, TreeNode* parent) {
 }
 {% endhighlight %}
 
-### 13. [Search Range in Binary Search Tree](http://www.lintcode.com/en/problem/search-range-in-binary-search-tree/)
+### 13. [Search Range in Binary Search Tree - Hard](http://www.lintcode.com/en/problem/search-range-in-binary-search-tree/)
 ```
 Given two values k1 and k2 (where k1 < k2) and a root pointer to a BST.
 Find all the keys of tree in range k1 to k2. i.e. print all x such that k1<=x<=k2 and x is a key of given BST. Return all the keys in ascending order.
