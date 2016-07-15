@@ -6,57 +6,58 @@ tags: [algorithm, leetcode, binary tree, Construct Binary Tree]
 categories: Algorithm
 ---
 
-### 1. [Construct Binary Tree from Preorder and Inorder Traversal - Leetcode 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
+### 1. [Construct Binary Tree from Preorder and Inorder Traversal - Hard Leetcode 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
 Given preorder and inorder traversal of a tree, construct the binary tree.
 {% highlight C++ %}
 TreeNode *buildTree(vector<int> &preorder, vector<int> &inorder) {
-    if(preorder.size() == 0 || inorder.size() == 0)
-        return NULL;
-    return buildTreeCore(preorder, inorder, 0, preorder.size()-1, 0, inorder.size()-1);
+  if(preorder.size() == 0 || inorder.size() == 0)
+      return NULL;
+  return buildTreeCore(preorder, inorder, 0, preorder.size()-1, 0, inorder.size()-1);
 }
+// 定义下面的接口：不需要copy两个vector, 直接用上边的每次赋值新的vector到参数里
 TreeNode *buildTreeCore(vector<int> &preorder, vector<int> &inorder, 
                         int preBeg, int preEnd, int inBeg, int inEnd) {
-    if(preBeg > preEnd || inBeg > inEnd)
-        return NULL;    // 终止条件
-    int rootval = preorder[preBeg];
-    TreeNode *root = new TreeNode(rootval);    //建立root节点
-    int i, len=0;
-    // 在in中找root,另，注意len的求法!不等于i
-    for(i=inBeg; inorder[i] != rootval && i <= inEnd; i++)
-        len++;
-    if(i > inEnd) return NULL;    //输入错误，无法建立树
-    // 把这些index搞对
-    root->left = buildTreeCore(preorder, inorder, preBeg+1, preBeg+len, inBeg, inBeg+len-1);
-    root->right = buildTreeCore(preorder, inorder, preBeg+len+1, preEnd, inBeg+len+1, inEnd);
-    return root;
+  if(preBeg > preEnd || inBeg > inEnd)
+    return NULL;    // 终止条件
+  int rootval = preorder[preBeg];
+  TreeNode *root = new TreeNode(rootval);    //建立root节点
+  int i, len=0;  // 注意，这里是根据len截取inorder和preorder!!!
+  // 在in中找root,另，注意len的求法!不等于i
+  for(i=inBeg; inorder[i] != rootval && i <= inEnd; i++)
+    len++;
+  if(i > inEnd) return NULL;    //输入错误，无法建立树
+  // 把这些index搞对
+  root->left = buildTreeCore(preorder, inorder, preBeg+1, preBeg+len, inBeg, inBeg+len-1);
+  root->right = buildTreeCore(preorder, inorder, preBeg+len+1, preEnd, inBeg+len+1, inEnd);
+  return root;
 }
 {% endhighlight %}
 
 ### 2. [Construct Binary Tree from Inorder and Postorder Traversal - Leetcode 106](https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)
 {% highlight C++ %}
 TreeNode *buildTree(vector<int> &inorder, vector<int> &postorder) {
-    if(postorder.size() == 0 || inorder.size() == 0)
-        return NULL;
-    return buildTreeCore(inorder, postorder, 0, inorder.size()-1, 0, postorder.size()-1);
+  if(postorder.size() == 0 || inorder.size() == 0)
+    return NULL;
+  return buildTreeCore(inorder, postorder, 0, inorder.size()-1, 0, postorder.size()-1);
 }
 TreeNode *buildTreeCore(vector<int> &inorder, vector<int> &postorder,
                         int inBeg, int inEnd, int postBeg, int postEnd) {
-    if(postBeg > postEnd || inBeg > inEnd)
-        return NULL;    //终止条件
-    int rootval = postorder[postEnd];   //主要就这3行不同
-    TreeNode *root = new TreeNode(rootval);    //建立root节点
-    int i, len=0;
-    for(i=inBeg; inorder[i] != rootval && i <= inEnd; i++) //在in中找root,另，注意len的求法!不等于i
-        len++;
-    if(i > inEnd) return NULL;    //输入错误，无法建立树
+  if(postBeg > postEnd || inBeg > inEnd)
+    return NULL;    //终止条件
+  int rootval = postorder[postEnd];   //主要就这3行不同
+  TreeNode *root = new TreeNode(rootval);    //建立root节点
+  int i, len=0;
+  for(i=inBeg; inorder[i] != rootval && i <= inEnd; i++) //在in中找root,另，注意len的求法!不等于i
+    len++;
+  if(i > inEnd) return NULL;    //输入错误，无法建立树
   
-    root->left = buildTreeCore(inorder, postorder, inBeg, inBeg+len-1, postBeg, postBeg+len-1); //把这些搞对   
-    root->right = buildTreeCore(inorder, postorder, inBeg+len+1, inEnd, postBeg+len, postEnd-1);
-    return root;
+  root->left = buildTreeCore(inorder, postorder, inBeg, inBeg+len-1, postBeg, postBeg+len-1); //把这些搞对!
+  root->right = buildTreeCore(inorder, postorder, inBeg+len+1, inEnd, postBeg+len, postEnd-1);
+  return root;
 }
 {% endhighlight %}
 
-### 3. Serialization/Deserialization of a Binary Tree
+### 3. [Binary Tree Serialization](http://www.lintcode.com/en/problem/binary-tree-serialization/)
 ```
 Assume we have a binary tree below:
     _30_ 
@@ -77,14 +78,20 @@ void writeBinaryTree(BinaryTree *p, ostream &out) {
     writeBinaryTree(p->right, out);
   }
 }
+// lintcode,返回string
+string serialize(TreeNode *root) {
+  if(root == NULL)
+    return "#";
+  string res(to_string(root->val));
+  res += ",";
+  res += serialize(root->left);
+  res += serialize(root->right);
+  return res;
+}
 {% endhighlight %}
 Deserializing a Binary Tree:
-Reading the binary tree from the file is similar. 
-
 We read tokens one at a time using pre-order traversal.
-
 If the token is a sentinel, we ignore it.
-
 If the token is a number, we insert it to the current node, and traverse to its left child, then its right child.
 {% highlight C++ %}
 void readBinaryTree(BinaryTree *&p, ifstream &fin) {
@@ -97,6 +104,20 @@ void readBinaryTree(BinaryTree *&p, ifstream &fin) {
     readBinaryTree(p->left, fin);
     readBinaryTree(p->right, fin);
   }
+}
+// lintcode，输入string
+TreeNode *deserialize(string &data) {
+  if(data.empty() || data[0] == '#') {
+    data = data.substr(1, data.size() - 1); // 不能忘记步进更新string！
+    return NULL;
+  }
+  int k = data.find(",");
+  string val = data.substr(0, k);
+  TreeNode *node = new TreeNode(stoi(val));
+  data = data.substr(k+1, data.size() - k - 1);
+  node->left = deserialize(data);  // data必须是引用&,因为要返回这一步的处理结果
+  node->right = deserialize(data);
+  return node;
 }
 {% endhighlight %}
 
