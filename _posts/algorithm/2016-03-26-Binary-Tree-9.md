@@ -74,7 +74,6 @@ TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *A, TreeNode *B) {
 ```
 The node has an extra attribute parent which point to the father of itself. The root's parent is null.
 ```
-
 {% highlight C++ %}
 ParentTreeNode *lowestCommonAncestorII(ParentTreeNode *root,
                                      ParentTreeNode *A,
@@ -103,5 +102,83 @@ ParentTreeNode *lowestCommonAncestorII(ParentTreeNode *root,
     pathB.pop();
   }
   return last;  // 题目规定肯定有答案，跳出了，说明A是B的父亲
+}
+{% endhighlight %}
+
+### 3. [Complete Binary Tree](http://www.lintcode.com/en/problem/complete-binary-tree/)
+```
+Check a binary tree is completed or not. A complete binary tree is a binary tree that every level is completed filled except the deepest level. In the deepest level, all nodes must be as left as possible. 
+```
+
+ResultType方法
+{% highlight C++ %}
+struct Result {
+  int height;
+  bool iscomplete;
+  bool isfull;
+  Result(int i = -1, bool is = false, bool full = false)
+      : height(i), iscomplete(is), isfull(full) {}
+};
+Result isCompleteHelper(TreeNode* root) {
+  if (root == NULL) {
+    return Result(0, true, true);
+  }
+  Result left = isCompleteHelper(root->left);
+  Result right = isCompleteHelper(root->right);
+  if (left.iscomplete == false || right.iscomplete == false) {
+    return Result();  // false
+  }
+  /* // do not need
+  if(left.height < right.height || left.height - right.height > 1) {
+      return Result();
+  }*/
+  // 相等,left is Full, right is complete
+  if (left.height == right.height) {
+    if (left.isfull && right.iscomplete) {
+      return Result(left.height + 1, true, right.isfull);
+    }
+    return Result();
+  }
+  // left is complete, right is full
+  if (left.height == right.height + 1) {
+    if (left.iscomplete && right.isfull) {
+      return Result(left.height + 1, true, false);
+    }
+    return Result();
+  }
+  return Result();
+}
+bool isComplete(TreeNode* root) {
+  if (root == NULL) return true;
+  return isCompleteHelper(root).iscomplete;
+}
+{% endhighlight %}
+推荐方法，层序遍历，叶节点填洞，最后的结尾都是洞
+{% highlight C++ %}
+bool isComplete(TreeNode* root) {
+  if (root == NULL) return true;
+  vector<TreeNode*> q;  // use vector, in order to index it
+  q.push_back(root);
+  for (int i = 0; i < q.size(); i++) {
+    TreeNode* node = q[i];
+    if (node == NULL) {
+      continue;
+    }
+    q.push_back(node->left);
+    q.push_back(node->right);
+  }
+  int lastNotNULL = -1;
+  for (int i = q.size() - 1; i >= 0; i--) {
+    if (q[i] != NULL) {
+      lastNotNULL = i;
+      break;
+    }
+  }
+  for (int i = lastNotNULL - 1; i > 0; i--) {
+    if (q[i] == NULL) {
+      return false;
+    }
+  }
+  return true;
 }
 {% endhighlight %}
