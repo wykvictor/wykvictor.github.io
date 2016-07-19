@@ -116,6 +116,7 @@ int maxPathSum2(TreeNode *root) {
 {% endhighlight %}
 
 [Binary Tree Maximum Path Sum - Leetcode 124 Hard](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
+
 ```
 Given a binary tree, find the maximum path sum.
 The path may start and end at any node in the tree.
