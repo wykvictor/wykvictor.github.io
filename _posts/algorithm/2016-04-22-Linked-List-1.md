@@ -1,10 +1,18 @@
 ---
 layout: post
-title:  "Linked List 1 - "
+title:  "Linked List 1 - Basic Modules"
 date:   2016-04-22 18:30:00
-tags: [algorithm, leetcode, dynamic programming, dp]
+tags: [algorithm, leetcode, linked list]
 categories: Algorithm
 ---
+
+> Use modules packaged in different functions
+
+* Insert a Node in Sorted List
+* Remove a Node from Linked List
+* Reverse a Linked List
+* Merge Two Linked Lists
+* Middle of a Linked List
 
 ### 1. [Reverse Linked List](http://www.lintcode.com/en/problem/reverse-linked-list/)
 
@@ -65,3 +73,134 @@ ListNode *reverseBetween(ListNode *head, int m, int n) {
 }
 {% endhighlight %}
 
+### 3. [Reorder List](http://www.lintcode.com/en/problem/reorder-list/)
+```
+Given 1->2->3->4->null, reorder it to 1->4->2->3->null.
+```
+{% highlight C++ %}
+ListNode *getMid(ListNode *head) {
+  if (head == NULL) {
+    return NULL;
+  }
+  ListNode *slow = head, *fast = head->next;    // !
+  while (fast != NULL && fast->next != NULL) {  // !
+    slow = slow->next;
+    fast = fast->next->next;
+  }
+  return slow;  // !
+}
+ListNode *reverse(ListNode *head) {
+  ListNode *prev = NULL, *cur = head;
+  while (cur != NULL) {
+    ListNode *temp = cur->next;
+    cur->next = prev;
+    prev = cur;
+    cur = temp;
+  }
+  return prev;
+}
+void reorderList(ListNode *head) {
+  if (head == NULL) return;
+  // module 1: get mid
+  ListNode *mid = getMid(head);
+  // module 2: reverse 2
+  ListNode *reversed = reverse(mid->next);
+  mid->next = NULL;  // 封口!
+  // module 3: merge 2 list
+  ListNode *p1 = head, *p2 = reversed;
+  while (p1 != NULL && p2 != NULL) {
+    ListNode *t1 = p1->next;
+    p1->next = p2;
+    p1 = t1;
+    ListNode *t2 = p2->next;
+    p2->next = p1;
+    p2 = t2;
+  } // l1比l2长
+  return;
+}
+{% endhighlight %}
+
+### 4. [Sort List](http://www.lintcode.com/en/problem/sort-list/)
+Merge Sort: 时间O(nlogn)，局部有序->整体有序，稳定排序
+{% highlight C++ %}
+ListNode *sortList(ListNode *head) {
+  // 退出条件
+  if (head == NULL || head->next == NULL) {
+    return head;
+  }
+  ListNode *mid = getMid(head);  //module 1
+
+  ListNode *right = sortList(mid->next);
+  mid->next = NULL;  // 封口,所以right放在left前
+  ListNode *left = sortList(head);
+
+  return mergeTwoLists(left, right); //module 2
+}
+{% endhighlight %}
+Quick Sort: 时间O(nlogn)，最坏O(n^2)，整体有序->局部有序，不稳定排序
+{% highlight C++ %}
+ListNode *getTail(ListNode *head) {
+  ListNode *tail = head;
+  // 先判断tail!
+  while (tail != NULL && tail->next != NULL) {
+    tail = tail->next;
+  }
+  return tail;
+}
+// !!极端情况: 如果3个list有NULL
+ListNode *concat(ListNode *l1, ListNode *l2, ListNode *l3) {
+  ListNode *head = l1;
+
+  ListNode *tail1 = getTail(l1);
+  if (tail1 == NULL) {
+    head = l2;
+  } else {
+    tail1->next = l2;
+  }
+  ListNode *tail2 = getTail(l2);
+  if (tail2 == NULL) {
+    tail1->next = l3;
+  } else {
+    tail2->next = l3;
+  }
+
+  return head;
+}
+
+ListNode *sortList(ListNode *head) {
+  // 退出条件
+  if (head == NULL || head->next == NULL) {
+    return head;
+  }
+
+  // Partition:
+  ListNode *mid = getMid(head);  // O(n)
+  // Array快排区别：没有i,j左右游标，得有mid的链表，才能左右分
+  ListNode dummy_min(0), dummy_max(0), dummy_mid(0);
+  ListNode *p = head, *pmin = &dummy_min, *pmax = &dummy_max,
+           *pmid = &dummy_mid;
+  while (p != NULL) {
+    if (p->val < mid->val) {
+      pmin->next = p;
+      pmin = pmin->next;
+    } else if (p->val > mid->val) {
+      pmax->next = p;
+      pmax = pmax->next;
+    } else {
+      pmid->next = p;
+      pmid = pmid->next;
+    }
+    p = p->next;
+  }
+  pmin->next = NULL;
+  pmax->next = NULL;
+  pmid->next = NULL;
+
+  // 递归
+  ListNode *left = sortList(dummy_min.next);
+  ListNode *right = sortList(dummy_max.next);
+
+  // 3者连接
+  return concat(left, dummy_mid.next, right);
+}
+{% endhighlight %}
