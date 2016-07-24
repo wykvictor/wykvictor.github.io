@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Array & Numbers 1 - Two Pointers"
-date:   2016-03-27 10:30:00
+title:  "Array & Numbers 2 - Two Pointers"
+date:   2016-03-28 10:30:00
 tags: [algorithm, leetcode, array, two pointer]
 categories: Algorithm
 ---

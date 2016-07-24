@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Basics on Dynamic Programming(DP) 1 - Intro"
-date:   2016-03-03 11:30:00
+date:   2016-03-19 11:30:00
 tags: [algorithm, leetcode, dynamic programming, dp]
 categories: Algorithm
 ---
@@ -24,29 +24,23 @@ The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).
 Note:
 Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle.
 ```
-1) 原始的解法, 爆炸性复杂度2^n, 伪代码:
+1) 原始的解法, DFS解法, 爆炸性复杂度2^n, 伪代码:
 {% highlight C++ %}
-void dfs(int x, int y, int sum) {
-    if (x == n) {
-        if (sum > best) {
-            best = sum;
-        }
-        return;
-    }
-    
-    if (max[x][y] != -1) {    //尝试最优性剪枝：自顶向下的优化方式
-        if (max[x][y] <= sum) {
-            return;
-        }
-    }
-    max[x][y] = sum;
-    
-    dfs(x + 1, y, sum + a[x][y]);
-    dfs(x + 1, y + 1, sum + a[x][y]);
+// traversal 
+int minimumTotal(vector<vector<int> > &triangle) {
+  int n = triangle.size();  // n is the height
+  int best = INT_MAX;
+  dfs(triangle, 0, 0, 0, best);  // sum is root->x,y, not include root
+  return best;
 }
- 
-best = -MAXINT;
-dfs(0, 0, 0);
+void dfs(vector<vector<int> > &triangle, int x, int y, int sum, int &best) {
+  if(x == triangle.size()) {
+    best = min(best, sum);
+    return;
+  }
+  dfs(triangle, x + 1, y, sum + triangle[x][y], best);
+  dfs(triangle, x + 1, y+1, sum + triangle[x][y], best); //sum这时包括了root点
+}
 {% endhighlight %}
 2) 此类方法的优化：
 
