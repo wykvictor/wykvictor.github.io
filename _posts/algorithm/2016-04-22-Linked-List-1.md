@@ -204,3 +204,38 @@ ListNode *sortList(ListNode *head) {
   return concat(left, dummy_mid.next, right);
 }
 {% endhighlight %}
+
+### 5. [Reverse Nodes in k-Group](http://www.lintcode.com/en/problem/reverse-nodes-in-k-group/)
+```
+Given this linked list: 1->2->3->4->5
+For k = 2, you should return: 2->1->4->3->5
+For k = 3, you should return: 3->2->1->4->5
+```
+{% highlight C++ %}
+ListNode *reverseKGroup(ListNode *head, int k) {
+  if (k <= 1) return head;
+  int len = getLength(head);
+  // if (k >= len) return reverse(head); //下面包含了此情况
+
+  ListNode dummy(0), *p = &dummy;
+  dummy.next = head;
+  // 根据长度，算出区间数，保证不越界，简化逻辑
+  for (int i = 0; i < len / k; i++) {
+    ListNode *tail = p->next;  // 记录尾部
+    // 翻转k个节点
+    ListNode *prev = NULL, *cur = p->next;
+    for (int i = 0; i < k; i++) {
+      ListNode *temp = cur->next;
+      cur->next = prev;
+      // 两个好基友,一起往后走
+      prev = cur;
+      cur = temp;
+    }
+    p->next = prev;  // cur成了尾巴的后一个
+    tail->next = cur;
+    p = tail;
+  }
+
+  return dummy.next;
+}
+{% endhighlight %}
