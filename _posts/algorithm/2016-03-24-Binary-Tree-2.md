@@ -204,61 +204,80 @@ TreeNode *sortedArrayToBSTCore(vector<int> &num, int start, int end) {
 ### 6. [Convert Sorted List to Binary Search Tree - Leetcode 109](https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/)
 Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
 {% highlight C++ %}
-TreeNode *sortedListToBST(ListNode *head) {
-    //首先模拟上题的解法
-    if(head == NULL)    return NULL;
-    ListNode *p = head;
-    int size = 1;
-    while(p->next != NULL) {
-        size++;
-        p = p->next;
-    }
-    return sortedListToBSTCore(head, size);
+TreeNode *sortedListToBSTCore(ListNode *head, int size) {  //有几个元素
+  if (size <= 0)  //有"="，0代表没有节点，直接返回NULL
+    return NULL;
+  int mid = size >> 1;
+  int step = 0;
+  ListNode *pToMid = head;
+  while (step++ < mid) {
+    pToMid = pToMid->next;  //找到中间的节点
+  }
+  TreeNode *root = new TreeNode(pToMid->val);   //初始化
+  root->left = sortedListToBSTCore(head, mid);  //前一半是 mid 的长度
+  // 从pToMid->next开始，注意计算好-1
+  root->right = sortedListToBSTCore(pToMid->next, size - mid - 1);
+  return root;
 }
-TreeNode *sortedListToBSTCore(ListNode *head, int size) {   //有几个元素
-    if(size <= 0)        //有"="，0代表没有节点，直接返回NULL
-        return NULL;
-    int mid = size >> 1;
-    int step = 0;
-    ListNode *pToMid=head;
-    while(step++ < mid){
-        pToMid = pToMid->next;  //找到中间的节点
-    }
-    TreeNode *root = new TreeNode(pToMid->val);    //初始化
-    root->left = sortedListToBSTCore(head, mid);   //前一半是 mid 的长度
-    // 从pToMid->next开始，注意计算好-1
-    root->right = sortedListToBSTCore(pToMid->next, size - mid - 1);
-    return root;
+TreeNode *sortedListToBST(ListNode *head) {
+  //首先模拟上题的解法
+  if (head == NULL) return NULL;
+  ListNode *p = head;
+  int size = 1;
+  while (p->next != NULL) {
+    size++;
+    p = p->next;
+  }
+  return sortedListToBSTCore(head, size);
 }
 {% endhighlight %}
-自底向上建树法，very hard
+自底向上建树法，中序遍历，推荐！
 {% highlight C++ %}
-TreeNode *sortedListToBST(ListNode *head) {
-    //链表不能随机读取，用上题的解决方案不便捷，考虑从底向上建树timeO(n),spaceO(logn)
-    int len = 0;
-    ListNode *p = head;
-    while(p) {
-        len++;
-        p = p->next;
-    }
-    return sortedListToBST_aux(head, 0, len - 1);
+TreeNode *sortedListToBSTCore(ListNode *&root, int size) {  //注意! &
+  if (size == 0) return NULL;
+  // 注意，这几句的顺序，root被带回新的节点值了!
+  TreeNode *leftNode = sortedListToBSTCore(root, size / 2);
+  TreeNode *parent = new TreeNode(root->val);
+  parent->left = leftNode;
+  root = root->next;  // root赋新值
+  parent->right = sortedListToBSTCore(root, size - size / 2 - 1);
+  return parent;
 }
-//注意! &
-TreeNode *sortedListToBST_aux(ListNode *&root, int begin, int end) {
-    if(begin > end)
-        return NULL;
-    int mid = (begin + end) / 2;
-    // 注意，这几句的顺序，root被带回新的节点值了!
-    TreeNode *leftNode = sortedListToBST_aux(root, begin, mid - 1);
-    TreeNode *parent = new TreeNode(root->val);
-    parent->left = leftNode;
-    root = root->next;
-    parent->right = sortedListToBST_aux(root, mid + 1, end);
-    return parent;
+TreeNode *sortedListToBST(ListNode *head) {
+  //链表不能随机读取，用上题的解决方案不便捷，考虑从底向上建树timeO(n),spaceO(logn)
+  int len = 0;
+  ListNode *p = head;
+  while (p) {
+    len++;
+    p = p->next;
+  }
+  return sortedListToBSTCore(head, len);
 }
 {% endhighlight %}
 
-### 7. Saving a Binary Search Tree to a File
+### 7. [Convert Binary Search Tree to Doubly Linked List](http://www.lintcode.com/en/problem/convert-binary-search-tree-to-doubly-linked-list/)
+二叉搜索树转换为排序的双向链表
+{% highlight C++ %}
+// 空间O(1) : 用了中序的模板
+DoublyListNode *head = NULL;
+DoublyListNode *end = NULL;
+DoublyListNode *bstToDoublyList(TreeNode *root) {
+  if (root == NULL) return NULL;  // 1，返回
+  bstToDoublyList(root->left);    // 2，处理左边的
+  // 3，中间的步骤
+  DoublyListNode *node = new DoublyListNode(root->val);
+  node->prev = end;
+  if (end == NULL)  //若是开头节点
+    end = head = node;
+  else
+    end->next = node;
+  end = node;
+  bstToDoublyList(root->right);  //搞右边的
+  return head;
+}
+{% endhighlight %}
+
+### 8. Saving a Binary Search Tree to a File
 ```
 和前序，中序建树类似。但该方法简洁些
 Describe an algorithm to save a Binary Search Tree (BST) to a file in terms of run-time and disk space complexity.
@@ -303,28 +322,6 @@ void readBST(BinaryTree *&root, ifstream &fin) {
   int val;
   fin >> val;
   readBSTHelper(INT_MIN, INT_MAX, val, root, fin);
-}
-{% endhighlight %}
-
-### 8. Build double linked list from BST
-二叉搜索树转换为排序的双向链表
-{% highlight C++ %}
-空间O(1): 用了中序的模板
-DoubleList *head = NULL; 
-DoubleList *end = NULL; 
-DoubleList* ConverToDoubleList(Node *root){ 
-    Node *temp = root; 
-    if(temp == NULL) return NULL; //1，返回
-    ConverToDoubleList(temp->left);     //2，处理左边的
-    //3，中间的步骤
-    temp->left = end; 
-    if (end == NULL)     //若是开头节点
-        end = head = temp; 
-    else 
-        end->right = temp; 
-    end = temp; 
-    ConverToDoubleList(temp->right);     //搞右边的
-    return head; 
 }
 {% endhighlight %}
 
