@@ -195,4 +195,110 @@ Find two non-overlapping subarrays A and B, which |SUM(A) - SUM(B)| is the large
 ```
 {% highlight C++ %}
 // 前边几道题的集大成
+int maxDiffSubArrays(vector<int> nums) {
+  int N = nums.size();
+  if (N == 0) return 0;
+  // left2right
+  vector<int> maxleft(N, INT_MIN);  // 左边subarray最大和
+  int premin = 0, presum = 0;
+  for (int i = 0; i < N; i++) {
+    presum += nums[i];
+    maxleft[i] = max(i == 0 ? INT_MIN : maxleft[i - 1], presum - premin);
+    premin = min(premin, presum);
+  }
+  vector<int> minleft(N, INT_MAX);
+  int premax = 0;
+  presum = 0;
+  for (int i = 0; i < N; i++) {  // 左边subarray最小和
+    presum += nums[i];
+    minleft[i] = min(i == 0 ? INT_MAX : minleft[i - 1], presum - premax);
+    premax = max(premax, presum);
+  }
+  // right2left
+  vector<int> maxright(N, INT_MIN);
+  int postmin = 0, postsum = 0;
+  for (int i = N - 1; i >= 0; i--) {  // 右边subarray最大和
+    postsum += nums[i];
+    maxright[i] = max(i == N - 1 ? INT_MIN : maxright[i + 1], postsum - postmin);
+    postmin = min(postmin, postsum);
+  }
+  vector<int> minright(N, INT_MAX);
+  int postmax = 0;
+  postsum = 0;
+  for (int i = N - 1; i >= 0; i--) {  // 右边subarray最小和
+    postsum += nums[i];
+    minright[i] = min(i == N - 1 ? INT_MAX : minright[i + 1], postsum - postmax);
+    postmax = max(postmax, postsum);
+  }
+  // calculate result
+  int res;
+  for (int i = 0; i < N - 1; i++) {
+    res = max(res, abs(maxleft[i] - minright[i + 1]));
+    res = max(res, abs(minleft[i] - maxright[i + 1]));
+  }
+  return res;
+}
+{% endhighlight %}
+
+### 7. [Subarray Sum](http://www.lintcode.com/en/problem/subarray-sum/)
+···
+Find a subarray where the sum of numbers is zero. 
+Given [-3, 1, 2, -3, 4], return [0, 2] or [1, 3]
+···
+{% highlight C++ %}
+vector<int> subarraySum(vector<int> nums) {
+  vector<int> res;
+  unordered_map<int, int> hash;
+  hash[0] = -1;  // -1代表0以前的
+  int presum = 0;
+  for (int i = 0; i < nums.size(); i++) {
+    presum += nums[i];                      // inclusive!
+    if (hash.find(presum) != hash.end()) {  // 找到相同的和
+      res.push_back(hash[presum] + 1);
+      res.push_back(i);
+      return res;
+    }
+    hash[presum] = i;
+  }
+  return res;
+}
+{% endhighlight %}
+
+### 8. [Subarray Sum Closest/](http://www.lintcode.com/en/problem/subarray-sum-closest/)
+···
+Find a subarray with sum closest to zero. Return the indexes of the first number and last number.
+···
+{% highlight C++ %}
+vector<int> subarraySumClosest(vector<int> nums) {
+  if (nums.size() == 0) return vector<int>();
+  vector<int> res(2, 0);
+  if (nums.size() == 1) return res;
+
+  map<int, int> hash;
+  hash[0] = -1;  // -1代表0以前的 下标
+  int presum = 0;
+  for (int i = 0; i < nums.size(); i++) {
+    presum += nums[i];                      // inclusive!
+    if (hash.find(presum) != hash.end()) {  // 加速：找到相同的和,立马退出
+      res[0] = hash[presum] + 1;
+      res[1] = i;
+      return res;
+    }
+    hash[presum] = i;
+  }
+  // 跟上题唯一区别：没有等于0的，就排序选最小的
+  // map自动排序
+  map<int, int>::iterator it = hash.begin();
+  int mingap = INT_MAX, lastSum = it->first, lastIndex = it->second;
+  for (it++; it != hash.end(); it++) {
+    if (it->first - lastSum < mingap) {
+      res[0] = min(it->second, lastIndex) + 1;  // exclusive!
+      res[1] = max(it->second, lastIndex);
+      mingap = it->first - lastSum;
+    }
+    lastSum = it->first;
+    lastIndex = it->second;  // 别忘了更新last
+  }
+  return res;
+}
 {% endhighlight %}
