@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Binary Tree 8 - Others"
+title:  "Binary Tree 9 - Others"
 date:   2016-03-26 12:30:00
 tags: [algorithm, leetcode, binary tree]
 categories: Algorithm
