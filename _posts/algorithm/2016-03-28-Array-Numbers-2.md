@@ -265,9 +265,9 @@ vector<int> subarraySum(vector<int> nums) {
 {% endhighlight %}
 
 ### 8. [Subarray Sum Closest/](http://www.lintcode.com/en/problem/subarray-sum-closest/)
-···
+```
 Find a subarray with sum closest to zero. Return the indexes of the first number and last number.
-···
+```
 {% highlight C++ %}
 vector<int> subarraySumClosest(vector<int> nums) {
   if (nums.size() == 0) return vector<int>();
