@@ -43,7 +43,7 @@ int Solve(vector<int> &num, int money) {
   // 初始化dp
   vector<int> dp(money + 1, 100001);  // 初始化为题目给定的最大值
   dp[0] = 0;
-  for (auto i : num) dp[i] = 1;  // 需要1个硬币
+  // for (auto i : num) dp[i] = 1;  // 需要1个硬币 这个可以不调用，dp[0]就可以了
 
   sort(num.begin(), num.end());  // 优化算法，从小到大排序
 
@@ -56,5 +56,47 @@ int Solve(vector<int> &num, int money) {
   while (dp[money] == 100001)  //所给数据不能用硬币表示
     money--;
   return dp[money];
+}
+{% endhighlight %}
+
+### 3.[Number of Ways to Represent N Cents](http://www.lintcode.com/en/problem/number-of-ways-to-represent-n-cents/)
+```
+Given an infinite number of quarters (25 cents), dimes (10 cents), nickels (5 cents) and pennies (1 cent), write code to calculate the number of ways of representing n cents.
+Example
+n = 11
+11 = 1 + 1 + 1... + 1
+   = 1 + 1 + 1 + 1 + 1 + 1 + 5
+   = 1 + 5 + 5
+   = 1 + 10
+return 4
+```
+
+{% highlight C++ %}
+// 错误解法
+int waysNCents(int n) {
+  int coins[4] = {1, 5, 10, 25};
+  vector<int> dp(n + 1, 0);
+  dp[0] = 1;  // 注意初始化!
+  for (int i = 1; i <= n; i++) {
+    for (int j = 0; coins[j] <= i && j < 4; j++) {
+      dp[i] += dp[i - coins[j]];  // dp[6] = dp[1] + dp[5]，1,5和5,1重复了
+    }
+  }
+  return dp[n];
+}
+// 正确解法!!
+int waysNCents(int n) {
+  int coins[4] = {1, 5, 10, 25};
+  vector<int> dp(n + 1, 0);
+  dp[0] = 1;  // 注意初始化!
+  // Pick all coins one by one and update the table[] values
+  // after the index greater than or equal to the value of the
+  // picked coin
+  for (int i = 0; i < 4; i++) {  // 区别：外层循环是coins
+    for (int j = coins[i]; j <= n; j++) {
+      dp[j] += dp[j - coins[i]];  // 肯定选了这个coin
+    }
+  }
+  return dp[n];
 }
 {% endhighlight %}
