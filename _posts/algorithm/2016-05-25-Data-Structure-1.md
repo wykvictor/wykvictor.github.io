@@ -149,6 +149,20 @@ Given [2, 5, 6, 0, 3, 1], the max tree constructed by this array is:
 6,5,3,2,#,0,1
 ```
 {% highlight C++ %}
-// O(n) time and memory
-
+// O(n) time and memory, Hard
+TreeNode *maxTree(vector<int> A) {
+  if (A.size() == 0) return NULL;
+  stack<TreeNode *> incS;
+  for (int i = 0; i < A.size(); i++) {
+    TreeNode *cur = new TreeNode(A[i]);
+    while (!incS.empty() && A[i] > incS.top()->val) {
+      cur->left = incS.top();  // 一直更新left
+      incS.pop();
+    }
+    if (!incS.empty()) incS.top()->right = cur;  // 一直更新right
+    incS.push(cur);
+  }
+  while (incS.size() > 1) incS.pop();
+  return incS.top();
+}
 {% endhighlight %}
