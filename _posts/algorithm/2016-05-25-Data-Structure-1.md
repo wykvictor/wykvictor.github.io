@@ -166,3 +166,142 @@ TreeNode *maxTree(vector<int> A) {
   return incS.top();
 }
 {% endhighlight %}
+
+### 5. [Implement Stack by Two Queues](http://www.lintcode.com/en/problem/implement-stack-by-two-queues/)
+```
+The queue is first in first out (FIFO). That means you can not directly pop the last element in a queue.
+```
+{% highlight C++ %}
+class Stack {
+ public:
+  // Push a new item into the stack
+  void push(int x) {
+    if (q1.empty())
+      q2.push(x);
+    else
+      q1.push(x);
+  }
+  // Pop the top of the stack
+  void pop() {
+    if (q1.empty()) {
+      while (q2.size() > 1) {
+        q1.push(q2.front());
+        q2.pop();
+      }
+      q2.pop();
+    } else {
+      while (q1.size() > 1) {
+        q2.push(q1.front());
+        q1.pop();
+      }
+      q1.pop();
+    }
+  }
+  // Return the top of the stack
+  int top() {
+    int res;
+    if (q1.empty()) {
+      while (q2.size() > 1) {
+        q1.push(q2.front());
+        q2.pop();
+      }
+      res = q2.front();
+      q2.pop();
+      q1.push(res);
+    } else {
+      while (q1.size() > 1) {
+        q2.push(q1.front());
+        q1.pop();
+      }
+      res = q1.front();
+      q1.pop();
+      q2.push(res);
+    }
+    return res;
+  }
+  // Check the stack is empty or not.
+  bool isEmpty() { return q1.empty() && q2.empty(); }
+
+ private:
+  queue<int> q1;
+  queue<int> q2;
+};
+{% endhighlight %}
+上述方法，pop和top代码复杂，且top的时间复杂度高，改进push时候倒腾：
+{% highlight C++ %}
+class Stack {
+ public:
+  // Push a new item into the stack
+  void push(int x) {
+    if (q1.empty()) {
+      q1.push(x);
+      while (!q2.empty()) {
+        q1.push(q2.front());
+        q2.pop();
+      }
+    } else {
+      q2.push(x);
+      while (!q1.empty()) {
+        q2.push(q1.front());
+        q1.pop();
+      }
+    }
+  }
+  // Pop the top of the stack
+  void pop() {
+    if (q1.empty()) {
+      q2.pop();
+    } else {
+      q1.pop();
+    }
+  }
+  // Return the top of the stack
+  int top() {
+    if (q1.empty()) {
+      return q2.front();
+    } else {
+      return q1.front();
+    }
+  }
+  // Check the stack is empty or not.
+  bool isEmpty() { return q1.empty() && q2.empty(); }
+
+ private:
+  queue<int> q1;
+  queue<int> q2;
+};
+{% endhighlight %}
+
+### 6. [Implement Queue by Two Stacks](http://www.lintcode.com/en/problem/implement-queue-by-two-stacks/)
+```
+Implement it by two stacks, do not use any other data structure and push, pop and top should be O(1) by AVERAGE.
+```
+{% highlight C++ %}
+class Queue {
+ public:
+  stack<int> stack1;
+  stack<int> stack2;
+
+  Queue() {}
+  void push(int element) { stack1.push(element); }
+  //!!提取出代码公共部分，简洁
+  void adjust() {
+    if (stack2.empty()) {
+      while (!stack1.empty()) {
+        stack2.push(stack1.top());
+        stack1.pop();
+      }
+    }
+  }
+  int pop() {
+    adjust();
+    int res = stack2.top();
+    stack2.pop();
+    return res;
+  }
+  int top() {
+    adjust();
+    return stack2.top();
+  }
+};
+{% endhighlight %}
