@@ -305,3 +305,67 @@ class Queue {
   }
 };
 {% endhighlight %}
+
+### 7. [Hash - 由key映射到固定且无规律的位置]
+```
+O(1) Insert / O(1) Find / O(1) Delete, 对于string来说，是O(len(str))
+Hash Table：线程安全
+Hash Map：线程不安全
+Hash Set：单元素
+```
+
+[Closed Hashing](https://www.cs.usfca.edu/~galles/visualization/ClosedHash.html)：3种状态占据/空的/deleted
+
+[Open Hashing](https://www.cs.usfca.edu/~galles/visualization/OpenHash.html)：拉链法，链表
+
+{% highlight C++ %}
+// hash函数示例
+int hashFunc(string key) {
+  int sum = 0;
+  for (int i = 0; i < key.size(); i++) {
+    sum = sum * 31 + (int)key[i];  // 31质数
+    sum = sum % HASH_TABLE_SIZE;   // %满足+-*交换结合律
+  }
+  return sum;
+}
+{% endhighlight %}
+
+### 8. [Rehashing](http://www.lintcode.com/en/problem/rehashing/)
+```
+If the total size of keys is too large (e.g. size >= capacity / 10), we should double the size of the hash table and rehash every keys
+```
+{% highlight C++ %}
+/**
+* @param hashTable: A list of The first node of linked list
+* @return: A list of The first node of linked list which have twice size
+*/
+void addToTail(ListNode *&head, ListNode *node) {
+  if (head == NULL) {
+    head = node;  // !!改变head，需要&
+    return;
+  }
+  ListNode *cur = head;
+  while (cur->next != NULL) {
+    cur = cur->next;
+  }
+  cur->next = node;
+}
+
+vector<ListNode *> rehashing(vector<ListNode *> hashTable) {
+  if (hashTable.size() <= 0) {
+    return hashTable;
+  }
+  int newcapacity = 2 * hashTable.size();
+  vector<ListNode *> newTable(newcapacity, NULL);
+  for (auto t : hashTable) {
+    while (t != NULL) {
+      ListNode *cur = t;
+      t = t->next;
+      cur->next = NULL;
+      addToTail(newTable[(cur->val % newcapacity + newcapacity) % newcapacity],
+                cur);
+    }
+  }
+  return newTable;
+}
+{% endhighlight %}
