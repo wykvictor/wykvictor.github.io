@@ -61,3 +61,141 @@ class LRUCache {
   int capacity;
 };
 {% endhighlight %}
+
+### 2. [Anagrams](http://www.lintcode.com/en/problem/anagrams/)
+```
+Given an array of strings, return all groups of strings that are anagrams. 
+Two strings are anagram if they can be the same after change the order of characters.
+Given ["lint", "intl", "inlt", "code"], return ["lint", "inlt", "intl"].
+Given ["ab", "ba", "cd", "dc", "e"], return ["ab", "ba", "cd", "dc"].
+```
+
+传统方法, 最差O(n^2)
+{% highlight C++ %}
+// 传统方法，超时；空间少
+bool isAnagrams(string src, string dst) {
+  if (src.size() != dst.size()) return false;
+  unordered_map<char, int> hash;
+  for (int i = 0; i < src.size(); i++) {
+    if (hash.find(src[i]) == hash.end()) {
+      hash[src[i]] = 1;  // !! 出现过1次了，不是0
+    } else {
+      hash[src[i]]++;
+    }
+  }
+  for (int i = 0; i < dst.size(); i++) {
+    if (hash.find(dst[i]) == hash.end()) {
+      return false;
+    } else {
+      hash[dst[i]]--;
+    }
+  }
+  for (auto h : hash) {
+    if (h.second != 0) return false;
+  }
+  return true;
+}
+// better solution
+bool isAnagrams(string src, string dst) {
+  if (src.size() != dst.size()) return false;  // 必须有
+  int hash[256] = {0};  // 只需256byte，空间也没大多少
+  for (int i = 0; i < src.size(); i++) {
+    hash[src[i]]++;
+  }
+  for (int i = 0; i < dst.size(); i++) {
+    hash[dst[i]]--;
+    if (hash[dst[i]] < 0) return false;  // 巧妙！
+  }
+  return true;
+}
+
+vector<string> anagrams(vector<string>& strs) {
+  vector<string> res;
+  vector<bool> done(strs.size(), false);
+  for (int i = 0; i < strs.size() - 1; i++) {
+    if (done[i]) continue;
+    done[i] = true;
+    bool isres = false;
+    for (int j = i + 1; j < strs.size(); j++) {
+      if (isAnagrams(strs[i], strs[j])) {
+        done[j] = true;
+        res.push_back(strs[j]);
+        isres = true;
+      }
+    }
+    if (isres) res.push_back(strs[i]);
+  }
+  return res;
+}
+{% endhighlight %}
+优化方法, O(n)
+{% highlight C++ %}
+// 桶排序，常数时间
+string getSortedString(string &str) {
+  int count[26] = {0};
+  for (int i = 0; i < str.length(); i++) {
+    count[str[i] - 'a']++;
+  }
+  string sorted_str = "";
+  for (int i = 0; i < 26; i++) {
+    for (int j = 0; j < count[i]; j++) {
+      sorted_str = sorted_str + (char)('a' + i);
+    }
+  }
+  return sorted_str;
+}
+
+vector<string> anagrams(vector<string> &strs) {
+  unordered_map<string, int> hash;
+  for (int i = 0; i < strs.size(); i++) {
+    string str = getSortedString(strs[i]);
+    if (hash.find(str) == hash.end()) {
+      hash[str] = 1;
+    } else {
+      hash[str] = hash[str] + 1;
+    }
+  }
+  // O(nL)存入，O(nL)查询
+  vector<string> result;
+  for (int i = 0; i < strs.size(); i++) {
+    string str = getSortedString(strs[i]);
+    if (hash.find(str) == hash.end()) continue;
+    if (hash[str] > 1) {
+      result.push_back(strs[i]);
+    }
+  }
+  return result;
+}
+{% endhighlight %}
+
+### 3. [Longest Consecutive Sequence](http://www.lintcode.com/en/problem/longest-consecutive-sequence/)
+```
+Given [100, 4, 200, 1, 3, 2],
+The longest consecutive elements sequence is [1, 2, 3, 4]. Return its length: 4
+Your algorithm should run in O(n) complexity.
+```
+{% highlight C++ %}
+int longestConsecutive(vector<int> &nums) {
+  unordered_map<int, bool> hash;  // O(1)时间 map不行
+  for (int i = 0; i < nums.size(); i++) {
+    hash[nums[i]] = true;
+  }
+  int res = 0;
+  for (int i = 0; i < nums.size(); i++) {
+    int up = nums[i];
+    while (hash.find(up) != hash.end()) {
+      hash.erase(up);
+      up++;
+    }
+    int down = nums[i] - 1;
+    while (hash.find(down) != hash.end()) {
+      hash.erase(down);
+      down--;
+    }
+    if (up - down - 1 > res) {
+      res = up - down - 1;
+    }
+  }
+  return res;
+}
+{% endhighlight %}
