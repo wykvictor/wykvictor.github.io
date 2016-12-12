@@ -39,3 +39,19 @@ void heapify(vector<int> &A) {
   }
 }
 {% endhighlight %}
+
+### 2. [Ugly Number II](http://www.lintcode.com/en/problem/heapify/)
+```
+Ugly number is a number that only have factors 2, 3 and 5.
+Design an algorithm to find the nth ugly number. The first 10 ugly numbers are 1, 2, 3, 4, 5, 6, 8, 9, 10, 12...
+If n=9, return 10.
+Challenge: O(nlogn) or O(n) time
+```
+{% highlight C++ %}
+// 1, { 乘2, 3, 5 }
+// 2, 3, 5 4, 6, 10 { 每次拿出堆里最小的元素，乘以2, 3, 5 }
+// 需要很快的add, min == > pq 另：2 * 5, 5 * 2 = 10，用hash记录是否10已经放过了
+int nthUglyNumber(int n) {
+
+}
+{% endhighlight %}
