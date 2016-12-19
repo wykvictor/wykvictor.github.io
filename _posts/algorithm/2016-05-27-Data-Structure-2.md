@@ -6,6 +6,13 @@ tags: [algorithm, leetcode, data structure, heap]
 categories: Algorithm
 ---
 
+> Heap
+
+* Binary Tree, 完全二叉树
+* 父节点 >= left/right，子节点间无特殊大小关系
+* 插入节点：放到末尾，再往上调整
+* 删除节点：首尾互换，再往下调整
+
 ### 1. [Heapify](http://www.lintcode.com/en/problem/heapify/)
 ```
 Given an integer array, heapify it into a min-heap array.
@@ -48,10 +55,162 @@ If n=9, return 10.
 Challenge: O(nlogn) or O(n) time
 ```
 {% highlight C++ %}
-// 1, { 乘2, 3, 5 }
+// O(nlogn). 1, { 乘2, 3, 5 }
 // 2, 3, 5 4, 6, 10 { 每次拿出堆里最小的元素，乘以2, 3, 5 }
 // 需要很快的add, min == > pq 另：2 * 5, 5 * 2 = 10，用hash记录是否10已经放过了
 int nthUglyNumber(int n) {
-
+  if (n <= 1) return n;
+  priority_queue<long long, vector<long long>, greater<long long>> pq;
+  unordered_set<long long> s;
+  pq.push(1);
+  for (int i = 1; i < n; i++) {
+    long long t = pq.top();
+    pq.pop();
+    if (s.find(2 * t) == s.end()) {
+      s.insert(2 * t);
+      pq.push(2 * t);
+    }
+    if (s.find(3 * t) == s.end()) {
+      s.insert(3 * t);
+      pq.push(3 * t);
+    }
+    if (s.find(5 * t) == s.end()) {
+      s.insert(5 * t);
+      pq.push(5 * t);
+    }
+  }
+  return pq.top();
 }
+{% endhighlight %}
+O(n)，模拟法
+{% highlight C++ %}
+// 用数组记录每一个丑数，一直算下一个，这样快，O(n) scan
+// 空间换时间(相比与从1开始遍历并判断每一个数)
+int nthUglyNumber(int n) {
+  int index2 = 0, index3 = 0, index5 = 0;
+  vector<int> uglys(n);
+  uglys[0] = 1;
+  for (int i = 1; i < n; i++) {
+    uglys[i] =  // 取到下一个值是多少
+        min(uglys[index2] * 2, min(uglys[index3] * 3, uglys[index5] * 5));
+    while (uglys[index2] * 2 <= uglys[i]) {  // 注意是==!!!
+      index2++;  // 一直找到乘以2能达到的最大的临界值
+    }
+    while (uglys[index3] * 3 <= uglys[i]) {
+      index3++;  // 一直找到乘以2能达到的最大的临界值
+    }
+    while (uglys[index5] * 5 <= uglys[i]) {
+      index5++;  // 一直找到乘以2能达到的最大的临界值
+    }
+  }
+  return uglys[n - 1];
+}
+{% endhighlight %}
+
+### 3. [Top k Largest Numbers II](http://www.lintcode.com/en/problem/top-k-largest-numbers-ii/)
+```
+Implement a data structure, provide two interfaces:
+add(number). Add a new number in the data structure.
+topk(). Return the top k largest numbers in this data structure.
+k is given when we create the data structure.
+```
+{% highlight C++ %}
+class Solution {
+ public:
+  //注意逻辑：用最小堆(从小到大)，和k个里边的最小的PK，一直保留k个
+  priority_queue<int, vector<int>, greater<int>> pq;
+  int capacity;
+  Solution(int k) { capacity = k; }
+  void add(int num) {
+    if (pq.size() < capacity) {
+      pq.push(num);
+    } else {
+      if (pq.top() < num) {
+        pq.pop();
+        pq.push(num);
+      }
+    }
+  }
+  vector<int> topk() {
+    vector<int> res;
+    priority_queue<int, vector<int>, greater<int>> pq_t(pq);
+    // 注意判断pq.size()!!!
+    int actualy_size = pq_t.size();
+    for (int i = 0; i < actualy_size; i++) {
+      res.push_back(pq_t.top());
+      pq_t.pop();
+    }
+    reverse(res.begin(), res.end());
+    return res;
+  }
+};
+{% endhighlight %}
+
+### 4. [Data Stream Median](http://www.lintcode.com/en/problem/data-stream-median/)
+```
+Numbers keep coming, return the median of numbers at every time a new number added.
+If there are n numbers in a sorted array A, the median is A[(n - 1) / 2]
+For example, if A=[1,2,3], median is 2. If A=[1,19], median is 1.
+
+Total run time in O(nlogn).
+```
+{% highlight C++ %}
+void rebalance(priority_queue<int, vector<int>, greater<int>>& min_heap,
+               priority_queue<int, vector<int>, less<int>>& max_heap) {
+  if (max_heap.size() > min_heap.size() + 1) {
+    min_heap.push(max_heap.top());
+    max_heap.pop();
+  } else if (max_heap.size() < min_heap.size()) {  // max heap has 1 more member
+    max_heap.push(min_heap.top());
+    min_heap.pop();
+  }
+}
+
+vector<int> medianII(vector<int>& nums) {
+  if (nums.size() <= 1) return nums;
+
+  vector<int> res;
+  priority_queue<int, vector<int>, greater<int>> min_heap;
+  priority_queue<int, vector<int>, less<int>> max_heap;
+  // 初始化
+  if (nums[1] > nums[0]) {
+    max_heap.push(nums[0]);
+    min_heap.push(nums[1]);
+    res.push_back(nums[0]);
+    res.push_back(nums[0]);
+  } else {
+    min_heap.push(nums[0]);
+    max_heap.push(nums[1]);
+    res.push_back(nums[0]);  // 注意!
+    res.push_back(nums[1]);
+  }
+
+  for (int i = 2; i < nums.size(); i++) {
+    if (nums[i] < max_heap.top()) {
+      max_heap.push(nums[i]);
+    } else {
+      min_heap.push(nums[i]);
+    }
+    rebalance(min_heap, max_heap);
+    res.push_back(max_heap.top());
+  }
+  return res;
+}
+{% endhighlight %}
+
+### 5. [Kth Smallest Number in Sorted Matrix](http://www.lintcode.com/en/problem/kth-smallest-number-in-sorted-matrix/)
+```
+Find the kth smallest number in at row and column sorted matrix.
+Given k = 4 and a matrix:
+[
+  [1 ,5 ,7],
+  [3 ,7 ,8],
+  [4 ,8 ,9],
+]
+return 5
+
+O(k log n), n is the maximal number in width and height.
+```
+{% highlight C++ %}
+
 {% endhighlight %}
