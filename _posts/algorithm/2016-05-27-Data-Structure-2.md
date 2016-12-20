@@ -212,5 +212,44 @@ return 5
 O(k log n), n is the maximal number in width and height.
 ```
 {% highlight C++ %}
+class Node {
+ public:
+  int val;
+  int x;
+  int y;
+  Node(int v, int xx, int yy) : val(v), x(xx), y(yy) {}
+  // friend bool operator<(const Node& n1, const Node& n2) {
+  //   return n1.val > n2.val;
+  // }  // > is min heap
+};
 
+struct cmp {  // struct is Public in default!!
+  bool operator()(const Node& n1, const Node& n2) { return n1.val > n2.val; }  // > is min heap
+};
+
+int kthSmallest(vector<vector<int>>& matrix, int k) {
+  // priority_queue<Node> min_heap;  // call operator < to compare
+  priority_queue<Node, vector<Node>, cmp> min_heap;  // 2 ways to use heap
+  int M = matrix.size(), N = matrix[0].size();
+  if (M * N < k) return -1;  // 極端情況
+  vector<bool> visited(M * N, false);
+  min_heap.push(Node(matrix[0][0], 0, 0));
+  visited[0] = true;
+
+  for (int i = 1; i < k; i++) {
+    Node cur = min_heap.top();
+    min_heap.pop();
+    // go down
+    if (cur.x + 1 < M && !visited[(cur.x + 1) * N + cur.y]) {
+      min_heap.push(Node(matrix[cur.x + 1][cur.y], cur.x + 1, cur.y));
+      visited[(cur.x + 1) * N + cur.y] = true;
+    }
+    // go right
+    if (cur.y + 1 < N && !visited[cur.x * N + cur.y + 1]) {
+      min_heap.push(Node(matrix[cur.x][cur.y + 1], cur.x, cur.y + 1));
+      visited[cur.x * N + cur.y + 1] = true;
+    }
+  }
+  return min_heap.top().val;
+}
 {% endhighlight %}
