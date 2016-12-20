@@ -218,18 +218,25 @@ class Node {
   int x;
   int y;
   Node(int v, int xx, int yy) : val(v), x(xx), y(yy) {}
+  // 自定义Node，方法1，priority_queue<Node>
   // friend bool operator<(const Node& n1, const Node& n2) {
   //   return n1.val > n2.val;
   // }  // > is min heap
+
+  // 自定义Node，方法2，priority_queue<Node>, const!
+  // bool operator<(const Node& other) const {
+  //   return val > other.val;
+  // }  // > is min heap
 };
 
+// 自定义Node，方法3，priority_queue<Node, vector<Node>, cmp>
 struct cmp {  // struct is Public in default!!
   bool operator()(const Node& n1, const Node& n2) { return n1.val > n2.val; }  // > is min heap
 };
 
 int kthSmallest(vector<vector<int>>& matrix, int k) {
   // priority_queue<Node> min_heap;  // call operator < to compare
-  priority_queue<Node, vector<Node>, cmp> min_heap;  // 2 ways to use heap
+  priority_queue<Node, vector<Node>, cmp> min_heap;  // 3 ways to use heap
   int M = matrix.size(), N = matrix[0].size();
   if (M * N < k) return -1;  // 極端情況
   vector<bool> visited(M * N, false);
@@ -251,5 +258,49 @@ int kthSmallest(vector<vector<int>>& matrix, int k) {
     }
   }
   return min_heap.top().val;
+}
+{% endhighlight %}
+
+### 6. [Top K Frequent Words](http://www.lintcode.com/en/problem/top-k-frequent-words/)
+```
+Given a list of words and an integer k, return the top k frequent words in the list.
+Do it in O(nlogk) time and O(n) extra space.
+
+Extra points if you can do it in O(n) time with O(k) extra space approximation algorithms.
+```
+{% highlight C++ %}
+class Node {
+ public:
+  string key;
+  int times;
+  Node(string _key, int _times) : times(_times), key(_key) {}
+  bool operator<(const Node& other) const {
+    return times > other.times || (times == other.times && key < other.key);
+  }
+};
+
+vector<string> topKFrequentWords(vector<string>& words, int k) {
+  unordered_map<string, int> hash;
+  for (auto a : words) {
+    if (hash.find(a) == hash.end()) hash[a] = 0;
+    hash[a]++;
+  }
+  priority_queue<Node> min_heap;  // 用小顶堆!!
+  for (unordered_map<string, int>::iterator it = hash.begin(); it != hash.end();
+       it++) {
+    Node cur(it->first, it->second);
+    min_heap.push(cur);
+    // 不能直接利用重载的<比较，反着的if (min_heap.top() < cur) {
+    if (min_heap.size() > k) {
+      min_heap.pop();
+    }
+  }
+  vector<string> res;
+  while (!min_heap.empty()) {
+    res.push_back(min_heap.top().key);
+    min_heap.pop();
+  }
+  reverse(res.begin(), res.end());
+  return res;
 }
 {% endhighlight %}
