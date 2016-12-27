@@ -128,6 +128,12 @@ int minimumTotal(vector<vector<int> > &triangle) {
 * Count all possbile solutions: doesn’t care about the solution details, only the
 count or possibility（若求所有的排列，只能全搜）
 
+什么情况下不使用DP：
+
+* 求出所有具体的方案，不只是个数，只能全搜
+* 输入数据是一个集合（无序的），而不是序列
+* 暴力算法的复杂度已经是多项式级别(不适合n^3-->n^2)，适合2^n/n! --> n^2/n^3
+
 ### 3. 动态规划的**4点要素**
 * 状态 State (灵感，创造力，存储小规模问题的结果）
 * 方程 Function (状态之间的联系，怎么通过小的状态，来算大的状态)
