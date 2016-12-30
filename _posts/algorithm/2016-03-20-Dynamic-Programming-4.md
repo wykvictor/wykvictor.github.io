@@ -24,69 +24,72 @@ For "ABCD" and "EACB", the LCS is "AC", return 2
 * answer: f[a.length()][b.length()]
 
 {% highlight C++ %}
-int longestCommonSubsequence(int *a, int m, int*b, int n) {
-    vector<vector<int> > dp(m+1, vector<int>(n+1, 0));    //initialize with 0，因为边界，多一个搞
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            if(a[i-1] == b[j-1])
-                dp[i][j] = dp[i-1][j-1] + 1;
-            else
-                dp[i][j] = max(dp[i][j-1], dp[i-1][j]);
-        }
+int longestCommonSubsequence(string A, string B) {
+  int m = A.size(), n = B.size();
+  // initialize with 0，因为边界，多一个, 表示前0个字符
+  vector<vector<int> > dp(m + 1, vector<int>(n + 1, 0));
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+      if (A[i - 1] == B[j - 1])
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+      else
+        dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
     }
-    return dp[m][n]; 
+  }
+  return dp[m][n];
 }
 {% endhighlight %}
 压缩后，注意！不是只跟i-1有关, 需要变量保存i-1,j-1
 {% highlight C++ %}
-int longestCommonSubsequence2(int *a, int m, int*b, int n) {
-    vector<int> dp(n+1, 0); //initialize with 0，因为边界，多一个搞
-    int lastDp=0;
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            int temp = dp[j];
-            if(a[i-1] == b[j-1])
-                dp[j] = lastDp + 1;
-            else
-                dp[j] = max(dp[j-1], dp[j]);  //dp[j]相当于dp[i-1][j], 而dp[j-1]相当于dp[i][j-1]
-            lastDp = temp;
-        }
+int longestCommonSubsequence(string A, string B) {
+  int m = A.size(), n = B.size();
+  vector<int> dp(n + 1, 0);  // initialize with 0
+  int lastDp = 0;
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+      int temp = dp[j];
+      if (A[i - 1] == B[j - 1])
+        dp[j] = lastDp + 1;
+      else
+        dp[j] = max(dp[j - 1], dp[j]);
+      // dp[j]相当于dp[i-1][j], 而dp[j-1]相当于dp[i][j-1]
+      lastDp = temp;
     }
-    return dp[n]; 
+  }
+  return dp[n];
 }
 {% endhighlight %}
-变体，连续子序列，更简单些：阿里笔试题目
+变体，连续，子序列，更简单些
 {% highlight C++ %}
-int longestCommonSubstring(string query, string text)
-{
-    int m = query.size();
-    int n = text.size();
-    int maxLen = 0;
-    vector<vector<int> > dp(m+1, vector<int>(n+1, 0));  //初始化，都是0
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            dp[i][j] = (query[i-1] != text[j-1]) ? 0 : (dp[i-1][j-1] + 1); // 这里不同，为0
-            maxLen = maxLen < dp[i][j] ? dp[i][j] : maxLen;  // 这里不同，一直保存max
-        }
+int longestCommonSubstring(string query, string text) {
+  int m = query.size();
+  int n = text.size();
+  int maxLen = 0;
+  vector<vector<int> > dp(m + 1, vector<int>(n + 1, 0));  //初始化，都是0
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+      // 这里不同，为0
+      dp[i][j] = (query[i - 1] != text[j - 1]) ? 0 : (dp[i - 1][j - 1] + 1);
+      maxLen = maxLen < dp[i][j] ? dp[i][j] : maxLen;  // 这里不同，一直保存max
     }
-    return maxLen;
+  }
+  return maxLen;
 }
 {% endhighlight %}
 压缩后：
 {% highlight C++ %}
-int longestCommonSubstring(string query, string text)
-{
-    int m = query.size();
-    int n = text.size();
-    int maxLen = 0;
-    vector<int> dp(n+1, 0);  //初始化，都是0
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            dp[j] = (query[i-1] != text[j-1]) ? 0 : (dp[j-1] + 1);
-            maxLen = maxLen < dp[j] ? dp[j] : maxLen;
-        }
+int longestCommonSubstring(string query, string text) {
+  int m = query.size();
+  int n = text.size();
+  int maxLen = 0;
+  vector<int> dp(n + 1, 0);  //初始化，都是0
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+      dp[j] = (query[i - 1] != text[j - 1]) ? 0 : (dp[j - 1] + 1);
+      maxLen = maxLen < dp[j] ? dp[j] : maxLen;
     }
-    return maxLen;
+  }
+  return maxLen;
 }
 {% endhighlight %}
 
