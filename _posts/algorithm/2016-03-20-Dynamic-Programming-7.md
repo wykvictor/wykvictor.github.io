@@ -51,3 +51,5 @@ for(int len=1; len<n; len++) {
     }
 }
 {% endhighlight %}
+
+### 2. [Scramble String](http://www.lintcode.com/en/problem/scramble-string/)

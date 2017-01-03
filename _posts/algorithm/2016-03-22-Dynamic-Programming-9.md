@@ -9,9 +9,10 @@ categories: Algorithm
 > backpack 背包问题
 
 *  [背包问题九讲](http://love-oriented.com/pack/)
-*  [backpack](http://www.lintcode.com/zh-cn/problem/backpack/)
-*  [minimum-adjustment-cost](http://www.lintcode.com/zh-cn/problem/minimum-adjustment-cost/)
-*  [k-sum](http://www.lintcode.com/zh-cn/problem/k-sum/)
+*  [backpack](http://www.lintcode.com/en/problem/backpack/)
+*  [backpack-ii](http://www.lintcode.com/en/problem/backpack-ii/)
+*  [minimum-adjustment-cost](http://www.lintcode.com/en/problem/minimum-adjustment-cost/)
+*  [k-sum](http://www.lintcode.com/en/problem/k-sum/)
 
 ### 1. 0-1背包问题
 {% highlight C++ %}
