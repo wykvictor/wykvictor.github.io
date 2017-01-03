@@ -320,13 +320,13 @@ Hash Set：单元素
 
 {% highlight C++ %}
 // hash函数示例
-int hashFunc(string key) {
-  int sum = 0;
+// hashcode("abcd") = (ascii(a) * 33^3 + ascii(b) * 33^2 + ascii(c) *33 + ascii(d)) % HASH_SIZE
+int hashCode(string key, int HASH_SIZE) {
+  long long res = 0;
   for (int i = 0; i < key.size(); i++) {
-    sum = sum * 31 + (int)key[i];  // 31质数
-    sum = sum % HASH_TABLE_SIZE;   // %满足+-*交换结合律
+    res = (res * 33 + key[i]) % HASH_SIZE; // %满足+-*交换结合律
   }
-  return sum;
+  return res;
 }
 {% endhighlight %}
 
