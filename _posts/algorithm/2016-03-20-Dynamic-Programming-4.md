@@ -44,14 +44,14 @@ int longestCommonSubsequence(string A, string B) {
 int longestCommonSubsequence(string A, string B) {
   int m = A.size(), n = B.size();
   vector<int> dp(n + 1, 0);  // initialize with 0
-  int lastDp = 0;
   for (int i = 1; i <= m; i++) {
+    int lastDp = 0;  // !!注意清空0，否则还是上一行的最后一个
     for (int j = 1; j <= n; j++) {
       int temp = dp[j];
       if (A[i - 1] == B[j - 1])
         dp[j] = lastDp + 1;
       else
-        dp[j] = max(dp[j - 1], dp[j]);
+        dp[j] = max(dp[j - 1], dp[j]);  // j只能从小到大，j依赖于j-1
       // dp[j]相当于dp[i-1][j], 而dp[j-1]相当于dp[i][j-1]
       lastDp = temp;
     }
@@ -59,17 +59,17 @@ int longestCommonSubsequence(string A, string B) {
   return dp[n];
 }
 {% endhighlight %}
-变体，连续，子序列，更简单些
+变体，连续子序列, [Longest Common Substring](http://www.jiuzhang.com/solutions/longest-common-substring/)
 {% highlight C++ %}
-int longestCommonSubstring(string query, string text) {
-  int m = query.size();
-  int n = text.size();
+int longestCommonSubstring(string &A, string &B) {
+  int m = A.size();
+  int n = B.size();
   int maxLen = 0;
   vector<vector<int> > dp(m + 1, vector<int>(n + 1, 0));  //初始化，都是0
   for (int i = 1; i <= m; i++) {
     for (int j = 1; j <= n; j++) {
       // 这里不同，为0
-      dp[i][j] = (query[i - 1] != text[j - 1]) ? 0 : (dp[i - 1][j - 1] + 1);
+      dp[i][j] = (A[i - 1] != B[j - 1]) ? 0 : (dp[i - 1][j - 1] + 1);
       maxLen = maxLen < dp[i][j] ? dp[i][j] : maxLen;  // 这里不同，一直保存max
     }
   }
@@ -78,15 +78,18 @@ int longestCommonSubstring(string query, string text) {
 {% endhighlight %}
 压缩后：
 {% highlight C++ %}
-int longestCommonSubstring(string query, string text) {
-  int m = query.size();
-  int n = text.size();
+int longestCommonSubstring(string &A, string &B) {
+  int m = A.size();
+  int n = B.size();
   int maxLen = 0;
   vector<int> dp(n + 1, 0);  //初始化，都是0
   for (int i = 1; i <= m; i++) {
+    int lastDP = 0;
     for (int j = 1; j <= n; j++) {
-      dp[j] = (query[i - 1] != text[j - 1]) ? 0 : (dp[j - 1] + 1);
-      maxLen = maxLen < dp[j] ? dp[j] : maxLen;
+      int tmp = dp[j];
+      dp[j] = (A[i - 1] != B[j - 1]) ? 0 : (lastDP + 1); // ! 注意这里不是dp[j-1]
+      maxLen = maxLen < dp[j] ? dp[j] : maxLen;  // 这里不同，一直保存max
+      lastDP = tmp;
     }
   }
   return maxLen;
@@ -110,46 +113,40 @@ c) Replace a character
 
 {% highlight C++ %}
 int minDistance(string word1, string word2) {
-    int m=word1.size(), n=word2.size();
-    vector<vector<int> > dp(m+1, vector<int>(n+1, INT_MAX));    
-    for(int i=0; i<=m; i++)     //初始化,有0个
-        dp[i][0] = i;
-    for(int i=0; i<=n; i++)     //初始化
-        dp[0][i] = i;
-         
-    for(int i=1; i<=m; i++) {
-        for(int j=1; j<=n; j++) {
-            if(word1[i-1] == word2[j-1])
-                dp[i][j] = dp[i-1][j-1];
-            else
-                dp[i][j] = min(min(dp[i][j-1], dp[i-1][j]), dp[i-1][j-1]) + 1;
-        }
+  int m = word1.size(), n = word2.size();
+  vector<vector<int> > dp(m + 1, vector<int>(n + 1, INT_MAX));
+  for (int i = 0; i <= m; i++) dp[i][0] = i;
+  for (int i = 0; i <= n; i++) dp[0][i] = i;
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++) {
+      if (word1[i - 1] == word2[j - 1])
+        dp[i][j] = dp[i - 1][j - 1];
+      else
+        dp[i][j] = min(min(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]) + 1;
     }
-    return dp[m][n];
+  }
+  return dp[m][n];
 }
 {% endhighlight %}
 压缩一维: 注意保存i-1 j-1
 {% highlight C++ %}
 int minDistance(string word1, string word2) {
-    int m=word1.size(), n=word2.size();
-    vector<int> dp(n+1, INT_MAX);    
-    for(int i=0; i<=n; i++)     //初始化
-        dp[i] = i;
-     
-    int lastDp=0;           //额外用一个变量记录 f[i-1][j-1]    
-    for(int i=1; i<=m; i++) {
-        lastDp = dp[0]; //每次初始化为第一个
-        dp[0] = i;
-        for(int j=1; j<=n; j++) {
-            int temp = dp[j];
-            if(word1[i-1] == word2[j-1])
-                dp[j] = lastDp;
-            else
-                dp[j] = min(min(dp[j-1], dp[j]), lastDp) + 1;
-            lastDp = temp;
-        }
+  int m = word1.size(), n = word2.size();
+  vector<int> dp(n + 1, INT_MAX);
+  for (int i = 0; i <= n; i++) dp[i] = i;
+  for (int i = 1; i <= m; i++) {
+    int lastDP = dp[0];  // 这两句顺序不能搞错，先记录lastDP(上一轮的)!!
+    dp[0] = i;
+    for (int j = 1; j <= n; j++) {
+      int tmp = dp[j];
+      if (word1[i - 1] == word2[j - 1])
+        dp[j] = lastDP;
+      else
+        dp[j] = min(min(dp[j], dp[j - 1]), lastDP) + 1;
+      lastDP = tmp;
     }
-    return dp[n];
+  }
+  return dp[n];
 }
 {% endhighlight %}
 
@@ -173,31 +170,51 @@ When s3 = "aadbbbaccc", return false.
 
 {% highlight C++ %}
 bool isInterleave(string s1, string s2, string s3) {
-    if (s3.length() != s1.length() + s2.length())   //直接错误
-        return false;
-    int m=s1.length(), n=s2.length();
-    vector<vector<bool>> dp(m+1, vector<bool>(n+1, false));
-    //初始化，2条边
-    dp[0][0] = true;
-    for(int i = 1; i <= m; i++) {
-        if(s1[i-1] == s3[i-1])  dp[i][0] = true;
-        else    break;  //只要有1个不等于，就break
-    }
-    for(int i = 1; i <= n; i++) {
-        if(s2[i-1] == s3[i-1])  dp[0][i] = true;
-        else    break;  //只要有1个不等于，就break
-    }
-    //开始算
-    for (int i = 1; i <= m; i++) {
-        for(int j = 1; j <= n; j++) {
-            dp[i][j] = ((s1[i-1] == s3[i+j-1]) && dp[i-1][j])
-                    || ((s2[j-1] == s3[i+j-1]) && dp[i][j-1]);
-        }
-    }
-    return dp[m][n];
+  if (s3.length() != s1.length() + s2.length())  //直接错误
+    return false;
+  int m = s1.length(), n = s2.length();
+  vector<vector<bool>> dp(m + 1, vector<bool>(n + 1, false));
+  //初始化，2条边
+  dp[0][0] = true;
+  for (int i = 1; i <= m; i++) {
+    if (s1[i - 1] == s3[i - 1])  dp[i][0] = true;
+    else  break;  //只要有1个不等于，就break
+  }
+  for (int i = 1; i <= n; i++) {
+    if (s2[i - 1] == s3[i - 1])  dp[0][i] = true;
+    else  break;  //只要有1个不等于，就break
+  }
+  //开始算
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++)
+      dp[i][j] = ((s1[i - 1] == s3[i + j - 1]) && dp[i - 1][j]) ||
+                 ((s2[j - 1] == s3[i + j - 1]) && dp[i][j - 1]);
+  }
+  return dp[m][n];
 }
 {% endhighlight %}
-压缩：稍微复杂，以后再说，网上有答案
+压缩：
+{% highlight C++ %}
+bool isInterleave(string s1, string s2, string s3) {
+  if (s3.length() != s1.length() + s2.length())  //直接错误
+    return false;
+  int m = s1.length(), n = s2.length();
+  vector<bool> dp(n + 1, false);
+  //初始化，2条边
+  dp[0] = true;
+  for (int i = 1; i <= n; i++) {
+    if (s2[i - 1] == s3[i - 1])  dp[i] = true;
+    else  break;  //只要有1个不等于，就break
+  }
+  //开始算
+  for (int i = 1; i <= m; i++) {
+    for (int j = 1; j <= n; j++)
+      dp[j] = ((s1[i - 1] == s3[i + j - 1]) && dp[j]) ||
+              ((s2[j - 1] == s3[i + j - 1]) && dp[j - 1]);
+  }
+  return dp[n];
+}
+{% endhighlight %}
 
 ### 4. [Distinct Subsequence - Leetcode115 Hard](https://leetcode.com/problems/distinct-subsequences/)
 ```
@@ -216,43 +233,61 @@ Return 3.
 * intialize: f[i][0]=1, f[0][i] = 0 (i>0)
 * answer: f[a.length()][b.length()]
 
+求方案总数，用DP，dfs做，大数据会超时
 {% highlight C++ %}
-int numDistinct(string S, string T) {
-    //dfs做，大数据会超时；题目意思，S中怎么删除，能变到T；用DP
-    int M=S.size(), N=T.size();
-    if(M == 0 && N == 0)    return 1;
-    else if(M < N)  return 0;
-     
-    vector<vector<int> > dp(M+1, vector<int>(N+1, 0));
-    for(int i=0; i<=M; i++)   //初始化
-        dp[i][0] = 1;
-    for(int i=1; i<=N; i++) //0,0是1!!
-        dp[0][i] = 0;
-    for (int i = 1; i <= M; i++) {
-        for (int j = 1; j <= N; j++) {
-            if (S[i-1] == T[j-1])   //若 S[i]==T[j]，则可以使用 S[i]，是二者的和
-                dp[i][j] = dp[i-1][j] + dp[i-1][j-1];
-            else
-                dp[i][j] = dp[i-1][j];  //不能使用S[i]，则等于i-1到j的种类数
-        }
+int numDistinct(string &S, string &T) {
+  int M = S.size(), N = T.size();
+  if (M == 0 && N == 0)  return 1;
+  else if (M < N)  return 0;
+
+  vector<vector<int> > dp(M + 1, vector<int>(N + 1, 0));
+  //初始化
+  for (int i = 0; i <= M; i++) dp[i][0] = 1;
+  for (int i = 1; i <= N; i++) dp[0][i] = 0;  // 0,0是1!!
+  for (int i = 1; i <= M; i++) {
+    for (int j = 1; j <= N; j++) {
+      if (S[i - 1] == T[j - 1])  //若 S[i]==T[j]，则可以使用 S[i]，是二者的和
+        dp[i][j] = dp[i - 1][j] + dp[i - 1][j - 1];
+      else
+        dp[i][j] = dp[i - 1][j];  //不能使用S[i]，则等于i-1到j的种类数
     }
-    return dp[M][N];
+  }
+  return dp[M][N];
 }
 {% endhighlight %}
-压缩一维： 不太好理解
+压缩一维：
 {% highlight C++ %}
-int numDistinct(string S, string T) {
-    int M=S.size(), N=T.size();
-    if(M == 0 && N == 0)    return 1;
-    else if(M < N)  return 0;
-    vector<int> dp(N+1, 0);
-    dp[0] = 1;
-    for (int i = 0; i < M; i++) {
-        for (int j = N-1; j >= 0; j--) {    //压缩后，从后往前，避免覆盖
-            if (S[i] == T[j])   //若 S[i]==T[j]，则可以使用 S[i]，是二者的和
-                dp[j+1] = dp[j] + dp[j+1];
-        }
+int numDistinct(string &S, string &T) {
+  int M = S.size(), N = T.size();
+  if (M == 0 && N == 0)  return 1;
+  else if (M < N)  return 0;
+
+  vector<int> dp(N + 1, 0);
+  dp[0] = 1;  // 初始化  0,0是1!!
+  for (int i = 1; i <= M; i++) {
+    int lastDP = 1;
+    for (int j = 1; j <= N; j++) {
+      int tmp = dp[j];
+      if (S[i - 1] == T[j - 1])  //若 S[i]==T[j]，则可以使用 S[i]，是二者的和
+        dp[j] = dp[j] + lastDP;
+      lastDP = tmp;
     }
-    return dp[N];
+  }
+  return dp[N];
+}
+// 进一步优化，倒着来
+int numDistinct(string S, string T) {
+  int M = S.size(), N = T.size();
+  if (M == 0 && N == 0)  return 1;
+  else if (M < N)  return 0;
+  vector<int> dp(N + 1, 0);
+  dp[0] = 1;
+  for (int i = 1; i <= M; i++) {
+    for (int j = N; j >= 1; j--) {  //压缩后，从后往前，避免覆盖
+      if (S[i - 1] == T[j - 1])  //若 S[i]==T[j]，则可以使用 S[i]，是二者的和
+        dp[j] = dp[j - 1] + dp[j];  // 区别，用的是上一次的j-1,不需要先算这次的j-1
+    }
+  }
+  return dp[N];
 }
 {% endhighlight %}
