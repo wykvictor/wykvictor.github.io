@@ -206,3 +206,9 @@ make install/strip
 
 cd "${WD}"
 {% endhighlight %}
+
+### 15. 批量重命名文件
+某个文件夹下1.txt, 1000.txt, 批量重命名成000001.txt和001000.txt, 这样程序读取时可以按顺序
+{% highlight Bash shell scripts %}
+for i in `ls *`; do mv $i `echo $i | awk -F. '{printf("%06d\n", $1)}'`.txt; done
+{% endhighlight %}
