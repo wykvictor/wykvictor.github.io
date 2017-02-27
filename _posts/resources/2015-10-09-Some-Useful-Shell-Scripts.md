@@ -212,3 +212,8 @@ cd "${WD}"
 {% highlight Bash shell scripts %}
 for i in `ls *`; do mv $i `echo $i | awk -F. '{printf("%06d\n", $1)}'`.txt; done
 {% endhighlight %}
+
+### 16. 批量删除大小为0的文件
+{% highlight Bash shell scripts %}
+find . -name "*" -type f -size 0c | xargs -n 1 rm -f
+{% endhighlight %}
