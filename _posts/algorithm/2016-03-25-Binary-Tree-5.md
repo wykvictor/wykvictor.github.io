@@ -326,3 +326,63 @@ void sumNumbersCore(TreeNode *root, int path, int &res) {
     if(root->right)  sumNumbersCore(root->right, path, res);    
 }
 {% endhighlight %}
+
+### 6. [Minimum Subtree](http://www.lintcode.com/en/problem/minimum-subtree/)
+```
+Given a binary tree, find the subtree with minimum sum. Return the root of the subtree.
+```
+{% highlight C++ %}
+int findCore(TreeNode* root, TreeNode*& result, int& minSum) {
+  if (root == NULL) return 0;
+  // Divide & Conqur, bottom-up
+  int left = findCore(root->left, result, minSum);
+  int right = findCore(root->right, result, minSum);
+  int curSum = left + right + root->val;
+  // minSum Global, compare with it
+  if (curSum < minSum) {
+    minSum = curSum;
+    result = root;
+  }
+  return curSum;
+}
+TreeNode* findSubtree(TreeNode* root) {
+  TreeNode* result = NULL;
+  int minSum = INT_MAX;
+  findCore(root, result, minSum);  // 不可直接传INT_MAX!! 引用需是变量
+  return result;
+}
+{% endhighlight %}
+
+### 7. [Subtree with Maximum Average](http://www.lintcode.com/en/problem/subtree-with-maximum-average/)
+```
+Given a binary tree, find the subtree with maximum average. Return the root of the subtree.
+```
+{% highlight C++ %}
+// 也可以把num放到返回值中：Result(sum;num), 代码结构更清晰!
+int findCore(TreeNode* root, TreeNode*& result, double& maxAvg, int& num) {
+  if (root == NULL) {
+    num = 0;
+    return 0;
+  }
+  // Divide & Conqur, bottom-up
+  int leftNum = 0, rightNum = 0;
+  int left = findCore(root->left, result, maxAvg, leftNum);
+  int right = findCore(root->right, result, maxAvg, rightNum);
+  int curSum = left + right + root->val;
+  num = leftNum + rightNum + 1;  // 当前的节点数目
+  // maxAvg Global, compare with it
+  if ((double)curSum / num > maxAvg) {  // 注意：double!
+    maxAvg = (double)curSum / num;
+    result = root;
+  }
+  return curSum;
+}
+
+TreeNode* findSubtree2(TreeNode* root) {
+  TreeNode* result = NULL;
+  double maxAvg = INT_MIN;  // 注意：double!
+  int num = 0;
+  findCore(root, result, maxAvg, num);  // 不可直接传INT_MAX!! 引用需是变量
+  return result;
+}
+{% endhighlight %}
