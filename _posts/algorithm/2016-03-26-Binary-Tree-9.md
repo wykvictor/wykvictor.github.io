@@ -182,3 +182,92 @@ bool isComplete(TreeNode* root) {
   return true;
 }
 {% endhighlight %}
+
+### 4. [Binary Tree Longest Consecutive Sequence](http://www.lintcode.com/en/problem/binary-tree-longest-consecutive-sequence/)
+```
+Given a binary tree, find the length of the longest consecutive sequence path.
+The longest consecutive path need to be from parent to child (cannot be the reverse).
+```
+
+DFS - Traverse:
+{% highlight C++ %}
+// 好理解，边Traverse，边记录
+void dfs(TreeNode* root, int& result, int curLen, int lastNum) {
+  if (root == NULL) {
+    return;
+  }
+  if (root->val == lastNum + 1)
+    curLen++;
+  else
+    curLen = 1;  // 不连续，归位
+  if (curLen > result) result = curLen;
+  dfs(root->left, result, curLen, root->val);
+  dfs(root->right, result, curLen, root->val);
+}
+int longestConsecutive(TreeNode* root) {
+  int result = -1;
+  dfs(root, result, 0, 0);
+  return result;
+}
+{% endhighlight %}
+DFS - Divide & Conquer:
+{% highlight C++ %}
+// 不太好理解：dfs函数代表，加上左/右子树后，返回最长值
+int dfs(TreeNode* root, int curLen, int lastNum) {
+  if (root == NULL) {
+    return 0;
+  }
+  if (root->val == lastNum + 1)
+    curLen++;
+  else
+    curLen = 1;  // 不连续，归位
+  // 区别：
+  int leftLongest = dfs(root->left, curLen, root->val);
+  int rightLongest = dfs(root->right, curLen, root->val);
+  return max(curLen, max(leftLongest, rightLongest));
+}
+int longestConsecutive(TreeNode* root) { return dfs(root, 0, 0); }
+{% endhighlight %}
+
+### 5. [Binary Tree Paths](http://www.lintcode.com/en/problem/binary-tree-paths/)
+{% highlight C++ %}
+void dfs(TreeNode* root, vector<string>& res, vector<int>& line) {
+  if (root->left == NULL && root->right == NULL) {
+    string tmp;
+    for (int i = 0; i < line.size(); i++) {
+      tmp += to_string(line[i]) + "->";
+    }
+    tmp += to_string(root->val);  // 最後一個直接加上，不放line了
+    res.push_back(tmp);
+    return;
+  }
+  line.push_back(root->val);
+  if (root->left != NULL) dfs(root->left, res, line);
+  if (root->right != NULL) dfs(root->right, res, line);
+  line.pop_back();
+}
+vector<string> binaryTreePaths(TreeNode* root) {
+  vector<string> res;
+  if (root == NULL) return res;
+  vector<int> line;
+  dfs(root, res, line);
+  return res;
+}
+// 或直接用string，简洁!
+void dfs(TreeNode* root, vector<string>& res, string line) {  // string无&，拷贝
+  if (root->left == NULL && root->right == NULL) {
+    res.push_back(line);
+    return;
+  }
+  if (root->left != NULL)
+    dfs(root->left, res, line + "->" + to_string(root->left->val));
+  if (root->right != NULL)
+    dfs(root->right, res, line + "->" + to_string(root->right->val));
+}
+vector<string> binaryTreePaths(TreeNode* root) {
+  vector<string> res;
+  if (root == NULL) return res;
+  dfs(root, res, to_string(root->val));
+  return res;
+}
+{% endhighlight %}
