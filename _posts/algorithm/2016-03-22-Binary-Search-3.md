@@ -38,6 +38,21 @@ int findPeak(vector<int> A) {
   if(A[beg] > A[end])  return beg;
   return end;
 }
+//简化写法：
+int findPeak(vector<int> A) {
+  int beg = 0, end = A.size() - 1;
+  while (beg + 1 < end) {
+    int mid = beg + (end - beg) / 2;
+    // 也对，但是没有上边运行返回快
+    if (A[mid] > A[mid - 1]) {
+      beg = mid;
+    } else {  // merge into 1 if
+      end = mid;
+    }
+  }
+  if (A[beg] > A[end]) return beg;
+  return end;
+}
 {% endhighlight %}
 另一种，while(i < j)的步进方式:
 {% highlight Java %}
@@ -238,5 +253,91 @@ vector<int> kClosestNumbers(vector<int>& A, int target, int k) {
     }
   }
   return res;
+}
+{% endhighlight %}
+
+### 6. [Smallest Rectangle Enclosing Black Pixels](http://www.lintcode.com/en/problem/smallest-rectangle-enclosing-black-pixels/)
+```
+An image is represented by a binary matrix with 0 as a white pixel and 1 as a black pixel. The black pixels are connected, i.e., there is only one black region. Pixels are connected horizontally and vertically. Given the location (x, y) of one of the black pixels, return the area of the smallest (axis-aligned) rectangle that encloses all black pixels.
+For example, given the following image:
+[
+  "0010",
+  "0110",
+  "0100"
+]
+and x = 0, y = 2,
+Return 6.
+```
+{% highlight C++ %}
+// BFS, 时间复杂度O(n)
+// Binary Search, O(logn)
+int minArea(vector<vector<char>>& image, int x, int y) {
+  int left = y, right = y, top = x, bottom = x;
+  int rows = image.size();
+  if (rows == 0) return 0;
+  int cols = image[0].size();
+  if (cols == 0) return 0;
+
+  // search left
+  int l = 0, r = left;
+  while (l + 1 < r) {
+    int mid = l + (r - l) / 2;
+    if (searchCols(image, mid)) {  // if has 1
+      r = mid;
+    } else {
+      l = mid;
+    }
+  }
+  left = searchCols(image, l) ? l : r;
+  // search right
+  l = right;
+  r = cols - 1;
+  while (l + 1 < r) {
+    int mid = l + (r - l) / 2;
+    if (searchCols(image, mid)) {  // if has 1
+      l = mid;
+    } else {
+      r = mid;
+    }
+  }
+  right = searchCols(image, r) ? r : l;
+  // search top
+  l = 0, r = top;
+  while (l + 1 < r) {
+    int mid = l + (r - l) / 2;
+    if (searchRows(image, mid)) {  // if has 1
+      r = mid;
+    } else {
+      l = mid;
+    }
+  }
+  top = searchRows(image, l) ? l : r;
+  // search bottom
+  l = bottom, r = rows - 1;
+  while (l + 1 < r) {
+    int mid = l + (r - l) / 2;
+    if (searchRows(image, mid)) {  // if has 1
+      l = mid;
+    } else {
+      r = mid;
+    }
+  }
+  bottom = searchRows(image, r) ? r : l;
+
+  return (right - left + 1) * (bottom - top + 1);
+}
+
+bool searchCols(vector<vector<char>>& image, int c) {
+  for (int i = 0; i < image.size(); i++) {
+    if (image[i][c] == '1') return true;
+  }
+  return false;
+}
+
+bool searchRows(vector<vector<char>>& image, int r) {
+  for (int i = 0; i < image[0].size(); i++) {
+    if (image[r][i] == '1') return true;
+  }
+  return false;
 }
 {% endhighlight %}
