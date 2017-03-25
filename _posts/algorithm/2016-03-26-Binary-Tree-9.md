@@ -56,7 +56,7 @@ c) 上述2个函数，也可以用到求树中2个节点的距离：先求最低
 // 如果都没有，就返回null
 TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *A, TreeNode *B) {
   if(root == NULL || root == A || root == B) {
-    return root;  // 如果是A是B的父节点这种情况，返回A即可
+    return root;  // 如果是A是B的父节点这种情况，直接返回A即可
   }
   TreeNode *left = lowestCommonAncestor(root->left, A, B);
   TreeNode *right = lowestCommonAncestor(root->right, A, B);
@@ -67,6 +67,44 @@ TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *A, TreeNode *B) {
     return NULL;  // 左右都没有
   }
   return left ? left : right;  // 只碰到了A，B中的某一个，返回它
+}
+{% endhighlight %}
+
+If node A or node B may not exist in tree：
+[Lowest Common Ancestor III](http://www.lintcode.com/en/problem/lowest-common-ancestor-iii/)
+Harder!
+{% highlight C++ %}
+struct Result {
+  bool isAexist;
+  bool isBexist;
+  TreeNode* answer;
+  Result(bool isA, bool isB, TreeNode* node)
+      : isAexist(isA), isBexist(isB), answer(node) {}
+};
+Result core(TreeNode* root, TreeNode* A, TreeNode* B) {
+  if (root == NULL) return Result(false, false, NULL);  // 这一句有区别
+  Result left = core(root->left, A, B);    //后序遍历，之前不返回
+  Result right = core(root->right, A, B);  // 一直走到叶节点
+  // set Result
+  TreeNode* curAnswer;
+  bool isA = left.isAexist || right.isAexist || (root == A);
+  bool isB = left.isBexist || right.isBexist || (root == B);
+  if ((left.answer != NULL && right.answer != NULL) ||
+      (root == A || root == B)) {
+    curAnswer = root;
+  } else if (left.answer == NULL && right.answer == NULL) {
+    curAnswer = NULL;
+  } else {
+    curAnswer = left.answer == NULL ? right.answer : left.answer;
+  }
+  return Result(isA, isB, curAnswer);
+}
+
+TreeNode* lowestCommonAncestor3(TreeNode* root, TreeNode* A, TreeNode* B) {
+  // if (root == NULL) return NULL;
+  Result res = core(root, A, B);
+  if (res.isAexist && res.isBexist) return res.answer;
+  return NULL;  // 都不存在
 }
 {% endhighlight %}
 
