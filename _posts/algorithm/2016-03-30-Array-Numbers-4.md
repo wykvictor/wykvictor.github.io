@@ -385,3 +385,21 @@ int findMissing(vector<int> &nums) {
   return nums.size();
 }
 {% endhighlight %}
+
+### 11. [Pow(x, n)](https://leetcode.com/problems/powx-n/#/description)
+{% highlight C++ %}
+double pow(double x, int n) {
+  if (n < 0)
+    return 1.0 / power(x, -n);
+  else
+    return power(x, n);
+}
+double power(double x, int n) {
+  if (n == 0) return 1;
+  double v = power(x, n / 2);
+  if (n % 2 == 0)
+    return v * v;
+  else
+    return v * v * x;
+}
+{% endhighlight %}
