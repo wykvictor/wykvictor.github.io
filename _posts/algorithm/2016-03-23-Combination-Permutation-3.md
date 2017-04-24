@@ -18,78 +18,82 @@ For example,
 {% highlight C++ %}
 时间复杂度O(n!)，空间复杂度O(n)
 vector<vector<int> > permute(vector<int> &num) {
-    vector<vector<int> > res;
-    vector<int> path;
-    vector<bool> visited(num.size(), false); //与组合区别
-    permuteCore(res, path, num, visited);
-    return res;
+  vector<vector<int> > res;
+  vector<int> path;
+  vector<bool> visited(num.size(), false);  //与组合区别
+  permuteCore(res, path, num, visited);
+  return res;
 }
-void permuteCore(vector<vector<int> > &res, vector<int> &path, vector<int> &num, vector<bool> &visited) {
-    if(path.size() == num.size()) {  //all numbers
-        res.push_back(path);
-        return;
-    }
-    for(int i=0; i<num.size(); i++) { // start from 0
-        if(visited[i])  //访问过的，不能再访问了；这里貌似可以直接利用path.find(element)是否包含
-            continue;
-        path.push_back(num[i]);
-        visited[i] = true;
-        permuteCore(res, path, num, visited);
-        path.pop_back();
-        visited[i] = false;
-    }
+void permuteCore(vector<vector<int> > &res, vector<int> &path, vector<int> &num,
+                 vector<bool> &visited) {
+  if (path.size() == num.size()) {  // all numbers
+    res.push_back(path);
+    return;
+  }
+  for (int i = 0; i < num.size(); i++) {  // start from 0
+    if (visited[i]) continue;             //访问过的，不能再访问了
+    path.push_back(num[i]);
+    visited[i] = true;
+    permuteCore(res, path, num, visited);
+    path.pop_back();
+    visited[i] = false;
+  }
 }
 {% endhighlight %}
 其他方法：
 a. swap方法
 {% highlight C++ %}
 vector<vector<int> > permute(vector<int> &num) {
-    vector<vector<int> > res;
-    permuteCore(res, num, 0);   //num就相当于path了
-    return res;
+  vector<vector<int> > res;
+  permuteCore(res, num, 0);  // num就相当于path了
+  return res;
 }
 void permuteCore(vector<vector<int> > &res, vector<int> &num, int start) {
-    if(start == num.size()) {
-        res.push_back(num);
-        return;
-    }
-    for(int i=start; i<num.size(); i++) {//注意：i=start
-        //交换数组的元素，在递归后需要交换回来。注意循环前要首先递归一次!!!因为有不换的情况
-        swap(num[start], num[i]);
-        permuteCore(res, num, start+1); //换了后，求start后边开始的结果
-        swap(num[start], num[i]);   
-    }
+  if (start == num.size()) {
+    res.push_back(num);
+    return;
+  }
+  // 递归：整体分两部分，1是所有可能出现在第一位的(通过交换得到)，2是剩下的 继续递归做
+  for (int i = start; i < num.size(); i++) {  //注意：i=start
+    // 交换数组的元素，在递归后需要交换回来
+    // 注意循环前要首先递归一次!!!本身原来的顺序就是第一种情况
+    swap(num[start], num[i]);
+    permuteCore(res, num, start + 1);  //换了后，求start后边开始的结果
+    swap(num[start], num[i]);   
+  }
 }
 {% endhighlight %}
 b. STL法
 {% highlight C++ %}
 vector<vector<int> > permute(vector<int> &num) {
-    //利用STL中std::next_permutation()，时间复杂度O(n!)，空间复杂度 O(1)
-    vector<vector<int> > res;
-    sort(num.begin(), num.end());
-    do {
-        res.push_back(num);
-    }while(next_permutation(num.begin(), num.end()));
-    return res;
+  //利用STL中std::next_permutation()，时间复杂度O(n!)，空间复杂度 O(1)
+  vector<vector<int> > res;
+  sort(num.begin(), num.end());
+  do {
+    res.push_back(num);
+  } while (next_permutation(num.begin(), num.end()));
+  return res;
 }
 {% endhighlight %}
 c. 插入法,迭代：推荐方法
 {% highlight C++ %}
 vector<vector<int> > permute(vector<int> &num) {
-    //插入法，迭代
-    vector<vector<int> > res(1);    //need one 初始值
-    for(int i=0; i<num.size(); i++) {   //for each num, insert it into...
-        vector<vector<int> > copyRes(res); //这种只要最后的结果的，都需要copyRes来赋值一份，跟combination相同
-        res.clear();
-        for(int j=0; j<copyRes.size(); j++) {  //for each res, insert the i
-            for(int k=0; k<=copyRes[j].size(); k++) { //there are res[j].size()+1 places to insert
-                vector<int> line(copyRes[j]);
-                line.insert(line.begin()+k, num[i]);
-                res.push_back(line);
-            }
-        }
+  //插入法，迭代
+  vector<vector<int> > res(1);            // need one 初始值
+  for (int i = 0; i < num.size(); i++) {  // for each num, insert it into...
+    //这种只要最后的结果的，都需要copyRes来赋值一份，跟combination相同
+    vector<vector<int> > copyRes(res);
+    res.clear();
+    for (int j = 0; j < copyRes.size(); j++) {  // for each res, insert the i
+      // there are res[j].size()+1 places to insert
+      for (int k = 0; k <= copyRes[j].size(); k++) {
+        vector<int> line(copyRes[j]);
+        line.insert(line.begin() + k, num[i]);
+        res.push_back(line);
+      }
     }
-    return res;
+  }
+  return res;
 }
 {% endhighlight %}
 
@@ -104,52 +108,54 @@ For example,
 通用模板：区别就是排序，且有continue判断
 {% highlight C++ %}
 vector<vector<int> > permuteUnique(vector<int> &num) {
-    vector<vector<int> > res;
-    vector<int> path;
-    vector<bool> visited(num.size(), false);
-    sort(num.begin(), num.end());   //这里需要排序!
-    permuteCore(res, path, num, visited);
-    return res;
+  vector<vector<int> > res;
+  vector<int> path;
+  vector<bool> visited(num.size(), false);
+  sort(num.begin(), num.end());  //这里需要排序!
+  permuteCore(res, path, num, visited);
+  return res;
 }
-void permuteCore(vector<vector<int> > &res, vector<int> &path, vector<int> &num, vector<bool> &visited) {
-    if(path.size() == num.size()) {  // all numbers
-        res.push_back(path);
-        return;
-    }
-    for(int i=0; i<num.size(); i++) {
-        if(visited[i] || (i!=0 && num[i]==num[i-1] && visited[i-1]))  
-        //访问过的，和上一个相同的 且上一个访问过的，都不能再访问了
-        //只有这儿不同； 如1,1这样的，只有第2个1进入，然后第一个1才能入，顺序的
-            continue;
-        path.push_back(num[i]);
-        visited[i] = true;
-        permuteCore(res, path, num, visited);
-        path.pop_back();
-        visited[i] = false;  
-    }
+void permuteCore(vector<vector<int> > &res, vector<int> &path, vector<int> &num,
+                 vector<bool> &visited) {
+  if (path.size() == num.size()) {  // all numbers
+    res.push_back(path);
+    return;
+  }
+  for (int i = 0; i < num.size(); i++) {
+    if (visited[i] || (i != 0 && num[i] == num[i - 1] && visited[i - 1]))
+      //访问过的，和上一个相同的 且上一个访问过的，都不能再访问了
+      //只有这儿不同； 如1,1这样的，只有第2个1进入，然后第一个1才能入，顺序的
+      continue;
+    path.push_back(num[i]);
+    visited[i] = true;
+    permuteCore(res, path, num, visited);
+    path.pop_back();
+    visited[i] = false;  
+  }
 }
 {% endhighlight %}
 其他方法：迭代+判重
 {% highlight C++ %}
 vector<vector<int> > permuteUnique(vector<int> &num) {
-    //插入法，迭代 ==> 判断重复
-    vector<vector<int> > res(1);    //need one初始值
-    for(int i=0; i<num.size(); i++) {   //for each num, insert it into...
-        int resNum = res.size();
-        vector<vector<int> > copyRes(res);  //这种只要最后的结果的，都需要copyRes来赋值一份
-        res.clear();
-        for(int j=0; j<resNum; j++) {  //for each res, insert the i
-            for(int k=0; k<=copyRes[j].size(); k++) {   //there are res[j].size() places to insert
-                vector<int> line(copyRes[j]);
-                line.insert(line.begin()+k, num[i]);
-                if(find(res.begin(), res.end(), line) == res.end()) // 就算排序了，也得有!
-                    res.push_back(line);
-                //过滤重复的位置==>必须有这句优化，否则超时！
-                while(k < line.size()-1 && num[i] == line[k+1])  k++;
-            }
-        }
+  //插入法，迭代 ==> 判断重复
+  vector<vector<int> > res(1);            // need one初始值
+  for (int i = 0; i < num.size(); i++) {  // for each num, insert it into...
+    int resNum = res.size();
+    vector<vector<int> > copyRes(res);
+    res.clear();
+    for (int j = 0; j < resNum; j++) {  // for each res, insert the i
+      for (int k = 0; k <= copyRes[j].size(); k++) {
+        vector<int> line(copyRes[j]);
+        line.insert(line.begin() + k, num[i]);
+        // 就算排序了，也得有!
+        if (find(res.begin(), res.end(), line) == res.end())
+          res.push_back(line);
+        //过滤重复的位置==>必须有这句优化，否则超时！
+        while (k < line.size() - 1 && num[i] == line[k + 1]) k++;
+      }
     }
-    return res;
+  }
+  return res;
 }
 {% endhighlight %}
 
@@ -166,18 +172,18 @@ Here are some examples. Inputs are in the left-hand column and its corresponding
 ![nextpermutation](http://7xno5y.com1.z0.glb.clouddn.com/nextpermutation.png)
 {% highlight C++ %}
 void nextPermutation(vector<int> &num) {
-    int index1 = num.size()-1, index2 = num.size()-1;
-    while(index1>0 && num[index1]<=num[index1-1]) {
-        index1--;
+  int index1 = num.size() - 1, index2 = num.size() - 1;
+  while (index1 > 0 && num[index1] <= num[index1 - 1]) {
+    index1--;
+  }
+  if (index1 > 0) {
+    // 注意相同的情况1,1,5-> 5,1,1
+    while (index2 >= index1 && num[index2] <= num[index1 - 1]) {
+      index2--;
     }
-    if(index1 > 0) {
-        // 注意相同的情况1,1,5-> 5,1,1
-        while(index2>=index1 && num[index2]<=num[index1-1]){
-            index2--;
-        }
-        swap(num[index1-1], num[index2]);
-    }
-    reverse(num.begin()+index1, num.end());
+    swap(num[index1 - 1], num[index2]);
+  }
+  reverse(num.begin() + index1, num.end());
 }
 {% endhighlight %}
 
@@ -200,21 +206,21 @@ Note: Given n will be between 1 and 9 inclusive.
 通用模板会超时，找规律并计算
 {% highlight Java %}
 public String getPermutation(int n, int k) {
-    ArrayList<Integer> nums = new ArrayList<Integer>();
-    int factorial = 1;
-    for (int i = 1; i <= n; i++) {
-        nums.add(i);
-        factorial = factorial * i;  // n!
-    }
-    String result = "";
-    k--;  // Don`t foget, begin from 1th!
-    for (int i = 0; i < n; i++)
-        factorial /= n-i;
-        int cur = k / factorial;
-        k = k % factorial;
-        result += nums.get(cur);
-        nums.remove(cur);
-    }
-    return result;
+  ArrayList<Integer> nums = new ArrayList<Integer>();
+  int factorial = 1;
+  for (int i = 1; i <= n; i++) {
+    nums.add(i);
+    factorial = factorial * i;  // n!
+  }
+  String result = "";
+  k--;  // Don`t foget, begin from 1th!
+  for (int i = 0; i < n; i++) {
+    factorial /= n - i;
+    int cur = k / factorial;
+    k = k % factorial;
+    result += nums.get(cur);
+    nums.remove(cur);
+  }
+  return result;
 }
 {% endhighlight %}

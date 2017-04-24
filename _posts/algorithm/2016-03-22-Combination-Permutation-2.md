@@ -23,29 +23,31 @@ A solution set is:
 利用通用模板:
 {% highlight C++ %}
 vector<vector<int> > combinationSum(vector<int> &candidates, int target) {
-    //DFS 深搜
-    sort(candidates.begin(), candidates.end());
-    vector<vector<int> > res;
-    vector<int> path;
-    combinationSumCore(candidates, res, path, target, 0, 0);
-    return res;  //!!别忘返回
+  // DFS 深搜
+  sort(candidates.begin(), candidates.end());
+  vector<vector<int> > res;
+  vector<int> path;
+  combinationSumCore(candidates, res, path, target, 0, 0);
+  return res;  //!!别忘返回
 }
-void combinationSumCore(vector<int> &candidates, vector<vector<int> > &res, vector<int> &path, int target, int start, int sum) {
-    //if(sum > target)  加入优化后，不需要了！
-    //    return;
-    if(sum == target){
-        res.push_back(path);
-        return;
-    }
-    for(int i=start; i<candidates.size(); i++) {
-        sum += candidates[i];
-        if(sum > target)    break;  //剪枝优化：说明不用再向后走了，已经超了
-        path.push_back(candidates[i]);
-        //also same "i", because same repeated number is allowed
-        combinationSumCore(candidates, res, path, target, i, sum);
-        path.pop_back();
-        sum -= candidates[i];
-    }
+void combinationSumCore(vector<int> &candidates, vector<vector<int> > &res,
+                        vector<int> &path, int target, int start, int sum) {
+  // if(sum > target)  加入优化后，不需要了！
+  //    return;
+  if (sum == target) {
+    res.push_back(path);
+    return;
+  }
+  for (int i = start; i < candidates.size(); i++) {
+    if (sum + candidates[i] > target)
+      break;  //剪枝优化：说明不用再向后走了，已经超了
+    // 防止输入是[2 2 3]这种有重复的情况
+    if (i != start && candidates[i] == candidates[i - 1]) continue;
+    path.push_back(candidates[i]);
+    // input same "i", because same repeated number is allowed
+    combinationSumCore(candidates, res, path, target, i, sum + candidates[i]);
+    path.pop_back();
+  }
 }
 {% endhighlight %}
 
@@ -67,40 +69,22 @@ A solution set is:
 
 与上题区别，一个数字不能用多次，改Core中递归调用一行就OK,同时不能有duplicate的解：
 {% highlight C++ %}
-void combinationSum2Core(vector<int> &candidates, vector<vector<int> > &res, vector<int> &path, int target, int start, int sum) {
-    if(sum == target){
-        if(find(res.begin(), res.end(), path) == res.end())
-            res.push_back(path);  //[1,1], 1 Output: [[1],[1]] Expected: [[1]]
-        return;
-    }
-    for(int i=start; i<candidates.size(); i++) {
-        sum += candidates[i];
-        if(sum > target)    break;
-        path.push_back(candidates[i]);
-        // The only difference is i+1
-        combinationSum2Core(candidates, res, path, target, i+1, sum);
-        path.pop_back();
-        sum -= candidates[i];
-    }
-}
-{% endhighlight %}
-更好的解决方案：与subset II相同
-{% highlight C++ %}
-void combinationSum2Core(vector<int> &candidates, vector<vector<int> > &res, vector<int> &path, int target, int start, int sum) {
-    if(sum == target){
-        res.push_back(path);
-        return;
-    }
-    for(int i=start; i<candidates.size(); i++) {
-        if(i != start && candidates[i] == candidates[i-1])    
-            continue;
-        sum += candidates[i];
-        if(sum > target)    break;
-        path.push_back(candidates[i]);
-        combinationSum2Core(candidates, res, path, target, i+1, sum);
-        path.pop_back();
-        sum -= candidates[i];
-    }
+void combinationSum2Core(vector<int> &candidates, vector<vector<int> > &res,
+                         vector<int> &path, int target, int start, int sum) {
+  if (sum == target) {
+    res.push_back(path);
+    return;
+  }
+  for (int i = start; i < candidates.size(); i++) {
+    if (sum + candidates[i] > target) break;
+    //[1,1], 1 Output: [[1],[1]] Expected: [[1]]
+    if (i != start && candidates[i] == candidates[i - 1]) continue;
+    path.push_back(candidates[i]);
+    // The only difference is i+1
+    combinationSum2Core(candidates, res, path, target, i + 1,
+                        sum + candidates[i]);
+    path.pop_back();
+  }
 }
 {% endhighlight %}
 
@@ -124,22 +108,23 @@ Output:
 Java解法
 {% highlight Java %}
 public List<List<Integer>> combinationSum3(int k, int n) {
-    List<List<Integer>> res = new ArrayList<List<Integer>>();
-    List<Integer> path = new ArrayList<Integer>();
-    DFS(res, k, n, 0, path, 0);
-    return res;
+  List<List<Integer>> res = new ArrayList<List<Integer>>();
+  List<Integer> path = new ArrayList<Integer>();
+  DFS(res, k, n, 1, path, 0);
+  return res;
 }
-void DFS(List<List<Integer>> res, int k, int n, int step, List<Integer> path, int sum) {
-    if(path.size() == k) {
-        if(sum == n)  res.add(new ArrayList(path));
-        return;
-    }
-    for(int i=step+1; i<=9; i++) {
-        path.add(i);
-        DFS(res, k, n, i, path, sum+i);
-        path.remove(path.size() - 1);
-    }
+void DFS(List<List<Integer>> res, int k, int n, int step, List<Integer> path,
+         int sum) {
+  if (path.size() == k) {
+    if (sum == n) res.add(new ArrayList(path));
+    return;
+  }
+  for (int i = step; i <= 9; i++) {
+    path.add(i);
+    DFS(res, k, n, i + 1, path, sum + i);
+    path.remove(path.size() - 1);
+  }
 }
 {% endhighlight %}
-Java中，List是一个接口，ListArray是一个类继承并实现了List
+Java中，List是一个接口，ArrayList是一个类继承并实现了List
  
