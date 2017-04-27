@@ -81,3 +81,36 @@ ListNode *rotateRight(ListNode *head, int k) {
   return newHead;
 }
 {% endhighlight %}
+
+### 3. [Insert into a Cyclic Sorted List](http://www.lintcode.com/en/problem/insert-into-a-cyclic-sorted-list/)
+```
+3->5->1 is a cyclic list, so 3 is next node of 1.
+3->5->1 is same with 5->1->3
+insert a value 4: Return 5->1->3->4
+```
+{% highlight C++ %}
+ListNode* insert(ListNode* node, int x) {
+  ListNode* X = new ListNode(x);
+  if (node == NULL) {  //特殊情况
+    X->next = X;       //注意，收尾
+    return X;
+  }
+  ListNode* pre = node, * cur = node->next;
+  while (cur != node) {                      // 终止条件!
+    if (pre->val > cur->val) {               // 首尾相接处
+      if (x >= pre->val || x <= cur->val) {  // 注意有等于
+        break;
+      }
+    } else {
+      if (x >= pre->val && x <= cur->val) {  // 注意有等于!
+        break;
+      }
+    }
+    pre = cur;
+    cur = cur->next;
+  }
+  pre->next = X;
+  X->next = cur;
+  return node;
+}
+{% endhighlight %}
