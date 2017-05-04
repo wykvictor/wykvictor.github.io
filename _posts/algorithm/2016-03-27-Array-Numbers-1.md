@@ -66,6 +66,24 @@ vector<int> twoSum(vector<int> &numbers, int target) {
 }
 {% endhighlight %}
 
+### 3. [Two Sum - Data structure design](http://www.lintcode.com/en/problem/two-sum-data-structure-design/) 
+{% highlight C++ %}
+class TwoSum {
+ public:
+  unordered_multiset<int> nums;
+  // Add the number to an internal data structure.
+  void add(int number) { nums.insert(number); }
+  // Find if there exists any pair of numbers which sum is equal to the value.
+  bool find(int value) {
+    for (auto i : nums) {
+      int c = (i == value - i ? 2 : 1);  // 特殊情况，需要两个i
+      if (nums.count(value - i) >= c) return true;
+    }
+    return false;
+  }
+};
+{% endhighlight %}
+
 ### 2. [Two Sum Closest](http://www.lintcode.com/en/problem/two-sum-closest/)
 {% highlight C++ %}
 // 返回最接近target的diff值是多少
