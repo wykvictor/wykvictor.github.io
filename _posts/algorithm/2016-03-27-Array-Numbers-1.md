@@ -66,7 +66,7 @@ vector<int> twoSum(vector<int> &numbers, int target) {
 }
 {% endhighlight %}
 
-### 3. [Two Sum - Data structure design](http://www.lintcode.com/en/problem/two-sum-data-structure-design/) 
+### 2. [Two Sum - Data structure design](http://www.lintcode.com/en/problem/two-sum-data-structure-design/) 
 {% highlight C++ %}
 class TwoSum {
  public:
@@ -84,7 +84,64 @@ class TwoSum {
 };
 {% endhighlight %}
 
-### 2. [Two Sum Closest](http://www.lintcode.com/en/problem/two-sum-closest/)
+### 3. [Two Sum - Unique pairs](http://www.lintcode.com/en/problem/two-sum-unique-pairs/)
+```
+Given an array of integers, find how many unique pairs in the array such that their sum is equal to a specific target number. Please return the number of pairs.
+Given nums = [1,1,2,45,46,46], target = 47
+return 2
+1 + 46 = 47
+2 + 45 = 47
+```
+
+Hash解法：易错
+{% highlight C++ %}
+int twoSum6(vector<int> &nums, int target) {
+  unordered_map<int, int> um;
+  for (auto i : nums) {
+    if (um.find(i) != um.end())
+      um[i]++;
+    else
+      um[i] = 1;
+  }
+  int res = 0;
+  for (auto i : um) {
+    if (um.find(target - i.first) == um.end()) continue;
+    if (i.first == target - i.first) {  // 特殊情况，需要两个i
+      if (um[target - i.first] >= 2) res += 2;
+    } else {
+      res += 1;
+    }
+  }
+  return res / 2;  // 重复算了2遍
+}
+{% endhighlight %}
+Two pointer解法：
+{% highlight C++ %}
+int twoSum6(vector<int> &nums, int target) {
+  if (nums.size() <= 1) return 0;
+  sort(nums.begin(), nums.end());
+  int i = 0, j = nums.size() - 1;
+  int res = 0;
+  while (i < j) {
+    if (nums[i] + nums[j] == target) {
+      res++;
+      do {
+        i++;
+      } while (i < j && nums[i] == nums[i - 1]);  // 别忘了i<j !!!
+      do {
+        j--;
+      } while (i < j && nums[j] == nums[j + 1]);
+    } else if (nums[i] + nums[j] < target) {
+      i++;
+    } else {
+      j--;
+    }
+  }
+  return res;
+}
+{% endhighlight %}
+
+### 4. [Two Sum Closest](http://www.lintcode.com/en/problem/two-sum-closest/)
 {% highlight C++ %}
 // 返回最接近target的diff值是多少
 int twoSumCloset(vector<int>& nums, int target) {
@@ -106,7 +163,7 @@ int twoSumCloset(vector<int>& nums, int target) {
 }
 {% endhighlight %}
 
-### 3. [3 Sum - Leetcode 15](http://www.lintcode.com/en/problem/3sum/)
+### 5. [3 Sum - Leetcode 15](http://www.lintcode.com/en/problem/3sum/)
 ```
 Given an array S of n integers, are there elements a, b, c in S such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
 Note:
@@ -183,7 +240,7 @@ vector<vector<int> > threeSum(vector<int> &num) {
 }
 {% endhighlight %}
 
-### 4. [3 Sum closest - Leetcode 16](http://www.lintcode.com/en/problem/3sum-closest/)
+### 6. [3 Sum closest - Leetcode 16](http://www.lintcode.com/en/problem/3sum-closest/)
 ```
 Given an array S of n integers, find three integers in S such that the sum is closest to a given number, target. Return the sum of the three integers. You may assume that each input would have exactly one solution.
 For example, given array S = {-1 2 1 -4}, and target = 1.
@@ -215,7 +272,7 @@ int threeSumClosest(vector<int> num, int target) {
 }
 {% endhighlight %}
 
-### 5. [4 Sum - Leetcode 18](https://leetcode.com/problems/4sum/)
+### 7. [4 Sum - Leetcode 18](https://leetcode.com/problems/4sum/)
 ```
 Given an array S of n integers, are there elements a, b, c, and d in S such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
 Note:
@@ -295,7 +352,7 @@ vector<vector<int> > fourSum(vector<int> &num, int target) {
 }
 {% endhighlight %}
 
-### 6. [Partition Array](http://www.lintcode.com/en/problem/partition-array/)
+### 8. [Partition Array](http://www.lintcode.com/en/problem/partition-array/)
 ```
 Given an array nums of integers and an int k, partition the array such that:
 
@@ -321,7 +378,7 @@ int partitionArray(vector<int> &nums, int k) {
 }
 {% endhighlight %}
 
-### 7. [Sort Letters by Case](http://www.lintcode.com/en/problem/sort-letters-by-case/)
+### 9. [Sort Letters by Case](http://www.lintcode.com/en/problem/sort-letters-by-case/)
 ```
 Given a string which contains only letters. Sort it by lower case first and upper case second.
 It's NOT necessary to keep the original order of lower-case letters and upper case letters.
@@ -342,7 +399,7 @@ void sortLetters(string &letters) {
 }
 {% endhighlight %}
 
-### 8. [Sort colors](http://www.lintcode.com/en/problem/sort-colors/)
+### 10. [Sort colors](http://www.lintcode.com/en/problem/sort-colors/)
 ```
 Given an array with n objects colored red, white or blue, sort them so that objects of the same color are adjacent, with the colors in the order red, white and blue.
 Here, we will use the integers 0, 1, and 2 to represent the color red, white, and blue respectively.
@@ -404,7 +461,7 @@ int partition(vector<int> &A, int start, int pivot) {
 }
 {% endhighlight %}
 
-### 9. [Sort colors II](http://www.lintcode.com/en/problem/sort-colors-ii/)
+### 11. [Sort colors II](http://www.lintcode.com/en/problem/sort-colors-ii/)
 ```
 n objects with k different colors
 A rather straight forward solution is a two-pass algorithm using counting sort. That will cost O(k) extra memory. Can you do it without using extra memory?
@@ -430,7 +487,7 @@ int partition(vector<int> &A, int start, int pivot) {
 }
 {% endhighlight %}
 
-### 10. [Interleaving Positive and Negative Numbers](http://www.lintcode.com/en/problem/interleaving-positive-and-negative-numbers/)
+### 12. [Interleaving Positive and Negative Numbers](http://www.lintcode.com/en/problem/interleaving-positive-and-negative-numbers/)
 ```
 Given an array with positive and negative integers. Re-range it to interleaving with positive and negative integers.
 Do it in-place and without extra memory
@@ -461,7 +518,7 @@ void rerange(vector<int> &A) {
 }
 {% endhighlight %}
 
-### 11. [Summary Ranges - Leetcode 228](https://leetcode.com/problems/summary-ranges/)
+### 13. [Summary Ranges - Leetcode 228](https://leetcode.com/problems/summary-ranges/)
 ```
 Given a sorted integer array without duplicates, return the summary of its ranges.
 For example, given [0,1,2,4,5,7], return ["0->2","4->5","7"].
@@ -487,7 +544,7 @@ vector<string> summaryRanges(vector<int>& nums) {
 }
 {% endhighlight %}
  
-### 12. [Remove duplicates from sorted array - Leetcode 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)
+### 14. [Remove duplicates from sorted array - Leetcode 26](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)
 ```
 Given a sorted array, remove the duplicates in place such that each element
 appear only once and return the new length.
@@ -509,7 +566,7 @@ int removeDuplicates(int A[], int n) {
 }
 {% endhighlight %}
 
-### 13. [Remove duplicates from sorted array II - Leetcode 80](https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/)
+### 15. [Remove duplicates from sorted array II - Leetcode 80](https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/)
 ```
 What if duplicates are allowed at most twice?
 For example,
@@ -562,7 +619,7 @@ int removeDuplicates(int A[], int n) {
 }
 {% endhighlight %}
 
-14, [Remove Element - Leetcode 27](https://leetcode.com/problems/remove-element/)
+### 16. [Remove Element - Leetcode 27](https://leetcode.com/problems/remove-element/)
 ```
 Given an array and a value, remove all instances of that value in place and return the new length.
 The order of elements can be changed. It doesn't matter what you leave beyond the new length. 
@@ -595,7 +652,7 @@ int removeElement(int A[], int n, int elem) {
 }
 {% endhighlight %}
 
-### 15. [Implement strStr - Leetcode 28](https://leetcode.com/problems/implement-strstr/)
+### 17. [Implement strStr - Leetcode 28](https://leetcode.com/problems/implement-strstr/)
 {% highlight C++ %}
 char *strStr(char *haystack, char *needle) {
   //暴力解法，时间复杂度 O(N*M)，空间复杂度 O(1),大集合超时
