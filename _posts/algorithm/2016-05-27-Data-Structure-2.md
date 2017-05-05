@@ -304,3 +304,77 @@ vector<string> topKFrequentWords(vector<string>& words, int k) {
   return res;
 }
 {% endhighlight %}
+
+### 7. [High Five](http://www.lintcode.com/en/problem/high-five/)
+```
+There are two properties in the node student id and scores, 
+to ensure that each student will have at least 5 points,
+find the average of 5 highest scores for each person.
+```
+{% highlight C++ %}
+double average(priority_queue<int, vector<int>, greater<int>>& pq) {
+  double res = 0;
+  int size = pq.size();
+  while (!pq.empty()) {
+    res += pq.top();
+    pq.pop();
+  }
+  return res / size;
+}
+map<int, double> highFive(vector<Record>& results) {
+  unordered_map<int, priority_queue<int, vector<int>, greater<int>>> pqmap;  // 小頂堆
+  map<int, double> res;
+  for (auto i : results) {
+    if (pqmap.find(i.id) == pqmap.end()) {
+      pqmap[i.id].push(i.score);
+    } else {
+      if (pqmap[i.id].size() < 5) {
+        pqmap[i.id].push(i.score);
+      } else if (i.score > pqmap[i.id].top()) {
+        pqmap[i.id].pop();
+        pqmap[i.id].push(i.score);
+      }
+    }
+  }
+  for (auto i : pqmap) {
+    res[i.first] = average(i.second);
+  }
+  return res;
+}
+{% endhighlight %}
+
+### 8.[K Closest Points](http://www.lintcode.com/en/problem/k-closest-points/)
+{% highlight C++ %}
+Point g_origin;
+double dist(const Point& p1, const Point& p2) {
+  return pow((p1.x - p2.x), 2) + pow((p1.y - p2.y), 2);
+}
+struct cmp {
+  bool operator()(const Point& p1, const Point& p2) {
+    double d1 = dist(p1, g_origin), d2 = dist(p2, g_origin);
+    if (d1 == d2) {
+      return p1.x < p2.x || p1.y < p2.y;
+    }
+    return d1 < d2;
+  }
+};
+vector<Point> kClosest(vector<Point>& points, Point& origin, int k) {
+  g_origin = origin;
+  priority_queue<Point, vector<Point>, cmp> max_heap; //大顶堆
+  vector<Point> res;
+  for (auto i : points) {
+    if (max_heap.size() < k) {
+      max_heap.push(i);
+    } else if (dist(i, g_origin) < dist(max_heap.top(), g_origin)) {
+      max_heap.pop();
+      max_heap.push(i);
+    }
+  }
+  while (!max_heap.empty()) {
+    res.push_back(max_heap.top());
+    max_heap.pop();
+  }
+  reverse(res.begin(), res.end());
+  return res;
+}
+{% endhighlight %}
