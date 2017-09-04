@@ -593,7 +593,7 @@ int removeDuplicates(int A[], int n) {
   for (int i = 2; i < n; i++) {
     //只有这种情况，跳过，啥不干
     if (A[i] == A[index - 1] && A[i] == A[index - 2]) continue;
-        A[index++] = A[i];
+    A[index++] = A[i];
   }
   return index;
 }
@@ -673,5 +673,63 @@ char *strStr(char *haystack, char *needle) {
       return p; // 找到啦
   }
   return NULL; //到结尾
+}
+{% endhighlight %}
+
+### 18. [Wiggle Sort](http://www.lintcode.com/en/problem/wiggle-sort/)
+```
+Given an unsorted array nums, reorder it in-place such that
+nums[0] <= nums[1] >= nums[2] <= nums[3]....
+Please complete the problem in-place.
+```
+{% highlight C++ %}
+// O(nlogn): First sorted, than flip each pair of 2 elements
+void wiggleSort(vector<int>& nums) {
+  sort(nums.begin(), nums.end());
+  for (int i = 2; i < nums.size(); i += 2) swap(nums[i], nums[i - 1]);
+}
+// O(n), one pass
+void wiggleSort(vector<int>& nums) {
+  int size = nums.size();
+  if (size < 2) return;
+  for (int i = 1; i < nums.size(); i++) {
+    if ((i % 2 == 1 && nums[i] < nums[i - 1]) ||
+        (i % 2 == 0 && nums[i] > nums[i - 1]))
+      swap(nums[i], nums[i - 1]);
+  }
+}
+{% endhighlight %}
+
+[Wiggle Sort II](http://www.lintcode.com/en/problem/wiggle-sort-ii/)
+```
+nums[0] < nums[1] > nums[2] < nums[3]....
+```
+{% highlight C++ %}
+void wiggleSort(vector<int>& nums) {
+  int size = nums.size();
+  if (size < 2) return;
+  vector<int> tmp(nums);
+  sort(tmp.begin(), tmp.end());
+  int mid = (size + 1) / 2;
+  int j = mid - 1, k = size - 1; // 从后往前，选着放
+  for (int i = 0; i < mid; i++) {
+    nums[i * 2] = tmp[j--];
+    if (i * 2 + 1 < size) nums[i * 2 + 1] = tmp[k--]; // 防止越界
+  }
+}
+void wiggleSort(vector<int>& nums) {
+#define A(i) nums[(1 + 2 * i) % (n | 1)]
+  int n = nums.size(), i = 0, j = 0, k = n - 1;
+  auto midptr = nums.begin() + n / 2;
+  nth_element(nums.begin(), midptr, nums.end());
+  int mid = *midptr;
+  while (j <= k) {
+    if (A(j) > mid)
+      swap(A(i++), A(j++));
+    else if (A(j) < mid)
+      swap(A(j), A(k--));
+    else
+      ++j;
+  }
 }
 {% endhighlight %}
