@@ -241,10 +241,10 @@ int maxDiffSubArrays(vector<int> nums) {
 {% endhighlight %}
 
 ### 7. [Subarray Sum](http://www.lintcode.com/en/problem/subarray-sum/)
-···
+```
 Find a subarray where the sum of numbers is zero. 
 Given [-3, 1, 2, -3, 4], return [0, 2] or [1, 3]
-···
+```
 {% highlight C++ %}
 vector<int> subarraySum(vector<int> nums) {
   vector<int> res;
@@ -264,7 +264,7 @@ vector<int> subarraySum(vector<int> nums) {
 }
 {% endhighlight %}
 
-### 8. [Subarray Sum Closest/](http://www.lintcode.com/en/problem/subarray-sum-closest/)
+### 8. [Subarray Sum Closest](http://www.lintcode.com/en/problem/subarray-sum-closest/)
 ```
 Find a subarray with sum closest to zero. Return the indexes of the first number and last number.
 ```
