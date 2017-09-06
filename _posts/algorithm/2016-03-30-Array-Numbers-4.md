@@ -258,13 +258,14 @@ int reverse(int x) {
 {% endhighlight %}
 
 ### 7. [Palindrome Number - Leetcode 9](https://leetcode.com/problems/palindrome-number/)
+```
 Determine whether an integer is a palindrome. Do this without extra space.
-
 Some hints:
 Could negative integers be palindromes? (ie, -1)
 If you are thinking of converting the integer to string, note the restriction of using extra space.
 You could also try reversing an integer. However, if you have solved the problem "Reverse Integer", you know that the reversed integer might overflow. How would you handle such case?
 There is a more generic way of solving this problem.
+```
 若直接用reverse，会溢出，所以下面直接首尾比较，靠谱
 {% highlight C++ %}
 bool isPalindrome(int x) {
@@ -283,6 +284,7 @@ bool isPalindrome(int x) {
 {% endhighlight %}
 
 ### 8. [Minimum window substring - Leetcode 76 Hard](https://leetcode.com/problems/minimum-window-substring/)
+```
 Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
 For example,
 S = "ADOBECODEBANC"
@@ -291,6 +293,7 @@ Minimum window is "BANC".
 Note:
 If there is no such window in S that covers all characters in T, return the emtpy string "".
 If there are multiple such windows, you are guaranteed that there will always be only one unique minimum window in S.
+```
 双指针的使用，right一直往前，left在count到的情况下收缩
 {% highlight C++ %}
 string minWindow(string S, string T) {
@@ -325,11 +328,13 @@ string minWindow(string S, string T) {
 {% endhighlight %}
 
 ### 9. [First Missing Positive - Leetcode 41](https://leetcode.com/problems/first-missing-positive/)
+```
 Given an unsorted integer array, find the first missing positive integer.
 For example,
 Given [1,2,0] return 3,
 and [3,4,-1,1] return 2.
 Your algorithm should run in O(n) time and uses constant space.
+```
 {% highlight C++ %}
 int firstMissingPositive(int A[], int n) {
   //用标记数组bool，出现的true，第一个没出现的就是答案，但是空间O(n)，不靠谱!
