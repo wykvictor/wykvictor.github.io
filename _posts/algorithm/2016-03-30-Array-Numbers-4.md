@@ -408,3 +408,95 @@ double power(double x, int n) {
     return v * v * x;
 }
 {% endhighlight %}
+
+### 12. [reverse-pairs](http://www.lintcode.com/en/problem/reverse-pairs/)
+```
+Given A = [2, 4, 1, 3, 5] , (2, 1), (4, 1), (4, 3) are reverse pairs. return 3
+```
+{% highlight C++ %}
+// 归并的思路, 边排序，边统计
+vector<int> tmp;
+long long reversePairs(vector<int> &A) {
+  if (A.size() <= 1) return 0;
+  tmp.resize(A.size());  // 这样提前分配好，比在子函数里效率高!
+  return mergeSort(A, 0, A.size() - 1);
+}
+long long mergeSort(vector<int> &A, int beg, int end) {
+  if (beg >= end) return 0;
+  int mid = beg + ((end - beg) >> 1);
+  // 必须是mid+1,end(否则，2个元素有死循环现象)
+  long long res = mergeSort(A, beg, mid) + mergeSort(A, mid + 1, end);
+  // merge
+  int left = beg, right = mid + 1;
+  int index = beg;  // 这里注意，下标和A的对应关系!!
+  while (left <= mid && right <= end) {
+    if (A[left] <= A[right]) {
+      tmp[index++] = A[left++];
+    } else {  //逆序了
+      tmp[index++] = A[right++];
+      res += mid - left + 1;  // 注意 +1
+    }
+  }
+  while(left <= mid) {
+    tmp[index++] = A[left++];
+  }
+  while(right <= end) {
+    tmp[index++] = A[right++];
+  }
+  for (int i = beg;i <= end; ++i)
+    A[i] = tmp[i];
+  return res;
+}
+{% endhighlight %}
+
+### 13. [First Missing Prime Number](http://www.lintcode.com/zh-cn/problem/first-missing-prime-number/)
+```
+Given a list [2,3,5,7,11,13,17,23,29],return 19
+```
+{% highlight C++ %}
+// 判断素数最简单的方法，复杂度O(n^1.5)
+bool isPrime(int num) {
+   if (num <= 1) return false;
+   // Loop's ending condition is i * i <= num instead of i <= sqrt(num)
+   // to avoid repeatedly calling an expensive function sqrt().
+   for (int i = 2; i * i <= num; i++) {
+      if (num % i == 0) return false;
+   }
+   return true;
+}
+// [筛选法](https://leetcode.com/problems/count-primes/hints/)
+// O(nloglog n)
+int countPrimes(int num) {  //统计<=num的素数的数目
+  if (num <= 1) return false;
+  vector<bool> tags(num + 1, true);     // 初始化为都是素数
+  for (int i = 2; i * i <= num; i++) {  // 优化：i * i <= num
+    if (!tags[i]) continue;
+    for (int j = i * i; j <= num; j += i) {  // 优化：从i*i开始,递加i,不是从2*i开始
+      tags[j] = false;
+    }
+  }
+  int count = 0;
+  for (int i=2; i<=num; i++) {
+    if (tags[i]) count++;
+  }
+  return count;
+}
+int firstMissingPrime(vector<int> nums) {
+  if(nums.size()==0) return 2; // 边界条件
+  int num = nums[nums.size() - 1] * 2;  // n和2n之间，肯定有素数
+  vector<bool> tags(num, true); 
+  for (int i = 2; i * i <= num; i++) {  // 从2开始乘倍数，筛选
+    if (!tags[i]) continue;
+    for (int j = i * i; j <= num; j += i) {  // 从i*i开始,递加i
+      tags[j] = false;
+    }
+  }
+  int count = 0;
+  for (int i=2; i<=num; i++) {
+    if (tags[i]) {
+      if(i != nums[count++]) return i;
+    }
+  }
+  return -1;
+}
+{% endhighlight %}
