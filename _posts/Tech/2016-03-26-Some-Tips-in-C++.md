@@ -7,7 +7,11 @@ categories: Tech
 ---
 
 1. 代码多用const, 包括类内部的函数
-2. 尽量少用指针，会有memory issue. 可以使用auto_ptr和shared_ptr代替，命名用p打头
+2. 尽量少用指针，会有memory issue. 可以使用智能指針代替，命名用p打头：
+   * auto_ptr: 内部沒有引用计数，赋值的时候，会转移拥有关系。不能共享所有权，即不要让两个auto_ptr指向同一个对象。
+   * shared_ptr：auto_ptr有和很多不足之处，建议使用shared_ptr。有计数，自动释放自己所管理的对象，也可以自定义一个删除器(deleter)函数来代替delete
+   * unique_ptr：某时刻只能有一个unique_ptr指向给定的对象，不支持普通的拷贝或赋值操作。p2.reset(p3.release());转移所有权
+   * weak_ptr: 是shared_ptr的助手而不是智能指针，它不具有普通指针的行为，没有重载operator*和->。成员函数lock()获得一个可用的shared_ptr对象
 3. 代码注意分段，一段一个小功能
 4. 代码开关多采用编译时开关，不需要的不编译进去，比true/false变量控制要好
 6. GLOG比较好，比cout好。在android中也可以logcat输出
@@ -37,6 +41,7 @@ f. Constant Name
    Variables declared constexpr or const, and whose value is fixed for the duration of the program,
    are named with a leading "k" followed by mixed case.
 ```
+
 13. 虚函数
    * 实现原理[虚函数表1](http://www.cnblogs.com/malecrab/p/5572730.html)和[2](https://blog.twofei.com/496/)
    * 构造函数不能是虚函数(刚开始构造，还没有vtable呢)，析构函数大部分是虚函数(防止子类无法释放完内存)
