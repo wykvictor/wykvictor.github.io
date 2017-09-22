@@ -224,3 +224,8 @@ for j in {1..5}; do
 for i in {1..15}; do echo $(($i*100)); head -$(($i*100)) dis1_$j.txt | tail -100 | awk '{print $8}' > tag$j/$j\_$i.txt; sed -i '/^$/d' tag$j/$j\_$i.txt; done
 done
 {% endhighlight %}
+
+### 18. 統計代碼文件行數
+{% highlight Bash shell scripts %}
+wc -l `find . -name "*.cpp"` | awk 'BEGIN{sum=0;} {sum=sum+$1;} END{print sum}'
+{% endhighlight %}
