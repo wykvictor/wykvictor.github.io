@@ -408,7 +408,25 @@ double power(double x, int n) {
     return v * v * x;
 }
 {% endhighlight %}
-
+非递归方法，二进制思路
+{% highlight C++ %}
+double myPow(double x, int n) {
+  double ans = 1;
+  unsigned long long p;
+  if (n < 0) {
+    p = -n;
+    x = 1 / x;
+  } else {
+    p = n;
+  }
+  while (p) {
+    if (p & 1) ans *= x;
+    x *= x;
+    p >>= 1;
+  }
+  return ans;
+}
+{% endhighlight %}
 ### 12. [reverse-pairs](http://www.lintcode.com/en/problem/reverse-pairs/)
 ```
 Given A = [2, 4, 1, 3, 5] , (2, 1), (4, 1), (4, 3) are reverse pairs. return 3
