@@ -12,7 +12,12 @@ categories: Resources
 WD=$(readlink -f "`dirname $0`")  # 取当前shell脚本的全路径，不包括最后的/
 {% endhighlight %}
 
-### 2. 实例 
+### 2. DEBUG or Release
+Win和Linux系统，可以通过cmake -DCMAKE_BUILD_TYPE=Release/Debug设置编译目标
+
+Xcode系统，上述变量可能没有效果，经测试可以使用CMAKE_CONFIGURATION_TYPES
+
+### 3. 实例 
 {% highlight Bash shell scripts %}
 cmake_minimum_required (VERSION 3.1)  # 指定需要的 CMake 的最低版本
 project (project)  # 指定项目的名称
@@ -33,6 +38,8 @@ endif()
 if(UNIX OR APPLE)  # UNIX-like 的系统，包括 Apple OS X 和 CygWin 或  Apple 系统
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall -DUSE_OPENCV=1")
 endif()
+# 只将Release版本，设置为-Ofast
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
 
 # 输出信息：message([STATUS|WARNING|AUTHOR_WARNING|FATAL_ERROR|SEND_ERROR] “message to display” …)
 message(STATUS "root path:${CMAKE_FIND_ROOT_PATH}")
@@ -61,8 +68,9 @@ endif()
 
 #eigen
 find_package(Eigen REQUIRED)
+# 也可以使用target_include_directories，只为某一个target添加include目录
 include_directories(SYSTEM ${EIGEN_INCLUDE_DIR})  # SYSTEM：to use system include directories on some platforms
-add_definitions(-DUSE_EIGEN)  # 用于添加编译器命令行标志
+add_definitions(-DUSE_EIGEN)  # 用于添加预编译，定义标志
 
 #caffe
 # [link](https://cmake.org/cmake/help/v3.4/command/find_package.html?highlight=find_package)
