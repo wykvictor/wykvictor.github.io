@@ -16,6 +16,7 @@ source deactivate python27    # 退出当前环境
 conda env remove -n python27  # 删除该环境
 conda info -e                 # 查看安装的环境
 conda install opencv          # 安装包
+conda list | grep opencv      # 列出已经安装的包
 {% endhighlight %}
 
 如果包安装比较慢，可以添加清华镜像源：
