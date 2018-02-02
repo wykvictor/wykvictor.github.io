@@ -25,3 +25,27 @@ b = torch.from_numpy(a)  # a为numpy的array
 
 x = x.cuda()  # Tensor x使用cuda函数以后，所有运算会调用gpu
 {% endhighlight %}
+
+### 2. 在CPU上Load由GPU train的nn.DataParallel模型
+该模型的key值前缀是module. 去掉即可
+{% highlight Python %}
+# lambda表达式，定义了函数: 传入2个值storage, loc作为参数，返回值是第一个值，就是cpu上的原始的序列化的位置
+tmp_pose_model = torch.load(model_path, map_location=lambda storage, loc: storage)
+old_state = tmp_pose_model.state_dict()
+from collections import OrderedDict
+new_state_dict = OrderedDict()
+for k, v in list(old_state.items()):
+    k = k.replace("module.", "")
+    new_state_dict[k] = v
+new_model = model.Model()
+new_model.load_state_dict(new_state_dict)
+# print(new_model.state_dict())
+{% endhighlight %}
+
+### 3. 其他
+{% highlight Python %}
+with torch.cuda.device(0):
+	# 这里的操作，都是在cuda的device 0上
+model.eval()  # Sets the module in evaluation mode
+x.detach()    # 表示该Tensor不需要求梯度
+{% endhighlight %}
