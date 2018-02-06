@@ -6,7 +6,11 @@ tags: [pytorch, deep learning]
 categories: ML
 ---
 
-[PyTorch Doc](http://pytorch.org/docs/master/torch.html)
+> [PyTorch Doc](http://pytorch.org/docs/master/torch.html)
+> [60分钟入门](https://zhuanlan.zhihu.com/p/25572330)
+> [Pytorch入门教程](https://www.jianshu.com/p/cbce2dd60120)
+> [莫烦PyTorch教程](https://morvanzhou.github.io/tutorials/machine-learning/torch/)
+
 
 ### 1. Tensor张量
 {% highlight Python %}
