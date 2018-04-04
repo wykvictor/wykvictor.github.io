@@ -229,3 +229,13 @@ done
 {% highlight Bash shell scripts %}
 wc -l `find . -name "*.cpp"` | awk 'BEGIN{sum=0;} {sum=sum+$1;} END{print sum}'
 {% endhighlight %}
+
+### 19. awk统计均值/最大值
+{% highlight Bash shell scripts %}
+# 求平均
+awk '{sum+=$1} END {print "Average = ", sum/NR}'
+# 求最大值
+awk 'BEGIN {max = 0} {if ($1>max) max=$1 fi} END {print "Max=", max}'
+# 求最小值
+awk 'BEGIN {min = 1999999} {if ($1<min) min=$1 fi} END {print "Min=", min}'
+{% endhighlight %}
