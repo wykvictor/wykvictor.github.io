@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "PyTorch Basics"
-date:   2017-01-29 16:00:00
+date:   2018-01-29 16:00:00
 tags: [pytorch, deep learning]
 categories: ML
 ---
@@ -46,10 +46,65 @@ new_model.load_state_dict(new_state_dict)
 # print(new_model.state_dict())
 {% endhighlight %}
 
-### 3. 其他
+
+### 3. 统计模型信息：计算量、参数量
+{% highlight Python %}
+# 计算量 ref: https://zhuanlan.zhihu.com/p/33992733
+def calc_computation():
+    # just calculate conv for now
+    list_conv = []
+    multiply_adds = False
+    def conv_hook(self, input, output):
+        batch_size, input_channels, input_height, input_width = input[0].size()
+        output_channels, output_height, output_width = output[0].size()
+
+        kernel_ops = self.kernel_size[0] * self.kernel_size[1] * (self.in_channels / self.groups) * (
+            2 if multiply_adds else 1)
+        bias_ops = 1 if self.bias is not None else 0
+        params = output_channels * (kernel_ops + bias_ops)
+        flops = batch_size * params * output_height * output_width
+
+        list_conv.append(flops)
+
+    def calc(net):
+        childrens = list(net.children())
+        if not childrens:
+            if isinstance(net, nn.Conv2d):
+                net.register_forward_hook(conv_hook)
+            return
+        for c in childrens:  # Recursively step into the sub nn.Modules to find the nn.Conv2d
+            calc(c)
+
+    _model = PoseModel()
+    calc(_model)
+    y = _model(Variable(torch.ones(1, 3, 256, 256)))
+    print('total_compuation:', sum(list_conv) / 1e6, 'M')
+
+# 参数量，统计的是trainable params，比如bn只有2个
+sum([np.prod(param.data.shape) for param in pose_model.parameters()])
+sum([param.nelement() for param in pose_model.parameters()])
+{% endhighlight %}
+
+### 4. 模型参数初始化
+{% highlight Python %}
+def weight_init(m):
+  if isinstance(m, nn.Conv2d):
+    m.weight.data.fill_(0.01)
+  if isinstance(m, nn.BatchNorm2d):
+    m.weight.data.fill_(1)
+    m.bias.data.zero_()
+    nn.init.constant(m._buffers['running_mean'], 0)
+    nn.init.constant(m._buffers['running_var'], 1)
+# Applies weight_init recursively to every submodule
+model.apply(weight_init)
+# important: 设置到eval模式，否则batchnorm中的running_mean/var使用的是统计出来的值，而不是0/1_
+pose_model.eval()
+{% endhighlight %}
+
+### 5. 其他
 {% highlight Python %}
 with torch.cuda.device(0):
-	# 这里的操作，都是在cuda的device 0上
+  # 这里的操作，都是在cuda的device 0上
 model.eval()  # Sets the module in evaluation mode
 x.detach()    # 表示该Tensor不需要求梯度
 {% endhighlight %}
