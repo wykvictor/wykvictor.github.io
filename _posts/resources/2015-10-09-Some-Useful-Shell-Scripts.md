@@ -212,6 +212,11 @@ cd "${WD}"
 {% highlight Bash shell scripts %}
 for i in `ls *`; do mv -- $i `echo $i | awk -F. '{printf("%06d\n", $1)}'`.txt; done # --避免$i开头有'-'
 {% endhighlight %}
+目录里包含很多子目录，每个子目录里有很多文件，将文件重命名将其目录名字加到前边
+{% highlight Bash shell scripts %}
+for i in `ls`; do pushd $i; ls | awk -v dir=$i '{print "mv " $1 " " dir$1}' | bash; popd; done
+{% endhighlight %}
+其中，注意awk需要external外部的变量时，需要用-v参数引入
 
 ### 16. 批量删除大小为0的文件
 {% highlight Bash shell scripts %}
