@@ -11,6 +11,8 @@ categories: Resources
 $ a="x y"
 $ echo ${a/ */}  # output: x
 $ echo ${a/x /z} # output: zy
+$ echo ${a% y}  # output: x 从后匹配百分号之后的串，并删除
+¥ echo ${a#* }  # output: y 从前匹配百分号之后的串，并删除，可以用通配符如*
 {% endhighlight %}
 
 ### 2. if [[ ]] 正则表达式
