@@ -35,6 +35,10 @@ nakosung/caffe-gpu                                                             0
 $ docker pull image-name  # download image
 $ docker rmi image_name  # delete image
 $ docker rmi $(docker images -a -f "dangling=true" -q)  # dangling的镜像
+
+#导出image，并在其他的机器导入
+$ docker save  -o save-img.tar image-name:tag
+$ docker load -i save-img.tar
 {% endhighlight %}
 
 ### 3. 操作docker container
