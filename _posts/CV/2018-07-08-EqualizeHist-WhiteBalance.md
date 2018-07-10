@@ -123,25 +123,25 @@ void balance_white(cv::Mat &mat, cv::Mat mask = cv::Mat()) {
 {% endhighlight %}
 
 ### 4. 一些结果
-1. equalize hist的好的结果：
+#### 1. equalize hist的好的结果：
 ![cv_face_1](/res/cv_face_1.png)
 图中，第三张equal hist，把皮肤变得很亮，整体图片对比度提升
 
-2. white balance好的结果：
+#### 2. white balance好的结果：
 ![cv_balance_red](/res/cv_balance_red.png)
 图中右上白平衡后，白色的盘子被矫正，整体图片和谐。左下角equal hist只是把整体亮度提升，也产生了噪点，右下颜色很奇怪
 
 下图类似：
 ![cv_face_4](/res/cv_face_4.png)
 
-3. 如果3个通道一起做，会产生异常颜色
+#### 3. 如果3个通道一起做，会产生异常颜色
 ![cv_tree](/res/cv_tree.png)
 图中第二张白平衡没有明显变化，第三张草地的颜色变得清晰，细节更丰富，但是第四张出现了自然界中不存在的树叶的颜色
 
-4. equalize hist有时会产生噪点
+#### 4. equalize hist有时会产生噪点
 ![cv_face_6](/res/cv_face_6.png)
 图中，第三张产生了很多噪点
 
-5. equalize hist有时会丢失细节，y通道过亮，导致颜色细节丢失
+#### 5. equalize hist有时会丢失细节，y通道过亮，导致颜色细节丢失
 ![cv_face_8](/res/cv_face_8.png)
-图中，第三张下部分，杯子的花纹过亮，细节花纹颜色丢失
+图中，第三张下部分，被子的花纹过亮，细节花纹颜色丢失
