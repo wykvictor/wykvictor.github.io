@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Learning Docker Network"
+title:  "Docker Network and ADB Devices"
 date:   2016-03-14 16:00:00
 tags: [docker, network, link, multi-host, swarm]
 categories: Tech
@@ -29,6 +29,19 @@ bridge-name  bridge id   STP enabled   interfaces
 docker0	8000.024261f0bd87	no	veth1cd2227, veth828ef90
 {% endhighlight %}
 
-
 ### 2. [Multi-host networking](https://docs.docker.com/engine/userguide/networking/get-started-overlay/)
 Refer to the above docker-doc
+
+### 3. Connect adb devices from Docker in Ubuntu
+[ref](http://learningbysimpleway.blogspot.com/2018/02/how-to-connect-adb-devices-to-linux.html)
+{% highlight Bash shell scripts %}
+adb kill-server # kill any running instance in host machine , other wise adb devices will not be visisble in container
+docker run -it --privileged -v /dev/bus/usb:/dev/bus/usb --net=host 。。。
+{% endhighlight %}
+
+### 4. Connect adb devices from Docker in MacOS
+##### a. [ref1](http://gw.tnode.com/docker/docker-machine-with-usb-support-on-windows-macos/)
+通过docker-machine安装VirtualBox，之后再安装docker，步骤同3(这里对于大的docker image，有可能由于太大无法正常倒入)
+
+##### b. [ref2](https://testerhome.com/topics/12489)
+直接在mac上安装Virtual Box，再在里头安装Ubuntu，之后步骤同3
