@@ -67,7 +67,7 @@ x = x - learning_rate * dx / (np.sqrt(cache) + 1e-7)
 Good:
 1. 相比于AdaGrad, 很好的解决了深度学习中过早结束的问题 
 Bad：
-1. 引入了新的超参数，dacay_rate
+1. 引入了新的超参数，dacay_rate，一般可以使用默认值
 
 ### 6. Adam (Adaptive Moment Estimation)
 在RMSProp基础上，加了Momentum, 利用梯度的一阶估计和二阶估计动态调整每个参数的学习率
@@ -85,7 +85,21 @@ for i in range(1, batchN):
 	m = m / (1 - beta1 ** i)  # i越来越大，也就是分母越来越大
 	v = v / (1 - beta2 ** i)
 	x = x - learning_rate * m / (np.sqrt(v) + 1e-7) 
-
 {% endhighlight %}
 Good:
-1. TODO: 经过偏置校正后，每一次迭代学习率都有个确定范围，使得参数比较平稳?
+1. 每一次迭代，学习率都有个确定范围，使得参数比较平稳，loss曲线也比较平稳
+Bad:
+1. 跟RMSProp和SGD相比，能够较快收敛但是最终收敛结果可能没有这两种好。比如RMSProp的loss曲线虽然较为震荡，但在某些learning_rate的设置情况下，能够达到比Adam更加低的loss
+
+### 7. Weight Decay
+weight decay（权值衰减）的使用既不是为了提高收敛精确度也不是为了提高收敛速度，其最终目的是防止过拟合。
+在损失函数中，weight decay是放在正则项（regularization）前面的一个系数。
+正则项一般指示模型的复杂度，所以weight decay的作用是调节模型复杂度对损失函数的影响，若weight decay很大，则复杂的模型Loss也就大。
+
+W(t+1) = W(t) − lr ∗ delta(W) − lr ∗ weight_decay ∗ W(t) = (1-lr ∗ weight_decay) * W(t) - lr ∗ delta(W)
+
+[公式参考链接](https://stats.stackexchange.com/questions/29130/difference-between-neural-net-weight-decay-and-learning-rate)
+
+但是Weight Decay不等同于L2正则化, [paper](https://arxiv.org/abs/1711.05101) TODO: 待分析
+
+公式表明weight的更新相当于先缩小了一个比例，再按常规梯度下降进行。这样某些神经元可能由于weight不断减小就不激活了，类似dropout的效果。但是有用的神经元，还是会靠梯度下降得到激活。
