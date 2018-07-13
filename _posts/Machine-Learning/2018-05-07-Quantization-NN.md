@@ -28,3 +28,10 @@ weight_[i] = torch.round(weight_[i] * 255 / 4.)
 这样网络上，一层一层往后，activation值会慢慢变小。
 # (这一点需要实际验证)
 {% endhighlight %}
+另外，注意量化过程只在forward时做，做完后copy回原来的weight，也就是后向更新梯度时，用的是旧的weight，否则会造成weight没法学习
+
+### 2. Activation Quantization
+在输入层/激活层/Pooling/Hardtanh/Upsample等后，添加量化损失的过程：
+{% highlight Python %}
+out = round(out.data[:]*255./vmax) * vmax/255.  # vmax是浮点范围，如0～1/4/6等
+{% endhighlight %}
