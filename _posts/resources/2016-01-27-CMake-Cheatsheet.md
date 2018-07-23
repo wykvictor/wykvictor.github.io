@@ -11,6 +11,7 @@ categories: Resources
 {% highlight Bash shell scripts %}
 WD=$(readlink -f "`dirname $0`")  # 取当前shell脚本的全路径，不包括最后的/
 {% endhighlight %}
+*注意：* 不要在cmake中用相对路径，用${CMAKE_CURRENT_SOURCE_DIR}等组合出全路径使用 
 
 ### 2. DEBUG or Release
 Win和Linux系统，可以通过cmake -DCMAKE_BUILD_TYPE=Release/Debug设置编译目标
