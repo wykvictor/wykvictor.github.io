@@ -91,6 +91,18 @@ $ git log --graph --oneline  # 之后的状态如下，工作区test.txt结果�
 * 489bc6e master      # 这是最初的提交
 {% endhighlight %}
 
+注意：在解决conflict时，如果要完全舍弃或保留某一个版本，则可以用--ours/theirs命令:
+{% highlight Bash shell scripts %}
+# in A branch, and excute: git merge B
+git checkout --ours filename # Keep A file
+git checkout --theirs filename # Keep B file
+# in A branch, and excute: git rebase B
+# rebase 其实相当于切到B分支，再把AB共同祖先之后的，A的所有的log一条一条merge到B的最后
+git checkout --ours filename # Keep B file
+git checkout --theirs filename # Keep A file
+{% endhighlight %}
+merge和rebase对于ours/theirs命令正好相反
+
 ####  g. Tag
 标签是为了更方便地参考提交而给它标上易懂的名称。
 
