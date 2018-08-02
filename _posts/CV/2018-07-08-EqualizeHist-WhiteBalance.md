@@ -140,7 +140,7 @@ void balance_white(cv::Mat &mat, cv::Mat mask = cv::Mat()) {
 
 #### 4. equalize hist有时会产生噪点
 ![cv_face_6](/res/cv_face_6.png)
-图中，第三张产生了很多噪点
+图中，第三张产生了很多噪点，可以后边接一个双边滤波缓解噪点问题
 
 #### 5. equalize hist有时会丢失细节，y通道过亮，导致颜色细节丢失
 ![cv_face_8](/res/cv_face_8.png)
