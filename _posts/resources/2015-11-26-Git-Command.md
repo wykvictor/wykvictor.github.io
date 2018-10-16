@@ -12,7 +12,7 @@ categories: Resources
 ####  a. HEAD索引
 HEAD指向当前分支的最后一次commit。通过移动HEAD，就可以变更使用的分支。
 
-![git-HEAD](http://7xno5y.com1.z0.glb.clouddn.com/git-head.png)
+![git-HEAD](/res/git-head.png)
 
 图中HEAD~指定HEAD之前的第几次提交记录。HEAD^指定使用哪个父节点
 
@@ -35,7 +35,7 @@ git add添加新内容后，执行commit \-\-amend，会修改上次的commit合
 ####  d. Cherry-pick
 从其他分支复制*指定*的commit，merge进来：
 
-![git-Cherry-pick](http://7xno5y.com1.z0.glb.clouddn.com/git-cherry-pick.png)
+![git-Cherry-pick](/res/git-cherry-pick.png)
 {% highlight Bash shell scripts %}
 $ git cherry-pick c81dba1  # merge其他分支的某个commit的hash值
 # 如果有冲突，解决后add，再commit
@@ -44,7 +44,7 @@ $ git cherry-pick c81dba1  # merge其他分支的某个commit的hash值
 ####  e. Merge
 Merge会生成一个新提交，master分支的HEAD会移动到该提交上
 
-![git-Merge](http://7xno5y.com1.z0.glb.clouddn.com/git-merge.png)
+![git-Merge](/res/git-merge.png)
 
 另，一个有用的命令，把另一个branch的某个file，checkout到本分支上来:
 
@@ -55,7 +55,7 @@ git checkout other-branch-name -- want-file-name
 ####  f. Rebase
 rebase bugfix分支到master分支, bugfix分支的历史记录会添加在master分支的后面。
 
-![git-Rebase](http://7xno5y.com1.z0.glb.clouddn.com/git-rebase.png)
+![git-Rebase](/res/git-rebase.png)
 
 如图，历史记录成一条线很整洁。这时移动提交X和Y有可能会发生冲突，需要修改各自的提交时发生冲突的部分。另：
 
@@ -165,7 +165,8 @@ $ git checkout -b branch-name  # 直接建立新branch，并自动checkout到新
 $ git merge branch_name  # 从别的branch merge改动到当前branch（若加--squash，代表别的分支的所有改动合并成1个commit）
 # 如果遇到冲突，可以直接编辑冲突文件，手动处理冲突的内容；或者用git checkout --ours/theirs filename
 $ git branch -d branch_name  # 删除branch
-$ git pull -p  # 等同于git fetch --prune origin；git fetch -p，删除远端已经删除的分支
+$ git pull -p  # 等同于git fetch --prune origin；git fetch -p，删除本地的，远端已经删除的分支
+$ git push origin :branch_name  # 删除远端分支，无论本地是否拉下来了这个分支
 {% endhighlight %}
 
 ### 3. Repo
@@ -230,7 +231,7 @@ $ git push -f  # 由于落后于remote，需要加 -f: 利用强覆盖方式用�
 </table>
 **revert** 可以安全地取消指定的commit，但跟reset不同，不会回退，只会生成新的commit：
 
-![git-Revert](http://7xno5y.com1.z0.glb.clouddn.com/git-revert.png)
+![git-Revert](/res/git-revert.png)
 {% highlight Bash shell scripts %}
 $ git revert HEAD  # 取消上次的commit
 $ git revert HEAD^  # 也可以直接取消上上次的commit，但是此时肯定有confict，需要解决后再commit
