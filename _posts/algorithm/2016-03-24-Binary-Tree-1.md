@@ -10,7 +10,7 @@ categories: Algorithm
 
 > DFS 总结：
 
-![DFS-1](http://7xno5y.com1.z0.glb.clouddn.com/DFS-1.jpg)
+![DFS-1](/res/DFS-1.png)
 
 <table border="2" frame="box" cellspacing="0px" style="border-collapse:collapse" valign="center">
     <tr bgcolor="lightgreen">

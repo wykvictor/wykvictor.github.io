@@ -7,16 +7,16 @@ categories: Algorithm
 ---
 
 ### 1. Summary
-![time_complex](http://7xno5y.com1.z0.glb.clouddn.com/time_complex.jpg)
+![time_complex](/res/time_complex.png)
 
 ### 2. Reduction
 通过O(n)的时间，把规模为n的问题变为n/2：
 
-![time_complex2](http://7xno5y.com1.z0.glb.clouddn.com/time_complex2.jpg)
+![time_complex2](/res/time_complex2.png)
 
 通过O(n)的时间，把规模为n的问题变为(2 * n/2)：
 
-![time_complex3](http://7xno5y.com1.z0.glb.clouddn.com/time_complex3.jpg)
+![time_complex3](/res/time_complex3.png)
 
 ### 3. Time Complexity in Coding Interview
 * O(1) 极少

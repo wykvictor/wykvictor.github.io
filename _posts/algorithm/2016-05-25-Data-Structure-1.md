@@ -56,7 +56,7 @@ n: 单调栈 [1,4,5] -> push(2) -> [1,2]
 
 解法：木桶原理，求每个柱子往左往右最大延伸的矩形(左右第一个比它小的数)
 
-![Histogram-Largest](http://7xno5y.com1.z0.glb.clouddn.com/Histogram-Largest.jpg)
+![Histogram-Largest](/res/Histogram-Largest.png)
 
 {% highlight C++ %}
 // O(n) time and memory, 每个数在stack上都进出一次；同理，binary tree相关，每个节点O(1),共n个点，所以O(n)

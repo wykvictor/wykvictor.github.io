@@ -281,4 +281,4 @@ $ rm -rf libs/lib2  # 实际删除物理文件
 # 之后编辑.gitmodules(前边这几步，可以用git rm代替)和.git/config，删除对应的条目，最后git add，push
 {% endhighlight %}
 
-![git-cheat-sheet](/res/git-cheat-sheet.jpg)
+![git-cheat-sheet](/res/git-cheat-sheet.png)

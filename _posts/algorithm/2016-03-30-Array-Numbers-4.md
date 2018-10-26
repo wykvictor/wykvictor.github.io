@@ -518,3 +518,44 @@ int firstMissingPrime(vector<int> nums) {
   return -1;
 }
 {% endhighlight %}
+
+### 14. [Quick Sort](https://blog.csdn.net/qq_36528114/article/details/78667034)
+主方法：
+{% highlight C++ %}
+void QuickSort(int* array,int left,int right) {
+  if(left >= right)  // 表示已经完成一个组
+    return;
+  int index = PartSort(array,left,right);  // 枢轴的位置
+  QuickSort(array,left,index - 1);
+  QuickSort(array,index + 1,right);
+}
+{% endhighlight %}
+PartSort的三种方法
+{% highlight C++ %}
+// 常见方法：左右指针法,左边一直找大于key的，右边一直找小于等于key的，之后交换
+int PartSort(int* array,int left,int right) {
+  int key = array[right];  // 比如选最后一个为 轴
+  int ll = left, rr = right-1;  // Note: right--
+  while(ll < rr) {
+    while(ll < rr && array[ll] <= key) ++ll;
+    while(ll < rr && array[rr] > key) --rr;
+    swap(array, ll, rr);
+  }
+  swap(array, ll, right);
+  return left;
+}
+// 挖坑法：一直更新坑的位置，往坑里放需要调换的值
+int PartSort(int* array,int left,int right) {
+  int key = array[right];  // 比如选最后一个为 轴
+  int ll = left, rr = right;  // Note: right! 不是right-1
+  while(ll < rr) {
+    while(ll < rr && array[ll] <= key) ++ll;
+    array[rr] = array[ll];
+    while(ll < rr && array[rr] > key) --rr;
+    array[ll] = array[rr];
+  }
+  array[rr] = key;
+  return rr;
+}
+{% endhighlight %}
+
