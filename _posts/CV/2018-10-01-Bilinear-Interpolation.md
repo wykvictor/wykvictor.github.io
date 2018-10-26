@@ -7,7 +7,7 @@ categories: CV
 ---
 
 ### 1. 已知周边四个点，计算双线性差值
-![interpalation](/res/interpalation.jpg)
+![interpalation](/res/interpalation.png)
 
 ### 2. 如何找到周边四个点坐标
 常见方式：顶点对齐，在PyTorch和TenserFlow实现中，align_corner=True
