@@ -167,6 +167,7 @@ $ git merge branch_name  # 从别的branch merge改动到当前branch（若加--
 $ git branch -d branch_name  # 删除branch
 $ git pull -p  # 等同于git fetch --prune origin；git fetch -p，删除本地的，远端已经删除的分支
 $ git push origin :branch_name  # 删除远端分支，无论本地是否拉下来了这个分支
+$ git checkout --orphan branch_name  # 新建一个完全空的，干净的分支，不带任何commit过去
 {% endhighlight %}
 
 ### 3. Repo
@@ -246,6 +247,8 @@ $ git reset ORIG_HEAD
 {% highlight Bash shell scripts %}
 # 如何 add
 $ git submodule add lib-git-repo-link libs/lib-name  # 添加submodule, 生成.gitmodules记录引用信息
+$ cd libs/lib-name  && git checkout branch-need  # 切换submodule到需要的分支
+$ git add libs/lib-name  # 提交submodule信息到repo
 
 # 如何 clone，正常clone后，.git/config中没有注册submodule的索引信息
 $ git submodule  # 查看submodule情况，前边的"-"，表示还没有检出
