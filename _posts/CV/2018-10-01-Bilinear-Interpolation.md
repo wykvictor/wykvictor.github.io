@@ -44,3 +44,6 @@ tensor([[[[ 1.0000,  1.2500,  1.7500,  2.0000],
 对于定点对齐，在pyTorch和TenserFlow能得到一致的结果
 
 但是如果为False，可能实现不同结果不同，其原理是图像的中心点对齐
+
+其中，pytorch的align_corners实现[link](https://github.com/pytorch/pytorch/blob/227c8f2654c5aa4dda319d7401d319bb4636be47/aten/src/THCUNN/linear_upsampling.h)
+相应的代码[merge](https://github.com/pytorch/pytorch/pull/5927)
