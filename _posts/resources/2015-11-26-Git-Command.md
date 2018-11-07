@@ -40,6 +40,8 @@ git add添加新内容后，执行commit \-\-amend，会修改上次的commit合
 $ git cherry-pick c81dba1  # merge其他分支的某个commit的hash值
 # 如果有冲突，解决后add，再commit
 {% endhighlight %}
+该命令谨慎使用，因为其他分支的某个commit，其实是depends on它之前的commit，实际pick的时候，会把之前的commit也带过来。
+所以不如直接用git merge来的清晰，只是pick的commit message会带过来，merge需要自己写
 
 ####  e. Merge
 Merge会生成一个新提交，master分支的HEAD会移动到该提交上
@@ -162,6 +164,10 @@ $ git reset HEAD^  # 取消这次的commit信息，HEAD恢复到上一次commit�
 {% highlight Bash shell scripts %}
 $ git branch branch-name  # 建新branch，之后可以checkout到新branch
 $ git checkout -b branch-name  # 直接建立新branch，并自动checkout到新branch
+# Note: git checkout -B branch-name, 大写B谨慎使用
+# 例如：基于A新建B分支，回到A分支添加commitA，再切回B分支添加commitB，此时如果checkout -B A
+# 则A分支变成commitA+commitB的形式，也就是文件最终的结果和B分支的文件相同，A分支的commitA修改被抹掉了。想恢复A，可以通过reset，删掉commitB
+
 $ git merge branch_name  # 从别的branch merge改动到当前branch（若加--squash，代表别的分支的所有改动合并成1个commit）
 # 如果遇到冲突，可以直接编辑冲突文件，手动处理冲突的内容；或者用git checkout --ours/theirs filename
 $ git branch -d branch_name  # 删除branch
