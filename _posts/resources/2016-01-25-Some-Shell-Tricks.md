@@ -77,5 +77,7 @@ cat << EOF >> a.txt  # 输出到a.txt, 或者直接打印到屏幕
       	 ...
       2. For slave:
          ...
-EOF  # 当然也不必用EOF，用AAA等也可以，只是个标识
+EOF  # 当然也不必用EOF，用AAA等也可以，只是个标识;必须顶格写
 {% endhighlight %}
+
+### 8. read -p "Press Enter to continue..."

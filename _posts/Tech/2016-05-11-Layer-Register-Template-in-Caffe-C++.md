@@ -22,7 +22,7 @@ class LayerRegistry {
   static CreatorRegistry& Registry() {
     // 静态变量，保证上述map(g_registry_)只被new一次
     static CreatorRegistry* g_registry_ = new CreatorRegistry();
-    return *g_registry_;  // 整个程序只有1个这样的map, 存放所有的layername->layer指针
+    return *g_registry_;  // 整个程序只有1个这样的map, 存放所有的layername->layer-creator函数指针
   }
 
   // Helper function: Adds a creator.
@@ -43,7 +43,8 @@ class LayerRegistry {
     CreatorRegistry& registry = Registry();
     CHECK_EQ(registry.count(type), 1) << "Unknown layer type: " << type
         << " (known types: " << LayerTypeListString() << ")";
-    return registry[type](param);  // 同样拿到registry, 通过这个map拿到layer指针
+    // 同样拿到registry, 通过这个map拿到layer creator函数指针，并传入param，实际new了一个layer出来
+    return registry[type](param);
   }
 
   static vector<string> LayerTypeList() {
@@ -119,19 +120,19 @@ template <typename Dtype>
 shared_ptr<Layer<Dtype> > Creator_DispatchLayer(const LayerParameter& param) {
   return shared_ptr<Layer<Dtype> >(new DispatchLayer<Dtype>(param));
 }
-// 因为有全局静态变量的定义，在其初始化时自动完成了create layer，即new出了指向layer的pointer
+// 因为有全局静态变量的定义，在其初始化时自动完成了create layer的注册，Dispatch和Creator_DispatchLayer这个函数对应
 static LayerRegisterer<float> g_creator_f_Dispatch("Dispatch", Creator_DispatchLayer<float>);
-// 上述一行调用了LayerRegisterer类型的构造函数，其中调用了AddCreator
 // AddCreator完成了注册Register：将上述的pointer存入map: registry[type] = creator
 {% endhighlight %}
-在net.cpp中通过以下代码，将上述实例化对象添加到layers_中进行管理
+在net.cpp中通过以下代码，将上述类实例化为对象后，就添加到layers_中进行管理
 {% highlight C++ %}
-// 调用了registry[type](param)，取出了pointer
+// 调用registry[type](param)，取出函数pointer，传入param，也就是实际调用了Creator_DispatchLayer函数，返回了shared_ptr<Layer<Dtype> >
 layers_.push_back(LayerRegistry<Dtype>::CreateLayer(layer_param));
 {% endhighlight %}
 If the layer is going to be created by another creator function, 可以直接调用REGISTER_LAYER_CREATOR
 {% highlight C++ %}
 // Get convolution layer according to engine.
+// 自定义creator
 template <typename Dtype>
 shared_ptr<Layer<Dtype> > GetConvolutionLayer(
     const LayerParameter& param) {
@@ -158,9 +159,11 @@ macro(caffe_set_caffe_link)
     set(Caffe_LINK caffe)
   else()
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    //-force_load，可以防止编译优化: 否则全局没有调用过的变量，如g_creator_f_Dispatch可能不会被编译
+      // -force_load，可以防止编译优化: 否则全局没有调用过的变量，如g_creator_f_Dispatch可能不会被引入
+      // include all symbols from a static library
       set(Caffe_LINK -Wl,-force_load caffe)
     elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+      // linux下，whole-archive作用于其后所有的lib，所以得no-whole-archive
       set(Caffe_LINK -Wl,--whole-archive caffe -Wl,--no-whole-archive)
     endif()
   endif()
