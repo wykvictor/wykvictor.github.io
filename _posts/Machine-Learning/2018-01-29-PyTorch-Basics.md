@@ -30,10 +30,15 @@ b = torch.from_numpy(a)  # a为numpy的array
 x = x.cuda()  # Tensor x使用cuda函数以后，所有运算会调用gpu
 {% endhighlight %}
 
-### 2. 在CPU上Load由GPU train的nn.DataParallel模型
-该模型的key值前缀是module. 去掉即可
+### 2. 在CPU上Load由多个GPU上train的nn.DataParallel模型
+首先，先都转到CPU，之后该模型的key值前缀是module. 去掉即可
+
+[pytorch doc](https://pytorch.org/docs/master/torch.html?highlight=load#torch.load)
 {% highlight Python %}
 # lambda表达式，定义了函数: 传入2个值storage, loc作为参数，返回值是第一个值，就是cpu上的原始的序列化的位置
+‘’‘
+原文解释：map_location can be either a dict where the locations corresponding to keys are remaped to their values. Alternatively, we support passing in a function, that will get a CPU storage and its serialized location, and it should return some storage that will replace the CPU one. If you just want to load everything onto the CPU, you can just return the first arugment, but you could do some more crazy stuff like sending all CUDA tensors to the next GPU, by parsing out the original device from the loc argument.
+’‘’
 tmp_model = torch.load(model_path, map_location=lambda storage, loc: storage)
 old_state = tmp_model.state_dict()
 from collections import OrderedDict
@@ -45,7 +50,6 @@ new_model = model.Model()
 new_model.load_state_dict(new_state_dict)
 # print(new_model.state_dict())
 {% endhighlight %}
-
 
 ### 3. 统计模型信息：计算量、参数量
 {% highlight Python %}
