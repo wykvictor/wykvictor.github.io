@@ -28,3 +28,35 @@ std::sort(
 	[&](size_t a, size_t b) { return values[a] > values[b]; }  // 非常简洁
 );
 {% endhighlight %}
+
+### 2. stringstream进行数据类型转换
+比sprintf等转换更简单，安全，方便 
+[reference](https://blog.csdn.net/puppylpg/article/details/51260100)
+
+{% highlight C++ scripts %}
+#include <sstream>
+template<class out_type,class in_value>
+out_type convert(const in_value& t)
+{
+    std::stringstream stream;
+    out_type result;        //这里存储转换结果
+    
+    stream << t;            //向流中传值
+    stream >> result;       //向result中写入值
+    return result;
+}
+// 使用
+double outv;
+std::string inv = "2.34";
+outv = convert<double>(inv);  // Note: 模版参数可以省略第二个string，因为可以推断出来
+std::string outv2 = convert<std::string>(outv);  // 2.34
+// stringstream有临时缓冲区，可以一直往里写东西，最后统一写入文件，这样效率高
+ofstream ofile("output.txt");
+ostringstream oss;
+oss << "blablabla" << endl;  // 多次写入
+ofile << oss.str();  // 一次性写入文件
+// 多次使用时，需要清空之前的内容时
+oss.clear();  // 清空标志位
+oss.str("");  // 清空内容，设置为空
+{% endhighlight %}
+另，高级用法参考[C++ 之定制输入输出流](http://kaiyuan.me/2017/06/22/custom-streambuf/)

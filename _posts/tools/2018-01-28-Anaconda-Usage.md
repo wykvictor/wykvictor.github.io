@@ -25,3 +25,17 @@ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/m
 conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
 conda config --set show_channel_urls yes
 {% endhighlight %}
+
+yml文件：
+{% highlight Bash shell scripts %}
+conda env export > environment.yml
+conda env create -f environment.yml  # 通过environment.yml导出并新建一个同样的conda环境
+{% endhighlight %}
+
+share conda环境：
+{% highlight Bash shell scripts %}
+conda create -p C:/full/public/path/to/py35 python=3.5  # -p 指定安装环境目录
+# 将目录添加到其他用户的conda configuration file .condarc
+envs_dirs:
+  - C:/full/public/path/to  # 注意，控制该目录的权限，开放给其他用户，以免遇到问题
+{% endhighlight %}
