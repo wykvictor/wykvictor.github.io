@@ -246,7 +246,10 @@ $ git revert HEAD^  # 也可以直接取消上上次的commit，但是此时肯�
 
 **ORIG_HEAD** 指向之前的HEAD。Reset或Revert错误的时候，在ORIG_HEAD上reset就可以还原之前状态：
 {% highlight Bash shell scripts %}
-$ git reset ORIG_HEAD
+$ git reset --hard ORIG_HEAD  # 强制回到上次的commit
+# 另外，git reflog可以记录之前所有操作的hash，包括reset，可以找回reset --hard的commit
+$ git reflog
+$ git reset --hard 98abc5a  # 从上一步列出的hash中选出需要的
 {% endhighlight %}
 
 ### 5. Git Submodule
