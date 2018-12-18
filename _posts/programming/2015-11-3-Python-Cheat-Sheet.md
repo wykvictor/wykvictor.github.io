@@ -58,3 +58,11 @@ l.func2 = types.MethodType(new_func, l)
 l.func2()  # 与l.func()打印的是同一个对象l的地址
 {% endhighlight %}
 __slots__()可以用来限制该class能添加的属性
+
+19. 正则表达式re
+{% highlight Python %}
+>>> line = 'training:  [epoch 301/total epoch 800][batch_idx 100/total_batch_idx 195]  Total #    batch: 117101    Loss: 0.1796, accuracy: 93.64 %'
+>>> retest = re.search('\[epoch\s(\d+)\/total\sepoch\s(\d+)\]\[.*\s(\d+)\/.*\s(\d+)\].*batch:\s(\d+).*Loss:\s(\d+\.\d+).*accuracy:\s(\d+\.\d+).*', line)  # search不必从开头开始匹配，而且表达式必须消除歧义： .*\s(\d+)，加入了\s,否则只匹配最后一个数字0
+>>> retest.groups()  # 打印出括号里指定的内容
+('301', '800', '100', '195', '117101', '0.1796', '93.64')
+{% endhighlight %}
