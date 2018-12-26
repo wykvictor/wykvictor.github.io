@@ -244,3 +244,8 @@ awk 'BEGIN {max = 0} {if ($1>max) max=$1 fi} END {print "Max=", max}'
 # 求最小值
 awk 'BEGIN {min = 1999999} {if ($1<min) min=$1 fi} END {print "Min=", min}'
 {% endhighlight %}
+
+### 20. 每隔10行统计一次均值，一共100行
+{% highlight Bash shell scripts %}
+for i in {1..10}; do grep "thread:" server.log | awk '{print $4}' | awk -F, '{print $1}' | head -$(($i*10)) | tail -10 | awk '{sum+=$1} END {print "Average = ", sum/NR}'; done
+{% endhighlight %}
