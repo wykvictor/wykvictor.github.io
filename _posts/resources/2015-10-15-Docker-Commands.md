@@ -44,7 +44,7 @@ $ docker load -i save-img.tar
 ### 3. 操作docker container
 {% highlight Bash shell scripts %}
 # 启动container，挂载GPU卡和本地目录(本地主机目录:image内目录)，进入交互式bash
-docker run -ti $DOCKER_NVIDIA_DEVICES --name container-name -v /mnt_data:/mnt_data1 image-name bash
+docker run -ti $DOCKER_NVIDIA_DEVICES --name container-name -v $(cd "$(dirname $0)/.."; pwd):/mnt_data1 image-name bash
 # 退出但不停止container: ctrl p + ctrl q; exit 和 ctrl d都会暂停container，之后需要运行start启动
 # 之后进入docker(-it 交互式伪终端)，ctrl+D/exit退出都不会退出container
 docker exec -it 102d3e949a37 bash
@@ -77,7 +77,15 @@ CMD /usr/games/fortune -a | cowsay # container启动时执行的命令，但只�
 # 之后基于此构建image whale-yk
 docker build -t whale-yk . # 当前目录找dockerfile
 {% endhighlight %}
+对于Centos机器，不同的地方：
+{% highlight Bash shell scripts %}
+RUN curl -o /etc/yum.repos.d/CentOS7-Base-163.repo  http://mirrors.163.com/.help/CentOS7-Base-163.repo \
+&& curl -o /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 https://archive.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7 \
+&& yum clean all \
+&& yum makecache \
+&& yum -y -t groupinstall "Development Tools" \
+。。。
+&& yum clean all
+{% endhighlight %}
 另，Dockerfile中每一条命令是一个step，在image中新加一层（新建一个container，然后操作，然后rm掉container，得到一个加一层的image）
 所以修改某一条命令后，之前的Cache，之后的丢掉重新建
-
-

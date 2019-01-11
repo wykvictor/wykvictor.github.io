@@ -112,6 +112,37 @@ install(TARGETS project DESTINATION ${INSTALL_DIST_PATH})  # 指定install的时
 # [link](https://cmake.org/cmake/help/v3.4/command/install.html#installing-files)
 install(FILES ${CAFFE_LIB_PATH} DESTINATION ${INSTALL_DIST_PATH})
 
+# install高级用法
+# copy so/dlls to another project
+if (UNIX AND NOT APPLE)
+  # in linux docker: can change to other path to install
+  if(NOT DEFINED Dst_Install_DIR)
+    set(Dst_Install_DIR /home/a)
+  endif()
+  set(CMAKE_INSTALL_PREFIX ${Dst_Install_DIR})
+  # 自动安装到lib/linux目录下
+  install(TARGETS main_lib ARCHIVE DESTINATION lib/linux/
+          LIBRARY DESTINATION lib/linux/)
+  # Install headers
+  Install(FILES "${project_DIR}/a.h" DESTINATION include/a)
+elseif (MSVC)
+  set(Dst_Install_DIR D:/Work/b)
+  set(CMAKE_INSTALL_PREFIX ${Dst_Install_DIR})
+  install(TARGETS main_lib ARCHIVE DESTINATION lib/${CMAKE_ARCH}/
+          RUNTIME DESTINATION bin/${CMAKE_ARCH}/)
+  # Install pdbs
+  install(FILES $<TARGET_PDB_FILE:main_lib> DESTINATION lib/${CMAKE_ARCH}/ OPTIONAL)
+  # Install headers
+  Install(FILES "${project_DIR}/a.h" DESTINATION include)
+else()  # mac
+  set(Dst_Install_DIR /Users/b/b)
+  set(CMAKE_INSTALL_PREFIX ${Dst_Install_DIR})
+  install(TARGETS main_lib ARCHIVE DESTINATION lib/mac/
+          LIBRARY DESTINATION lib/mac/)
+  # Install headers
+  Install(FILES "${project_DIR}/a.h" DESTINATION include/b)
+endif()
+
 # 设置一些Options. Turn on with 'cmake -Dmyvarname=ON'.
 option(BUILD_TESTS "Build all tests." 0) # 可定义一些编译开关ON/OFF，最后给出默认值如0
 

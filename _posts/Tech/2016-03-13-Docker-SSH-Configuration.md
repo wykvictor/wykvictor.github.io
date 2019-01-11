@@ -6,6 +6,8 @@ tags: [docker, ssh, network]
 categories: Tech
 ---
 
+> [ssh原理](https://www.jianshu.com/p/33461b619d53)
+
 ### 1. Log into ssh service using passwd
 Please refer to [docker doc](https://docs.docker.com/engine/examples/running_ssh_service/)
 
@@ -43,3 +45,28 @@ host-ssh
 {% endhighlight %}
 
 ### 3. Containers on different hosts need to export port and then ssh via host
+
+### 4. 利用host key完成git clone等需要认证的操作
+Dockerfile:
+{% highlight Bash shell scripts %}
+RUN mkdir -p /root/.ssh \
+&& chmod 0700 /root/.ssh
+# add ssh keys
+ARG SSH_PRIVATE_KEY
+ARG SSH_PUB_KEY
+RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa \
+&& chmod 600 /root/.ssh/id_rsa \
+&& echo "${SSH_PUB_KEY}" > /root/.ssh/id_rsa.pub \
+&& chmod 600 /root/.ssh/id_rsa.pub \
+&& ssh-keyscan private.github.com >> /root/.ssh/known_hosts
+
+RUN cd /root \
+&& git clone -b my_branch --single-branch git@git.private.github.com:private.git \
+&& cd private && ./build.sh
+
+# 最后注意删掉key，其实也不完全安全：build时--squash操作可以压缩所有的image层为一个，看不到之前存在key的层，就安全了
+RUN rm -rf /root/.ssh/
+
+# 之后build image
+docker build -t image_name --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" --build-arg SSH_PUB_KEY="$(cat ~/.ssh/id_rsa.pub)" .
+{% endhighlight %}
