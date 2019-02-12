@@ -6,13 +6,50 @@ tags: [linux, shell, trick]
 categories: Resources
 ---
 
-### 1. 变量赋值时直接替换某些字符
+[shell进阶](http://www.361way.com/bash-15minutes-advanced/3248.html)
+
+### 1. shell字符串操作
+截取操作
+{% highlight Bash shell scripts %}
+f="path1/path2/file.ext"
+len="${#f}" # = 20 (字符串长度)
+# 切片操作: ${<var>:<start>} or ${<var>:<start>:<length>}
+slice1="${f:6}" # = "path2/file.ext"
+slice2="${f:6:5}" # = "path2"
+slice3="${f: -8}" # = "file.ext"(注意："-"前有空格)
+pos=6
+len=5
+slice4="${f:${pos}:${len}}" # = "path2" 
+{% endhighlight %}
+
+替换操作
+{% highlight Bash shell scripts %}
+f="path1/path2/file.ext"
+single_subst="${f/path?/x}"   # = "x/path2/file.ext"
+global_subst="${f//path?/x}"  # = "x/x/file.ext"
+# 字符串拆分
+readonly DIR_SEP="/"
+array=(${f//${DIR_SEP}/ })
+second_dir="${arrray[1]}"     # = path2 
+{% endhighlight %}
+
+删除头部或尾部
 {% highlight Bash shell scripts %}
 $ a="x y"
 $ echo ${a/ */}  # output: x
 $ echo ${a/x /z} # output: zy
 $ echo ${a% y}  # output: x 从后匹配百分号之后的串，并删除
-¥ echo ${a#* }  # output: y 从前匹配百分号之后的串，并删除，可以用通配符如*
+$ echo ${a#* }  # output: y 从前匹配百分号之后的串，并删除，可以用通配符如*
+
+f="path1/path2/file.ext"
+# 删除字符串头部
+extension="${f#*.}"  # = "ext"
+# 以贪婪匹配方式删除字符串头部
+filename="${f##*/}"  # = "file.ext"
+# 删除字符串尾部
+dirname="${f%/*}"    # = "path1/path2"
+# 以贪婪匹配方式删除字符串尾部
+root="${f%%/*}"      # = "path1"
 {% endhighlight %}
 
 ### 2. if [[ ]] 正则表达式
@@ -81,3 +118,41 @@ EOF  # 当然也不必用EOF，用AAA等也可以，只是个标识;必须顶格
 {% endhighlight %}
 
 ### 8. read -p "Press Enter to continue..."
+
+### 9. 使用getopt parse输入参数
+{% highlight Bash shell scripts %}
+#!/bin/bash
+ARGS=`getopt -o hp:i -l "help,port:,intOrnot" -- "$@"`
+eval set -- "${ARGS}"
+usage() {
+    echo "usage:start.sh -h -p 6692 -i"
+}
+port=6692
+isInt=false
+
+while true;
+do
+    case "$1" in
+        --port|-p)
+            fkp_port=$2
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        --intOrnot|-i)
+            isInt=true
+            shift 1
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "error!"
+            exit 1
+            ;;
+    esac
+done
+{% endhighlight %}

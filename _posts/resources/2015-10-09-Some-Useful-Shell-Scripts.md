@@ -154,6 +154,13 @@ function fSum()  // 函数定义 必须放在使用前
 }
 t=$(fSum 3 2)  // 相当于定义了fSum命令，传入参数
 echo $t, $?  // 5, 0，$?是上一句命令的返回值，0代表成功
+
+log() {  # classic logger
+# 注意，shell函数中定义的变量是global的，其作用域从函数被调用执行变量的地方开始，到shell结束或者显示删除为止。函数定义的变量可以是local的，其作用域局限于函数内部，但是函数的参数是local的。
+    local prefix="[$(date "+%Y/%m/%d %H:%M:%S")]: "
+    echo "${prefix} $@" >&2  # 重定向到标准错误
+}
+log "INFO" "a message"
 {% endhighlight %}
 
 ### 12. 批量杀死进程

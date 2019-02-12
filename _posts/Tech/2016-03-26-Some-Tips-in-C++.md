@@ -22,6 +22,7 @@ categories: Tech
 9. add unit test
 10. use (try catch) to deal with error
 11. 使用工具，调代码时间和内存问题，如[Valgrind和Kcachegrind](http://wykvictor.github.io/2016/02/04/Profile-C++-Apps-Using-Kcachegrind.html)
+    valgrind --undef-value-errors=no --leak-check=full -v
 
 ### 2. 代码文件命名格式统一，参考[Google Style](https://google.github.io/styleguide/cppguide.html#Naming)
 
