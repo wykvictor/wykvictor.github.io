@@ -67,13 +67,22 @@ if(ENABLE_OPENCV)
    set(project_lib ${project_lib} ${OpenCV_LIBS})  # 存储lib到统一的变量里
 endif()
 
-#eigen
+# eigen
 find_package(Eigen REQUIRED)
 # 也可以使用target_include_directories，只为某一个target添加include目录
 include_directories(SYSTEM ${EIGEN_INCLUDE_DIR})  # SYSTEM：to use system include directories on some platforms
 add_definitions(-DUSE_EIGEN)  # 用于添加预编译，定义标志
 
-#caffe
+# Qt5
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+if (Qt5_FOUND)
+  set(CMAKE_AUTOMOC ON)  # qt wrapper around c++, like QObject
+else()
+  message(STATUS "QT not found, build without QT demo.")
+endif()
+# then we can use ${Qt5Widgets_INCLUDE_DIRS} and ${Qt5Widgets_LIBRARIES}
+
+# caffe
 # [link](https://cmake.org/cmake/help/v3.4/command/find_package.html?highlight=find_package)
 find_package(Caffe REQUIRED)  # 若找到，则name_FOUND被自动置为1
 find_library(CAFFE_LIB_PATH ${Caffe_LIBRARIES})  # 查找library的绝对路径，存入变量
