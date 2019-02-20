@@ -128,7 +128,7 @@ TreeNode *deserialize(string &data) {
 
 然后枚举左子树的各种长度，看能否构造出相应的右子树
 
-![preorderpostorder](http://7xno5y.com1.z0.glb.clouddn.com/preorderpostorder.png)
+![preorderpostorder](/res/preorderpostorder.png)
 {% highlight C++ %}
 int count(vector<int>& preorder, int s1, vector<int>& postorder, int s2, int len) {
     if (len == 0) {

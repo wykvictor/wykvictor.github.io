@@ -73,7 +73,7 @@ find_package(Eigen REQUIRED)
 include_directories(SYSTEM ${EIGEN_INCLUDE_DIR})  # SYSTEM：to use system include directories on some platforms
 add_definitions(-DUSE_EIGEN)  # 用于添加预编译，定义标志
 
-# Qt5
+# Qt5: [link](https://zhuanlan.zhihu.com/p/34667993)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 if (Qt5_FOUND)
   set(CMAKE_AUTOMOC ON)  # qt wrapper around c++, like QObject

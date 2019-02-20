@@ -7,7 +7,7 @@ categories: Algorithm
 ---
 
 ### 1. [Letter Combinations of a Phone Number - Leetcode 17](https://leetcode.com/problems/letter-combinations-of-a-phone-number/)
-![phonenumber](http://7xno5y.com1.z0.glb.clouddn.com/phonenumber.png)
+![phonenumber](/res/phonenumber.png)
 
 ```
 Given a digit string, return all possible letter combinations that the number could represent.

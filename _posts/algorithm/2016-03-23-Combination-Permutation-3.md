@@ -169,7 +169,7 @@ Here are some examples. Inputs are in the left-hand column and its corresponding
 3,2,1 → 1,2,3
 1,1,5 → 1,5,1
 ```
-![nextpermutation](http://7xno5y.com1.z0.glb.clouddn.com/nextpermutation.png)
+![nextpermutation](/res/nextpermutation.png)
 {% highlight C++ %}
 void nextPermutation(vector<int> &num) {
   int index1 = num.size() - 1, index2 = num.size() - 1;

@@ -18,7 +18,7 @@ categories: Tools
 
 #### 3. 分析
 左边界面，列出所有函数，可以搜索特定函数名：
-![valgrind-1](http://7xno5y.com1.z0.glb.clouddn.com/valgrind-1.png)
+![valgrind-1](/res/valgrind-1.png)
 
 右上部界面，有如下域：
 
@@ -27,7 +27,7 @@ categories: Tools
 * All Callers : List of all the callers, it seems the callers and the callers of the callers
 * Callee Map : A map of the callee, personally, I do not really understand this view, but it's a kind of call graph representing the cost of the functions
 * Source code : The source code of the function if the application has been compiled with the debug symbol(编译-g)
-![valgrind-2](http://7xno5y.com1.z0.glb.clouddn.com/valgrind-2.png)
+![valgrind-2](/res/valgrind-2.png)
 
 右下部界面，有如下域：
 
@@ -36,4 +36,4 @@ categories: Tools
 * All Callees : All the callees and the callees of the callees
 * Caller Map : The map of the caller, again not really understandable for me
 * Machine Code : The machine code of the function if the application has been profiled with --dump-instr=yes option
-![valgrind-3](http://7xno5y.com1.z0.glb.clouddn.com/valgrind-3.png)
+![valgrind-3](/res/valgrind-3.png)

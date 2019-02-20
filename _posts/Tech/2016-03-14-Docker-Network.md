@@ -18,7 +18,7 @@ docker run创建容器时，可以用--net选项指定网络模式，有以下4�
 *bridge模式*
 为每一个容器分配Network Namespace、设置IP等，并将一个主机上的Docker容器连接到一个虚拟网桥上：
 
-![docker-network](http://7xno5y.com1.z0.glb.clouddn.com/docker-network.png)
+![docker-network](/res/docker-network.png)
 
 1. 在主机上创建一对虚拟网卡veth pair设备。veth设备总是成对出现的，它们组成了一个数据的通道，数据从一个设备进入，就会从另一个设备出来。因此，veth设备常用来连接两个网络设备。
 2. Docker将veth pair设备的一端放在新创建的容器中，并命名为eth0。另一端放在主机中，以veth65f9这样类似的名字命名，并将这个网络设备加入到docker0网桥中
