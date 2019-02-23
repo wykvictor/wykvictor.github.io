@@ -60,3 +60,26 @@ oss.clear();  // 清空标志位
 oss.str("");  // 清空内容，设置为空
 {% endhighlight %}
 另，高级用法参考[C++ 之定制输入输出流](http://kaiyuan.me/2017/06/22/custom-streambuf/)
+
+### 3. 文件夹和文件操作
+{% highlight C++ scripts %}
+std::string findDirRecursively(const std::string &dirToFind, std::string curDir) {
+    struct dirent *ptr;
+    DIR *dir;
+    while (1) {                                         // find the dir upwords
+        if ((dir = opendir(curDir.c_str())) == NULL) {  // open the dir
+            std::cerr << "Error open dir: " << curDir << std::endl;
+            break;
+        }
+        while ((ptr = readdir(dir)) != NULL) {
+            if ((ptr->d_type == 4) && (std::string(ptr->d_name) == dirToFind)) {
+                // std::cout << "Find " << dirToFind << " in " << curDir << std::endl;
+                return curDir + dirToFind + std::string("/");
+            }
+        }
+        closedir(dir);
+        curDir = std::string("../") + curDir;
+    }
+    return std::string();
+}
+{% endhighlight %}
