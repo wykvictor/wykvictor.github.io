@@ -56,7 +56,7 @@ root="${f%%/*}"      # = "path1"
 {% highlight Bash shell scripts %}
 $ platform="android-armeabi-v7a"
 $ if [[ $platform == "android"* ]];  # match
-$ if [[ $platform =~ "arm" ]];  # match
+$ if [[ $platform =~ "arm" ]];  # match，可以不加引号
 $ if [[ $platform == "arm" ]];  # not match
 $ if [[ $platform == *"arm"* ]];  # match
 {% endhighlight %}

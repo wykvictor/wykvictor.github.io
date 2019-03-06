@@ -75,6 +75,7 @@ add_definitions(-DUSE_EIGEN)  # 用于添加预编译，定义标志
 
 # Qt5: [link](https://zhuanlan.zhihu.com/p/34667993)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+# 如果提示找不到qt，请打印${CMAKE_PREFIX_PATH} ${Qt5_DIR}，分析下config file的路径中是否有Qt5WidgetsConfig.cmake
 if (Qt5_FOUND)
   set(CMAKE_AUTOMOC ON)  # qt wrapper around c++, like QObject
 else()
@@ -105,6 +106,12 @@ add_executable(main main.cpp )
 set(main_lib project)
 # main依赖于main_lib=project，就是libproject.so
 TARGET_LINK_LIBRARIES(main ${main_lib})
+# 如果运行时需要动态库，可以这么拷贝：copy the dlls to runtime dir
+file(GLOB RUNTIME_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_ARCH}/*.dll")
+foreach(file_i ${RUNTIME_DLLS})
+  add_custom_command(TARGET main POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${file_i} ${CMAKE_BINARY_DIR}/)
+endforeach()
+
 
 if(ENABLE_JNI)
    add_subdirectory(src/jni)  # 添加一个需要进行构建的子目录，里边编辑子CMakeLists.txt

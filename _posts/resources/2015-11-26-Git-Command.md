@@ -291,6 +291,7 @@ $ git submodule foreach "git checkout master && git pull"  # 该命令取代上�
 $ git rm -r --cached libs/lib2  # 从git删除，--cached会保留实际的文件
 $ rm -rf libs/lib2  # 实际删除物理文件
 # 之后编辑.gitmodules(前边这几步，可以用git rm代替)和.git/config，删除对应的条目，最后git add，push
+# 如果提示A git directory for '' is found locally with remote，仍旧无法添加，则.git/config中删除相应条目，rm -rf .git/modules/module2delete删除相应条目
 {% endhighlight %}
 
 ![git-cheat-sheet](/res/git-cheat-sheet.png)
