@@ -77,7 +77,7 @@ add_definitions(-DUSE_EIGEN)  # 用于添加预编译，定义标志
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 # 如果提示找不到qt，请打印${CMAKE_PREFIX_PATH} ${Qt5_DIR}，分析下config file的路径中是否有Qt5WidgetsConfig.cmake
 if (Qt5_FOUND)
-  set(CMAKE_AUTOMOC ON)  # qt wrapper around c++, like QObject
+  set(CMAKE_AUTOMOC ON)  # qt wrapper around c++, like QObject, CMAKE会自动生成moc文件
 else()
   message(STATUS "QT not found, build without QT demo.")
 endif()

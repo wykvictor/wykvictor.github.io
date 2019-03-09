@@ -1,4 +1,4 @@
-# parameters to disable unused package in the opencv android's build
+# parameters to disable unused package in opencv build
 
 set(BUILD_ANDROID_EXAMPLES OFF CACHE BOOL "")
 set(BUILD_FAT_JAVA_LIB OFF CACHE BOOL "")
