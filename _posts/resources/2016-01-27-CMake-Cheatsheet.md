@@ -89,6 +89,14 @@ find_package(Caffe REQUIRED)  # 若找到，则name_FOUND被自动置为1
 find_library(CAFFE_LIB_PATH ${Caffe_LIBRARIES})  # 查找library的绝对路径，存入变量
 message(STATUS "caffe:${Caffe_LIBRARIES} ${Caffe_FOUND} ${CAFFE_LIB_PATH}") 
 
+# protobuf
+find_package(Protobuf REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS myown.proto)
+message(STATUS "pb:${PROTOBUF_LIBRARIES}")
+# then we can add ${PROTO_SRCS} ${PROTO_HDRS} to add_library; and #include "myown.pb.h" in main.cpp
+
 set(project_src a.cpp b.cpp c.cpp)
 
 # 用于指定从一组源文件中编译出一个库文件 libproject.so
