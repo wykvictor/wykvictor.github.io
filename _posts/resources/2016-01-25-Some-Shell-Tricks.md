@@ -157,7 +157,7 @@ do
 done
 {% endhighlight %}
 
-### 10, android-accept-license.sh
+### 10. android-accept-license.sh
 {% highlight Bash shell scripts %}
 #!/usr/bin/expect -f
 
@@ -173,4 +173,9 @@ expect {
   }
   eof
 }
+{% endhighlight %}
+
+### 11. sed命令：正则表达式
+{% highlight Bash shell scripts %}
+echo "Point 5:  [237, 1051]" | sed 's/.*\[\(.*\)\]/\1/'  # output: 237, 1051，打印匹配的模式(括号内)
 {% endhighlight %}
