@@ -393,6 +393,7 @@ int findMissing(vector<int> &nums) {
 
 ### 11. [Pow(x, n)](https://leetcode.com/problems/powx-n/#/description)
 {% highlight C++ %}
+// 递归方法1
 double pow(double x, int n) {
   if (n < 0)
     return 1.0 / power(x, -n);
@@ -406,6 +407,19 @@ double power(double x, int n) {
     return v * v;
   else
     return v * v * x;
+}
+// 递归方法2
+double myPow(double x, long long n) {
+  if (n == 0) return 1;
+  if (n < 0) {
+    x = 1.0 / x;
+    n = -n;
+  }
+  double v = myPow(x * x, n / 2);
+  if (n % 2 == 0)
+    return v;
+  else
+    return v * x;
 }
 {% endhighlight %}
 非递归方法，二进制思路
