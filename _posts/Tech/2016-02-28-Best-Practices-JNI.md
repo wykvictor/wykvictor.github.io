@@ -89,6 +89,13 @@ void workOnArray(JNIEnv* env, jobject obj, jarray array){
 }
 {% endhighlight %}
 
+* **Using many local references without informing the JVM**
+[ref](https://stackoverflow.com/questions/23258357/whats-the-trade-off-between-using-getprimitivearraycritical-and-getprimitivety)
+
+  * 使用GetPrimitiveArrayCritical比Get*ArrayElements更快，因为GetArrayRegion will always give you a copy, GetPrimitiveArrayCritical may give you a copy or may give you a direct pointer
+  
+  * GetPrimitiveArrayCritical后必须ReleasePrimitiveArrayCritical，俩之间是gc locker保护临界区，这段中间的代码，也不能通过JNI再调用其他的Java代码（因为jni call会分配内存），或者是任何其他可能造成等待某个其他java线程的事情，或者是java端分配内存。而且如果不release，会block住java的gc，会导致内存撑爆
+
 ### 3. Correctness pitfalls
 
 * **Using the wrong JNIEnv**
