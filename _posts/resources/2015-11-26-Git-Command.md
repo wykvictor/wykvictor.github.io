@@ -297,4 +297,27 @@ $ rm -rf libs/lib2  # 实际删除物理文件
 $ git submodule update --init (-f)
 {% endhighlight %}
 
+### 6. Git LFS
+[用法参考](https://github.com/git-lfs/git-lfs/wiki/Tutorial)
+git lfs专为repo中的大文件设计，有单独的存储大文件的地方，本repo只存储地址信息
+新repo：
+{% highlight Bash shell scripts %}
+git lfs install                   # 在需要该特性的git中，执行
+git lfs track '*.bin' ‘*.a’       # 跟踪需要放到lfs大存储的文件
+git lfs track                     # 查看已经跟踪的文件
+git add .gitattributes *.bin *.a  # add修改的文件
+git commit -m "add lfs files"
+git lfs ls-files                  # 此时可以查看已经track好的文件，都有了hash id
+{% endhighlight %}
+迁移已有repo到lfs
+{% highlight Bash shell scripts %}
+git lfs migrate import --include="*.a,*.lib,*.pdb,*.dll" --include-ref=refs/heads/master
+git lfs track
+git lfs ls-files  # 确认下，添加的对不对!!!
+git push -f       # 上一步重写了history，所以必须-f来push
+git reflog expire --expire-unreachable=now --all
+git gc --prune=now  # 这2步清空.git中的cache
+{% endhighlight %}
+
+
 ![git-cheat-sheet](/res/git-cheat-sheet.png)
