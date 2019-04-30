@@ -86,10 +86,15 @@ std::string findDirRecursively(const std::string &dirToFind, std::string curDir)
 
 ### 4. 正则表达式
 {% highlight C++ scripts %}
-// regex_match
+// regex_match  必须全字符串匹配
 if(std::regex_match("/a/b/c.x", sm, std::regex("(.*)\/(.*)(\.x$|\.y$)"))) {
     for(auto i: sm)  std::cout << i << std::endl;  // /a/b/c.x ; /a/b ; c ; .x
 }
 // regex_replace
 std::regex_replace("a.json", std::regex("(.*)\.json"), "$1.bin");  // a.bin
+// 匹配数字
+std::regex integer("(\\+|-)?[0-9]+");
+std::regex integer("(\\+|-)?\\d+");
+std::regex integer(R"((\+|-)?\d+)");  // raw string更简洁，少\
+std::regex integer("(\\+|-)?[[:d:]]+");  // 更通用，包括诡异国家的数字字符
 {% endhighlight %}

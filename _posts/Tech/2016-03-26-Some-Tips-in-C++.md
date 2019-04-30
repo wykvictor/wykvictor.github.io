@@ -96,5 +96,22 @@ A(int a = 2):a(a) {
 * 声明时直接初始化最方便
 * 如果要修改，构造函数接口里不要用相同的名字 a
 * 用初始化列表初始化，名字相同也可以
-* 初始化列表初始化，比构造函数体初始化，效率高，因为a如果是个很大的类，在进入构造函数体时，已经构造过一次了，进入之后又掉用一次复制构造函数
+* 初始化列表初始化，比构造函数体初始化，效率高，因为a如果是个很大的类，在进入构造函数体时，已经构造过一次了，进入之后又调用一次复制构造函数
 * 如果有多个成员变量a,b,c，即使有初始化列表，也是按照类里边声明的顺序初始化的
+
+### 9. C++11 raw string literals
+1. 特点是‘\’不进行转义：a string in which the escape characters (like \n \t or \" ) of C++ are not processed
+2. 定义是R"(之间的字符串)"，必须有()，否则"""三个引号编译错误
+{% highlight C++ %}
+// raw string可以跨越多行，其中的空白和换行符都属于字符串的一部分。
+std::cout <<R"(\n  // 注释也输出
+    Hello,
+    world!
+    )" << std::endl;
+// 结果：
+\n  // 注释也输出
+    Hello,
+    world!
+{% endhighlight %}
+3. 对于错误：string too big, trailing characters truncated
+可以将一个string用引号隔开，否则visual studio编译不过：[参考](https://docs.microsoft.com/en-us/cpp/error-messages/compiler-errors-1/compiler-error-c2026?view=vs-2019)
