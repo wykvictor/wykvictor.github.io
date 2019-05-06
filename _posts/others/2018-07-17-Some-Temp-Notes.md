@@ -137,3 +137,6 @@ Use -L point to the library, and -l to the libdepend.so
 ### 16. softmax加速：1. e指数近似方法  2. 限制到-4～4，然后量化到0～255，查表计算
 ### 17. Instance Normalization: 每个例子的每个通道进行normalization,在做style transfer的时候，只要计算单个图中每个channel的统计量，跟其他图无关。否则结果有些奇怪，比如人脸有突兀的阴影。
 ### 18. nm -A (-D) libycnn2.so | grep "Android"： 查找符号表
+### 19. [execstack](https://stackoverflow.com/questions/23276488/why-is-execstack-required-to-execute-code-on-the-heap/23277109)用来操作是否允许堆上执行代码
+* execstack -s(set) -c(clear) -q(query) the flag
+* execstack is On by default, -z noexecstack in gcc flag will OFF it
