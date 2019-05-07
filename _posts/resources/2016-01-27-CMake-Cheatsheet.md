@@ -119,6 +119,8 @@ file(GLOB RUNTIME_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_ARCH}/*.dll")
 foreach(file_i ${RUNTIME_DLLS})
   add_custom_command(TARGET main POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${file_i} ${CMAKE_BINARY_DIR}/)
 endforeach()
+# 如果copy目标文件夹不存在，则需要先新建
+# COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/${dstdir}
 
 
 if(ENABLE_JNI)
