@@ -23,6 +23,9 @@ Xcode系统，上述变量可能没有效果，经测试可以使用CMAKE_CONFIG
 cmake_minimum_required (VERSION 3.1)  # 指定需要的 CMake 的最低版本
 project (project)  # 指定项目的名称
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_CXX_STANDARD 11)
+
 # CMAKE_BINARY_DIR就是build目录，即这次build的顶层目录
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)  # 设置 ARCHIVE 目标的输出路径
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)  # 设置 LIBRARY 目标的输出路径
@@ -37,8 +40,10 @@ endif()
 # Then, we can use "DEBUG=${DEBUG:-1}, cmake -DDEBUG=${DEBUG}" to turn on/off the flag
 
 if(UNIX OR APPLE)  # UNIX-like 的系统，包括 Apple OS X 和 CygWin 或  Apple 系统
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall -DUSE_OPENCV=1")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall -DUSE_OPENCV=1 -std=c++11 -static-libstdc++")
 endif()
+# 其中，如果系统canot find  libstdc++.a，需要安装yum install glibc-static libstdc++-static
+# -static-libstdc++ 参考：https://github.com/rordenlab/dcm2niix/issues/137
 # 只将Release版本，设置为-Ofast
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
 
