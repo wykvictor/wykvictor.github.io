@@ -31,7 +31,11 @@ categories: Programming
 
 [更多magic方法的介绍](http://pycoders-weekly-chinese.readthedocs.io/en/latest/issue6/a-guide-to-pythons-magic-methods.html)
 
-18. python是动态语言，比如一个类，可以在运行过程中随时添加属性
+18. __iter__(self)函数，会返回一个[迭代器](https://www.ibm.com/developerworks/cn/opensource/os-cn-python-yield/index.html)
+* 使用yield: 带有yield的函数在Python中被称之为generator：生成器
+* 函数内部用for循环包含yield语句，执行到yield var时，函数就返回一个迭代值var，下次迭代时，代码从yield var 的下一条语句继续执行，而函数的本地变量看起来和上次中断执行前是完全一样的，于是函数继续执行，直到再次遇到yield
+
+19. python是动态语言，比如一个类，可以在运行过程中随时添加属性
 {% highlight Python %}
 class layer():
     def __init__(self):
@@ -59,7 +63,7 @@ l.func2()  # 与l.func()打印的是同一个对象l的地址
 {% endhighlight %}
 __slots__()可以用来限制该class能添加的属性
 
-19. 正则表达式re
+20. 正则表达式re
 {% highlight Python %}
 >>> line = 'training:  [epoch 301/total epoch 800][batch_idx 100/total_batch_idx 195]  Total #    batch: 117101    Loss: 0.1796, accuracy: 93.64 %'
 >>> retest = re.search('\[epoch\s(\d+)\/total\sepoch\s(\d+)\]\[.*\s(\d+)\/.*\s(\d+)\].*batch:\s(\d+).*Loss:\s(\d+\.\d+).*accuracy:\s(\d+\.\d+).*', line)  # search不必从开头开始匹配，而且表达式必须消除歧义： .*\s(\d+)，加入了\s,否则只匹配最后一个数字0
