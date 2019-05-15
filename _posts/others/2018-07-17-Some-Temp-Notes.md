@@ -51,30 +51,6 @@ if (inputs.size() == 2) {  // SSE
     break;
 }
 {% endhighlight %}
-### 5. dynamic_cast static_cast dynamic_pointer_cast
-* static_cast: 
-  * 基本数据类型之间的转换，如把int转换成char，把int转换成enum
-  * 用于类层次结构中基类和子类之间指针或引用的转换: 进行上行转换（把子类的指针或引用转换成基类表示）是安全的； 进行下行转换时，由于没有动态类型检查，不安全
-  * 把void指针转换成目标类型的指针(不安全!!)
-  * static_cast不能转换掉expression的const、volatile
-* dynamic_cast: 主要用于类层次间的上行转换和下行转换
-  * 上行转换时，dynamic_cast和static_cast的效果是一样的
-  * 在进行下行转换时，dynamic_cast具有类型检查的功能，比static_cast更安全, 如果转换不成，返回NULL
-  * 多重继承：选择唯一的一条路径，一层一层向上转换
-* const_cast：
-  * 常量指针被转化成非常量指针，并且仍然指向原来的对象
-  * 常量引用被转换成非常量引用，并且仍然指向原来的对象
-* reinterpret_cast：
-  * 允许将任何指针类型转换为其它的指针类型（慎用！！！）
-
-{% highlight C++ %}
-const int b = 10;
-// b = 11 编译报错，因为b是一个常量对象
-int * pc = const_cast<int *>(&b);
-*pc = 11;
-cout << "*pc = " << *pc << endl; //11， b原来地址的数据现在可由*pc来改变，即解除const
-cout << "b = " << b << endl;  //10， b其实类似(编译器处理问题)#define b 10，没有变。但是xcode调试器给出的是11
-{% endhighlight %}
 
 ### 6. cmake install, cmake相关
 https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#informational-expressionsinstall(FILES $<TARGET_PDB_FILE:kscnnrenderlib> DESTINATION lib/${CMAKE_ARCH}/ OPTIONAL)
