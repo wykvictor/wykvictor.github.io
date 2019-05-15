@@ -31,6 +31,7 @@ jbyteArray JNIEXPORT JNICALL Java_com_sh_process(JNIEnv *env, jobject thiz) {
   jbyteArray res_byte = env->NewByteArray(size);  // construce jbarray[]
   env->SetByteArrayRegion(res_byte, 0, size, (jbyte *)buffer);  // copy result to java layer
 
+  free(buffer); // 注意：内存泄漏
   return res_byte;
 }
 {% endhighlight %}
