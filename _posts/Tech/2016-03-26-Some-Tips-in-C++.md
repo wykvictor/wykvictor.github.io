@@ -144,3 +144,13 @@ cout << "b = " << b << endl;  //10， b其实类似(编译器处理问题)#defin
 * const double PI = 3.1415926535; 可以直接放到hpp头文件，不会报错duplicate symbols
 * because in C++ const objects have internal linkage by default
 * 效果类似于static const double PI = 3.1415926535; 
+* 但是注意char *的情况：
+{% highlight C++ %}
+// 如下的定义放到hpp中：
+const std::string aa = "haha";
+const char aaa='a';
+const char a[] = R"(haha)";
+const char * const aaaa = R"(haha)";
+static const char * aaaaa = R"(haha)";
+const char * aaaaaa = R"(haha)";  // 以上都对，这个不对！！！aaaaaa是个普通变量，还不是const的
+{% endhighlight %}
