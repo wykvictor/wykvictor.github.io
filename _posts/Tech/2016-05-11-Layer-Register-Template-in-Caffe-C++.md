@@ -8,7 +8,12 @@ categories: Tech
 
 > 本文重点分析深度学习平台(Caffe)中注册(register layer)的相关代码[layer_factory.hpp](https://github.com/wykvictor/caffe/blob/master/include/caffe/layer_factory.hpp)
 
+> [参考](https://www.bfilipek.com/2018/02/factory-selfregister.html)
+
 ### 1. LayerRegistry - 功能模板类
+好处：
+* 添加新类时，总得修改factory::Create()函数，对于大系统很繁杂
+* factory需要提前知道所有的类
 {% highlight C++ %}
 template <typename Dtype>  // 模板类(caffe中，预知是float或double)
 class LayerRegistry {
@@ -151,6 +156,7 @@ REGISTER_LAYER_CREATOR(Convolution, GetConvolutionLayer);
 {% endhighlight %}
 
 ### 5. Targets.cmake - 编译
+[参考](https://www.bfilipek.com/2018/02/static-vars-static-lib.html)
 {% highlight Bash shell scripts %}
 # Defines global Caffe_LINK flag, This flag is required to prevent linker from excluding
 # some objects which are not addressed directly but are registered via static constructors
