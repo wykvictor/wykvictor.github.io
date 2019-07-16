@@ -130,6 +130,11 @@ endforeach()
 
 if(ENABLE_JNI)
    add_subdirectory(src/jni)  # 添加一个需要进行构建的子目录，里边编辑子CMakeLists.txt
+   # 子CMakeLists.txt可以这么写：
+   set(JAVA_INCLUDE_PATH2 NotNeeded)  # 如果报错Could NOT find JNI (missing: JAVA_INCLUDE_PATH2，JAVA_AWT_INCLUDE_PATH）
+   set(JAVA_AWT_INCLUDE_PATH NotNeeded)
+   find_package(JNI REQUIRED)
+   include_directories(${JNI_INCLUDE_DIRS})
 endif()
 
 if(DEFINED BUILD_ANDROID)
