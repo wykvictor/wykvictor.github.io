@@ -140,6 +140,7 @@ int * pc = const_cast<int *>(&b);
 cout << "*pc = " << *pc << endl; //11， b原来地址的数据现在可由*pc来改变，即解除const
 cout << "b = " << b << endl;  //10， b其实类似(编译器处理问题)#define b 10，没有变。但是xcode调试器给出的是11
 {% endhighlight %} 
+
 [关于const](https://stackoverflow.com/questions/2328671/constant-variables-not-working-in-header)：
 * const double PI = 3.1415926535; 可以直接放到hpp头文件，不会报错duplicate symbols
 * because in C++ const objects have internal linkage by default
@@ -154,3 +155,27 @@ const char * const aaaa = R"(haha)";
 static const char * aaaaa = R"(haha)";
 const char * aaaaaa = R"(haha)";  // 以上都对，这个不对！！！aaaaaa是个普通变量，还不是const的
 {% endhighlight %}
+
+### 11. [避免使用虚函数作为库的接口](https://blog.csdn.net/Solstice/article/details/6244905)
+* 如果提供动态库so，期望不让调用方重新编译可执行代码，hot fix。直接更换头文件，加新代码就可以，旧代码不用动。
+* 如果用虚函数做接口，会给二进制兼容性带来很大麻烦: 
+  * 本质问题在于C++以vtable[offset]方式实现虚函数调用，而offset又是根据虚函数声明的位置隐式确定的，这造成了增加接口后，旧的可执行程序调用不到正确的函数
+* 推荐使用pimpl技法：
+  1. 暴露的接口里边不要有虚函数，存一个句柄，这样不存在[编译依赖](https://harttle.land/2015/08/29/effective-cpp-31.html)
+{% highlight C++ %}
+class Person{
+public:
+    Person(string& name);
+    string name() const;
+private:
+    class PersonImpl;
+    shared_ptr<PersonImpl> pImpl;
+};
+Person::Person(string& name): pImpl(new PersonImpl(name)){}
+string Person::name(){
+    return pImpl->name();
+}
+{% endhighlight %}
+相当于把实现放到了另外一个类PersonImpl中，这样的Person类称为句柄类。当PersonImpl的内部实现发生改变时，依赖于Person的代码不再需要重新编译了。
+  2. 在库的实现中把调用转发(forward)给实现Graphics::Impl，这部分代码位于.so/.dll中，随库的升级一起变化
+  3. 如果要加入新的功能，不必通过继承来扩展，可以原地修改，且保持二进制兼容性
