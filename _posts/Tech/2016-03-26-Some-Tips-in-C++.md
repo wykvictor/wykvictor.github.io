@@ -59,6 +59,85 @@ f. Constant Name
 
 ### 5. 并发编程
    * 读写锁：可以同时被多个读者拥有，但是只能被一个写者拥有的锁，就是说不能有多个写者同时去写
+      * 当读写锁是写加锁状态时, 在这个锁被解锁之前, 所有试图对这个锁加锁的线程都会被阻塞.
+      * 当读写锁在读加锁状态时, 所有试图以读模式对它进行加锁的线程都可以得到访问权, 但是如果线程希望以写模式对此锁进行加锁, 它必须直到所有的线程释放锁.
+      * 通常, 当读写锁处于读模式锁住状态时, 如果有另外线程试图以写模式加锁, 读写锁通常会阻塞随后的读模式锁请求, 这样可以避免读模式锁长期占用, 而等待的写模式锁请求长期阻塞.
+{% highlight C++ %}
+#include<condition_variable>
+class RWMutex {
+public:
+    RWMutex() : counter_(0), waiting_readers_(0), waiting_writers_(0) {}
+    ~RWMutex() = default;
+    RWMutex(const RWMutex &) = delete;
+    RWMutex(RWMutex &&) = delete;
+    RWMutex& operator=(const RWMutex &) = delete;
+    RWMutex& operator=(RWMutex &&) = delete;
+    int counter_;  // 全局控制
+    int waiting_readers_;
+    int waiting_writers_;
+    std::mutex mutex_;  // 全局
+    std::condition_variable reader_cv_;
+    std::condition_variable writer_cv_;
+};
+class ReadLock {
+public:
+    explicit ReadLock(RWMutex* rw_mutex) : rw_mutex_(rw_mutex)
+    {
+        assert(rw_mutex != NULL);
+        std::unique_lock<std::mutex> lock(rw_mutex->mutex_);
+        rw_mutex_->waiting_readers_ += 1;
+        rw_mutex_->reader_cv_.wait(lock, [&]() -> bool {  // 写者优先，counter_>=0表示没有人在写
+        // 当读写锁处于读模式锁住状态时, 如果有另外线程试图以写模式加锁, 读写锁通常会阻塞随后的读模式锁请求, 这样可以避免读模式锁长期占用, 而等待的写模式锁请求长期阻塞.
+           return rw_mutex_->waiting_writers_ == 0 && rw_mutex_->counter_ >= 0;
+        });
+        rw_mutex_->waiting_readers_ -= 1;
+        rw_mutex_->counter_ += 1;
+    }
+    ~ReadLock() {
+        std::unique_lock<std::mutex> lock(rw_mutex_->mutex_);
+        rw_mutex_->counter_ -= 1;
+        if (rw_mutex_->waiting_writers_ > 0) {
+            if (rw_mutex_->counter_ == 0) {  // 有人等写，而且没有人在读/写
+                rw_mutex_->writer_cv_.notify_one();
+            }
+        }
+    }
+    ReadLock(const ReadLock &) = delete;
+    ReadLock(ReadLock &&) = delete;
+    ReadLock& operator=(const ReadLock &) = delete;
+    ReadLock& operator=(ReadLock &&) = delete;
+private:
+    RWMutex* rw_mutex_;
+};
+class WriteLock {
+public:
+    explicit WriteLock(RWMutex* rw_mutex) : rw_mutex_(rw_mutex) {
+        assert(rw_mutex != NULL);
+        std::unique_lock<std::mutex> lock(rw_mutex->mutex_);
+        rw_mutex_->waiting_writers_ += 1;
+        rw_mutex_->writer_cv_.wait(lock, [&]() -> bool {  // 没有别人读&写时候，才可以写
+            return rw_mutex_->counter_ == 0;
+        });
+        rw_mutex_->waiting_writers_ -= 1;  // 拿到了写权利
+        rw_mutex_->counter_ -= 1;
+    }
+    ~WriteLock() {
+        std::unique_lock<std::mutex> lock(rw_mutex_->mutex_);
+        rw_mutex_->counter_ = 0;
+        if (rw_mutex_->waiting_writers_ > 0) {  // 优先写
+            rw_mutex_->writer_cv_.notify_one();
+        } else {
+            rw_mutex_->reader_cv_.notify_all();
+        }
+    }
+    WriteLock(const WriteLock &) = delete;
+    WriteLock(WriteLock &&) = delete;
+    WriteLock& operator=(const WriteLock &) = delete;
+    WriteLock& operator=(WriteLock &&) = delete;
+private:
+    RWMutex* rw_mutex_;
+};
+{% endhighlight %}
 
 ### 6. [lambda](http://blog.csdn.net/booirror/article/details/26973611)匿名函数
 
