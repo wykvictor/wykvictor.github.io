@@ -47,6 +47,15 @@ endif()
 # 只将Release版本，设置为-Ofast
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
 
+# 缩减so或者exe的大小
+add_definitions(-fvisibility=hidden -fvisibility-inlines-hidden)  # 6.8-> 6.1M
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")  # 6.1 -> 5.4M
+if (UNIX AND NOT APPLE)
+  link_libraries("-Wl, --gc-sections")
+elseif (APPLE)
+  link_libraries("-Wl, -dead_strip")
+endif()
+
 # 输出信息：message([STATUS|WARNING|AUTHOR_WARNING|FATAL_ERROR|SEND_ERROR] “message to display” …)
 message(STATUS "root path:${CMAKE_FIND_ROOT_PATH}")
 # CMAKE_FIND_ROOT_PATH指定了一个或者多个优先于其他搜索路径的搜索路径。默认为空
