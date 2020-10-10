@@ -31,6 +31,7 @@ cls = (*env)->FindClass(env, "com/ibm/example/TestClass");
 if ((*env)->ExceptionCheck(env)) {
    return ERR_FIND_CLASS_FAILED;
 }
+// 关于回调Java函数签名问题：https://www.jianshu.com/p/0e62d00a9e59
 method = (*env)->GetStaticMethodID(env, cls, "setInfo", "(I)V");
 if ((*env)->ExceptionCheck(env)) {
    return ERR_GET_STATIC_METHOD_FAILED;

@@ -35,6 +35,38 @@ jbyteArray JNIEXPORT JNICALL Java_com_sh_process(JNIEnv *env, jobject thiz) {
   return res_byte;
 }
 {% endhighlight %}
+上述的方式，仍然有内存泄漏，返回了res_byte是new出来的，这个应该交给java管理：
+{% highlight C++ %}
+jobject data_t0 = env->NewDirectByteBuffer((void *)proto_res.c_str(), proto_res.size());
+if (data_t0) {
+    jclass jclsJNILib = env->FindClass("com/test/MyJNILib");
+    jmethodID methodID_setOutputData =
+        env->GetMethodID(jclsJNILib, "setOutputData", "(Ljava/nio/ByteBuffer;)V");
+    env->CallVoidMethod(obj, methodID_setOutputData, data_t0);
+}
+env->DeleteLocalRef(data_t0);
+// Java端：
+// call from native jni
+public void setOutputData(ByteBuffer data)
+{
+    if (data == null) {
+        data = ByteBuffer.wrap(new byte[]{});
+        System.out.println("debug: date == null");
+        return;
+    }
+    if (data.capacity() < 1) {
+        data = ByteBuffer.wrap(new byte[]{});
+        System.out.println("debug: data.capacity() < 1");
+        return;
+    }
+    jni_data = ByteBuffer.allocateDirect(data.capacity());
+    data.rewind();
+    jni_data.put(data);
+    data.rewind();
+    jni_data.flip();
+}
+{% endhighlight %}
+
 
 ### 3. In java: byte[]->protobuf
 {% highlight Java %}
