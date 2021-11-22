@@ -224,4 +224,18 @@ if (BUILD_TESTS)
     # Add Unit Tests Here
     add_unit_test(TestName test/testMain.cpp src/a.cpp)
 endif()
+
+# foreach/string regex/interface用法
+FOREACH(FFMPEG_MODULE ${FFMPEG_LIBS})
+    STRING(REGEX REPLACE "(.*)/(.*).(dylib|so)$" "\\2" FFMPEG_MODULE_OUT ${FFMPEG_MODULE})
+    add_library(${FFMPEG_MODULE_OUT} SHARED IMPORTED)
+    set_target_properties(${FFMPEG_MODULE_OUT} PROPERTIES
+        IMPORTED_LOCATION ${FFMPEG_MODULE}
+    )
+    set(ffmpeg_import_libs ${ffmpeg_import_libs} ${FFMPEG_MODULE})
+ENDFOREACH()
+add_library(ffmpeg INTERFACE IMPORTED GLOBAL)
+target_link_libraries(ffmpeg INTERFACE ${ffmpeg_import_libs})
+target_include_directories(ffmpeg INTERFACE ${FFMPEG_INCLUDE})
+target_compile_definitions(ffmpeg INTERFACE ENABLE_FFMPEG=1)
 {% endhighlight %}

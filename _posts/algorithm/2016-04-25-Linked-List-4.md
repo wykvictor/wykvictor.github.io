@@ -89,6 +89,32 @@ ListNode *mergeKLists(vector<ListNode *> &lists) {
   }
   return dummy.next;
 }
+// 另：lamda函数初始化queue
+ListNode *mergeKLists(vector<ListNode *> &lists) {
+  // write your code here
+  if(lists.empty()) return NULL;
+  if(lists.size() == 1) return lists[0];
+  // 可调用对象cmp
+  auto cmp = [](ListNode *l1, ListNode *l2) -> bool {
+      return l1->val > l2->val;  // 升序，就是>
+  };
+  // lambda表达式的匿名类型是没有默认构造函数的，所以需要传进去
+  priority_queue<ListNode*, vector<ListNode*>, decltype(cmp)> q(cmp);
+  for(auto l: lists) {
+      if(l != NULL) q.push(l);
+  }
+  ListNode head(-1);
+  ListNode *cur = &head;
+  while(!q.empty()) {
+      ListNode *topnode = q.top();
+      q.pop();
+      cur->next = topnode;
+      cur = cur->next;
+      if(topnode->next) q.push(topnode->next);
+  }
+  cur->next = NULL;
+  return head.next;
+}
 {% endhighlight %}
 
 ### 2. [Copy List with Random Pointer](http://www.lintcode.com/en/problem/copy-list-with-random-pointer/)
