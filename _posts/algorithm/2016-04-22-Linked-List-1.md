@@ -87,7 +87,7 @@ ListNode *getMid(ListNode *head) {
     slow = slow->next;
     fast = fast->next->next;
   }
-  return slow;  // !
+  return slow;  // ! 返回上一个!!!
 }
 ListNode *reverse(ListNode *head) {
   ListNode *prev = NULL, *cur = head;
@@ -139,13 +139,34 @@ ListNode *sortList(ListNode *head) {
 {% endhighlight %}
 Quick Sort: 时间O(nlogn)，最坏O(n^2)，整体有序->局部有序，不稳定排序
 {% highlight C++ %}
+int partition(vector<int> &A, int low, int high) {
+    int pivot = A[low];
+    while(low < high) {
+        if(low < high && pivot <= A[high]) high--;
+        A[low] = A[high];  // A[low] 可以用，接下来A[high]也可以被占
+        if(low < high && pivot >= A[low]) low++;
+        A[high] = A[low]; 
+    }
+    A[low] = pivot;
+    return low;
+}
+void quickSort(vector<int> &A, int low, int high) {
+    if(low >= high) return;  // 注意这个条件！！
+    int mid = partition(A, low, high);
+    quickSort(A, low, mid-1);
+    quickSort(A, mid+1, high);
+}
+{% endhighlight %}
+
+{% highlight C++ %}
 ListNode *getTail(ListNode *head) {
-  ListNode *tail = head;
-  // 先判断tail!
-  while (tail != NULL && tail->next != NULL) {
-    tail = tail->next;
-  }
-  return tail;
+    if(head == NULL)  return NULL;
+    ListNode *cur = head;
+    // ！判断条件
+    while(cur->next != NULL) {
+        cur = cur->next;
+    }
+    return cur;
 }
 // !!极端情况: 如果3个list有NULL
 ListNode *concat(ListNode *l1, ListNode *l2, ListNode *l3) {
@@ -202,6 +223,49 @@ ListNode *sortList(ListNode *head) {
 
   // 3者连接
   return concat(left, dummy_mid.next, right);
+}
+
+// 简洁方式
+void printlist(ListNode *head) {
+    std::cout << "printlist:" << std::endl;
+    while(head != NULL) {
+        std::cout << head->val << "->";
+        head = head->next;
+    }
+    std::cout << "end" << std::endl;
+}
+
+ListNode * sortList(ListNode * head) {
+    // write your code here
+    if(head == NULL || head->next == NULL)  return head;
+    ListNode smallhead(-1), bighead(-1);
+    ListNode *small = &smallhead, *big = &bighead;
+    ListNode *cur = head->next;
+    ListNode *pivot = head;  // 头作为pivot
+    while(cur != NULL) {
+        if(cur->val < pivot->val) {
+            small->next = cur;
+            small = cur;
+        } else {
+            big->next = cur;
+            big = cur;
+        }
+        cur = cur->next;
+    }
+    small->next = NULL;
+    big->next = NULL;
+    small = sortList(smallhead.next);
+    big = sortList(bighead.next);
+
+    // concat small, pivot, big
+    pivot->next = big;
+    ListNode *tailsmall = getTail(small);
+    if(tailsmall != NULL) {
+        tailsmall->next = pivot;
+        return small;  // ！！！不是smallhead.next
+    } else {
+        return pivot;
+    }
 }
 {% endhighlight %}
 

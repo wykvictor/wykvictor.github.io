@@ -113,4 +113,25 @@ ListNode* insert(ListNode* node, int x) {
   X->next = cur;
   return node;
 }
+// 简化
+ListNode * insert(ListNode * node, int x) {
+    // write your code here
+    ListNode *xnode = new ListNode(x);
+    if(node == NULL) return xnode;
+
+    ListNode *cur = node;
+    while(cur->next != node) {
+        if (cur->val > cur->next->val) { // 首尾相接处
+            if(cur->next->val >= x) break;
+        } else if((cur->val <= x) && (x <= cur->next->val)) {
+            // 找到位置了
+            break;
+        }
+        cur = cur->next;
+    }
+    // 插入
+    xnode->next = cur->next;
+    cur->next = xnode;
+    return node;
+}
 {% endhighlight %}

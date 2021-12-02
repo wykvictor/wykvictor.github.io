@@ -30,7 +30,11 @@ If S = [1,2,3], a solution is:
 {% highlight C++ %}
 vector<vector<int> > subsets(vector<int> &S) {
   vector<vector<int> > res;
-  if (S.empty()) return res;
+  // 下边已经涵盖了这种情况
+  // if (S.empty()) {
+  //    res.push_back(vector<int>());
+  //    return res;  // 输入判断
+  // }
   sort(S.begin(), S.end());  // could change S or not?
   vector<int> path;
   // Don't need for combination! vector<bool> visited(S.size(), false);
@@ -140,18 +144,15 @@ vector<vector<int> > subsetsWithDup(vector<int> &S) {
   vector<vector<int> > res(1);
   sort(S.begin(), S.end());
   int len = 1;
-  int start = 1;  // record the same entrance
   for (int i = 0; i < S.size(); i++) {
+    int start = 0;  // record the same entrance
     //相同的数字，那么start就从上次开始的地方开始，上次start之前的，不能重复弄了!
-    if (i != 0 && S[i] == S[i - 1])
-      start = len;
-    else
-      start = 0;
+    if (i != 0 && S[i] == S[i - 1])  start = len;
     len = res.size();  //更新len
     for (int j = start; j < len; j++) {
       vector<int> path = res[j];
       path.push_back(S[i]);
-            res.push_back(path);
+      res.push_back(path);
     }
   }
   return res;

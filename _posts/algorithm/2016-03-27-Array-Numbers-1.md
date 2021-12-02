@@ -674,6 +674,23 @@ char *strStr(char *haystack, char *needle) {
   }
   return NULL; //到结尾
 }
+// C++
+int strStr(string &source, string &target) {
+    // Write your code here
+    // return source.find(target);
+    int srclen = source.size();
+    int tarlen = target.size();
+    if (tarlen == 0)
+        return 0;
+    for(int i=0; i<srclen-tarlen+1; i++) { // srclen-tarlen+1
+        int j=0;
+        for(; j<tarlen; j++) {
+            if(source[i+j] != target[j]) break;
+        }
+        if(j == tarlen) return i;
+    }
+    return -1;
+}
 {% endhighlight %}
 
 ### 18. [Wiggle Sort](http://www.lintcode.com/en/problem/wiggle-sort/)

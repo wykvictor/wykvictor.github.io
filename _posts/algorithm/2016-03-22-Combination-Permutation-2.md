@@ -105,25 +105,25 @@ Output:
 [[1,2,6], [1,3,5], [2,3,4]]
 ```
 
-Java解法
-{% highlight Java %}
-public List<List<Integer>> combinationSum3(int k, int n) {
-  List<List<Integer>> res = new ArrayList<List<Integer>>();
-  List<Integer> path = new ArrayList<Integer>();
-  DFS(res, k, n, 1, path, 0);
-  return res;
+{% highlight C++ %}
+void combineCore(vector<vector<int>> &res, vector<int> &path, int k, int n, int sum, int pos) {
+    if(sum == n && path.size() == k) {  // 2个限制条件
+        res.push_back(path);
+        return;
+    }
+    for(int i=pos; i<=9; i++) {
+        if(sum + pos > n || path.size() == k)  break;  // 优化
+        path.push_back(i);
+        combineCore(res, path, k, n, sum+i, i+1);
+        path.pop_back();
+    }
 }
-void DFS(List<List<Integer>> res, int k, int n, int step, List<Integer> path,
-         int sum) {
-  if (path.size() == k) {
-    if (sum == n) res.add(new ArrayList(path));
-    return;
-  }
-  for (int i = step; i <= 9; i++) {
-    path.add(i);
-    DFS(res, k, n, i + 1, path, sum + i);
-    path.remove(path.size() - 1);
-  }
+
+vector<vector<int>> combinationSum3(int k, int n) {
+    vector<vector<int>> res;
+    vector<int> path;
+    combineCore(res, path, k, n, 0, 1);
+    return res;
 }
 {% endhighlight %}
 Java中，List是一个接口，ArrayList是一个类继承并实现了List

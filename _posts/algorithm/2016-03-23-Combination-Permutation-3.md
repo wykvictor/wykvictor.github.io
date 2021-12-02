@@ -77,21 +77,21 @@ vector<vector<int> > permute(vector<int> &num) {
 {% endhighlight %}
 c. 插入法,迭代：推荐方法
 {% highlight C++ %}
-vector<vector<int> > permute(vector<int> &num) {
+vector<vector<int> > permute(vector<int> &nums) {
   //插入法，迭代
   vector<vector<int> > res(1);            // need one 初始值
-  for (int i = 0; i < num.size(); i++) {  // for each num, insert it into...
+  for (int i = 0; i < nums.size(); i++) {  // for each num, insert it into...
     //这种只要最后的结果的，都需要copyRes来赋值一份，跟combination相同
-    vector<vector<int> > copyRes(res);
-    res.clear();
-    for (int j = 0; j < copyRes.size(); j++) {  // for each res, insert the i
+    vector<vector<int>> swapres;
+    for (int j = 0; j < res.size(); j++) {  // for each res, insert the i
       // there are res[j].size()+1 places to insert
-      for (int k = 0; k <= copyRes[j].size(); k++) {
-        vector<int> line(copyRes[j]);
-        line.insert(line.begin() + k, num[i]);
-        res.push_back(line);
+      for (int k = 0; k <= res[j].size(); k++) {
+        vector<int> line(res[j]);
+        line.insert(line.begin() + k, nums[i]);
+        swapres.push_back(line);
       }
     }
+    res = swapres;
   }
   return res;
 }
@@ -136,24 +136,21 @@ void permuteCore(vector<vector<int> > &res, vector<int> &path, vector<int> &num,
 {% endhighlight %}
 其他方法：迭代+判重
 {% highlight C++ %}
-vector<vector<int> > permuteUnique(vector<int> &num) {
-  //插入法，迭代 ==> 判断重复
-  vector<vector<int> > res(1);            // need one初始值
-  for (int i = 0; i < num.size(); i++) {  // for each num, insert it into...
-    int resNum = res.size();
-    vector<vector<int> > copyRes(res);
-    res.clear();
-    for (int j = 0; j < resNum; j++) {  // for each res, insert the i
-      for (int k = 0; k <= copyRes[j].size(); k++) {
-        vector<int> line(copyRes[j]);
-        line.insert(line.begin() + k, num[i]);
-        // 就算排序了，也得有!
-        if (find(res.begin(), res.end(), line) == res.end())
-          res.push_back(line);
-        //过滤重复的位置==>必须有这句优化，否则超时！
-        while (k < line.size() - 1 && num[i] == line[k + 1]) k++;
+vector<vector<int>> permuteUnique(vector<int>& nums) {
+  vector<vector<int>> res(1);
+  for(int i=0; i<nums.size(); i++) {
+      vector<vector<int>> swapres;
+      for(int j=0; j<res.size(); j++) {
+          vector<int> path = res[j];
+          for(int k=0; k<=path.size(); k++) {
+              vector<int> line = path;
+              line.insert(line.begin() + k, nums[i]);
+              if(find(swapres.begin(), swapres.end(), line) == swapres.end())
+                  swapres.push_back(line);
+              while(k < path.size() && nums[i] == path[k]) k++;  // 剪枝
+          }
       }
-    }
+      res = swapres;
   }
   return res;
 }
