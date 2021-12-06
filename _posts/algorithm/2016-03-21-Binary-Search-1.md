@@ -26,6 +26,8 @@ int lastPosition(vector<int>& A, int target) {  // A若是new，则在heap空间
     } else if (A[mid] < target) {
       start = mid;  // 写完后考虑，上边这2个if可以合并成1个
     } else {
+      // 写作 end = mid - 1 也是正确的
+      // 只是可以偷懒不写，因为不写也没问题，不会影响时间复杂度
       end = mid;
     }
   }

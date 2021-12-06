@@ -82,7 +82,7 @@ int searchInsert(vector<int> &A, int target) {
   }
   if (A[start] >= target) return start;
   if (A[end] >= target) return end;  //模板：这2句顺序区别
-  if (A[end] < target) return end + 1;
+  if (A[end] < target) return end + 1;  // 注意，这种特殊情况！
 }
 {% endhighlight %}
 
@@ -233,10 +233,86 @@ bool search(vector<int> &A, int target) {
 }
 {% endhighlight %}
 
+### 6. [Search a 2D Matrix](https://www.lintcode.com/problem/28/)
+```
+写出一个高效的算法来搜索m × n矩阵中的值target
+1. 每行中的整数从左到右是排序的。
+2. 每行的第一个数大于上一行的最后一个整数。
+```
+{% highlight C++ %}
+// 按照模版，2次二分O(logm) + O(logn)
+bool searchMatrix(vector<vector<int>> &matrix, int target) {
+  if(matrix.size() == 0) return false;
+  if(matrix[0].size() == 0)  return false;
+  int rows = matrix.size(), cols = matrix[0].size();
+  // search which row, last row < target
+  int begin = 0, end = rows - 1;
+  while(begin + 1 < end) {
+      int mid = begin + (end - begin) / 2;
+      if(matrix[mid][0] == target) {
+          return true;
+      } else if (matrix[mid][0] < target) {
+          begin = mid + 1;
+      } else {
+          end = mid - 1;
+      }
+  }
+  int rowID = 0;
+  if(matrix[end][0] <= target) {  // ！！重要，需要有“=”
+      rowID = end;
+  } else if(matrix[begin][0] <= target) {
+      rowID = begin;
+  } else {
+      return false;
+  }
+
+  // search which col
+  begin = 0, end = cols - 1;
+  while(begin + 1 < end) {
+      int mid = begin + (end-begin) / 2;
+      int midval = matrix[rowID][mid];
+      if(midval == target) {
+          return true;
+      } else if(midval < target) {
+          begin = mid + 1;
+      } else {
+          end = mid - 1;
+      }
+  }
+  if(matrix[rowID][begin] == target) return true;
+  if(matrix[rowID][end] == target) return true;
+  return false;
+}
+{% endhighlight %}
+O(log(m*n))的方式，但是代码简洁
+{% highlight C++ %}
+bool searchMatrix(vector<vector<int>> &matrix, int target) {
+  if(matrix.size() == 0) return false;
+  if(matrix[0].size() == 0)  return false;
+  int rows = matrix.size(), cols = matrix[0].size();
+  int begin = 0, end = rows * cols - 1;
+  while(begin + 1 < end) {
+    int mid = begin + (end-begin) / 2;
+    int midval = matrix[mid/cols][mid%cols];
+    if(midval == target) {
+        return true;
+    } else if(midval < target) {
+        begin = mid + 1;
+    } else {
+        end = mid - 1;
+    }
+  }
+  if(matrix[begin/cols][begin%cols] == target) return true;
+  if(matrix[end/cols][end%cols] == target) return true;
+  return false;
+}
+{% endhighlight %}
+
+
 ### Binary Search on Result
 往往没有给定数组让二分，同样是找满足某个条件的最大/小值
 
-### 6. [First Bad Version - Leetcode 278](https://leetcode.com/problems/first-bad-version/)
+### 7. [First Bad Version - Leetcode 278](https://leetcode.com/problems/first-bad-version/)
 ```
 You are a product manager and currently leading a team to develop a new product. Unfortunately, the latest version of your product fails the quality check. Since each version is developed based on the previous version, all the versions after a bad version are also bad.
 
@@ -260,7 +336,7 @@ int firstBadVersion(int n) {
 }
 {% endhighlight %}
 
-### 7. [Sqrt(x)](http://www.lintcode.com/en/problem/sqrtx/)
+### 8. [Sqrt(x)](http://www.lintcode.com/en/problem/sqrtx/)
 {% highlight C++ %}
 int sqrt(int x) {
   if(x <= 0)  return 0;
@@ -282,7 +358,7 @@ int sqrt(int x) {
 }
 {% endhighlight %}
 
-### 8. [Wood Cut](https://leetcode.com/problems/first-bad-version/)
+### 9. [Wood Cut](https://leetcode.com/problems/first-bad-version/)
 ```
 Given n pieces of wood with length L[i](integer array). Cut them into small pieces to guarantee you could have equal or more than k pieces with the same length. What is the longest length you can get from the n pieces of wood? Given L & k, return the maximum length of the small pieces.
 For L=[232, 124, 456], k=7, return 114.
