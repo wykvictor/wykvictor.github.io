@@ -7,6 +7,7 @@ categories: Algorithm
 ---
 
 ### 1. Level 1 - Knows the template - 4 tips
+一般O(n)肯定能解决的暴力题目，都会有O(logn)的解法，那就是二分
 * start + 1 < end
 * start + (end - start) / 2
 * A[mid] ==, <, >

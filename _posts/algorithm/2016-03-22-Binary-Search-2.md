@@ -95,24 +95,25 @@ Return -1, if the number doesn't exist in the array.
 {% highlight C++ %}
 int searchBigSortedArray(ArrayReader *reader, int target) {
   if(reader == NULL)  return -1;
-  int range = 1;
-  while(reader->get(range-1) < target) {
-    range = range * 2;
+  int begin = 0, end = 1;
+  // 先找end
+  while(reader->get(end) < target) {
+      end = end * 2;
   }
-  int beg = range / 2 - 1, end = range - 1;
-  if(beg < 0)  beg = 0;
-  while(beg + 1 < end) {
-    int mid = beg + (end - beg) / 2;
-    if(reader->get(mid) == target) {
-      end = mid;  // first index: should not return
-    } else if (reader->get(mid) < target) {
-      beg = mid;
-    } else {
-      end = mid;
-    }
+  // 应该在end和end/2之间
+  begin = end / 2;
+  while(begin + 1 < end) {
+      int mid = begin + (end-begin) / 2;
+      if(reader->get(mid) == target) {
+          end = mid;
+      } else if (reader->get(mid) < target) {
+          begin = mid + 1;
+      } else {
+          end = mid - 1;
+      }
   }
-  if(reader->get(beg) == target)  return beg;
-  if(reader->get(end) == target)  return end;
+  if(reader->get(begin) == target) return begin;
+  if(reader->get(end) == target) return end;
   return -1;
 }
 {% endhighlight %}
@@ -125,20 +126,21 @@ Find the minimum element.
 ```
 {% highlight C++ %}
 int findMin(vector<int> &num) {
-  if(num.empty())  return INT_MIN;
-  int beg = 0, end = num.size()-1;
-  if(num[beg] < num[end])  return num[beg];
-  // keep the same problem
-  while(beg + 1 < end) {
-    int mid = beg + (end-beg)/2;
-    if(num[mid] > num[beg]) { // only lies on these two lines
-      beg = mid;
-    } else if(num[mid] < num[end]) {
-      end = mid;
-    }
+  int size = nums.size();
+  if(size == 0)  return -1;
+  int start = 0, end = size - 1;
+  if(nums[start] < nums[end])  return nums[start];
+  while(start + 1 < end) {
+      int mid = start + (end - start) / 2;
+      if(nums[mid] > nums[start]) {
+          start = mid;
+      } else if (nums[mid] < nums[start]) {
+          end = mid;
+      } else {
+          break;
+      }
   }
-  if (num[beg] <= num[end]) return num[beg];
-  return num[end];
+  return nums[end];
 }
 {% endhighlight %}
 
@@ -148,23 +150,26 @@ The array may contain duplicates.
 {% highlight C++ %}
 // worst case: 1110111 (O(n), just use for loop)
 int findMin(vector<int> &num) {
-  if(num.empty())  return INT_MIN;
-  int beg = 0, end = num.size()-1;
-  if(num[beg] < num[end])  return num[beg];
-  while(beg + 1 < end) {
-    int mid = beg + (end-beg)/2;
-    if(num[mid] == num[beg]){
-      beg++; // Important! worst case: just move beg or end
-    } else if(num[mid] == num[end]){
-      end--; // Important! worst case: just move beg or end
-    } else if(num[mid] > num[beg]) {
-      beg = mid;
-    } else {
-      end = mid;
-    }
+  int size = nums.size();
+  if(size == 0)  return -1;
+  int start = 0, end = size - 1;
+  while(start + 1 < end) {
+      if(nums[start] < nums[end])  return nums[start];  // 11110111，而且注意放到循环里！
+      int mid = start + (end - start) / 2;
+      if(nums[mid] > nums[start]) {
+          start = mid;
+      } else if (nums[mid] < nums[start]) {
+          end = mid;
+      } else if(nums[mid] == nums[start]) {
+          // 无法判断mid在左/右区间，如11110111
+          start++;
+      } else if(nums[mid] == nums[end]) {
+          // 无法判断mid在左/右区间，如11110111
+          end--;
+      }
   }
-  if (num[beg] <= num[end]) return num[beg];
-  return num[end];
+  if(nums[start] < nums[end])  return nums[start];
+  return nums[end];
 }
 {% endhighlight %}
 
@@ -175,28 +180,33 @@ You may assume no duplicate exists in the array.
 ```
 {% highlight C++ %}
 int search(vector<int> &A, int target) {
-  if (A.empty()) return -1;
-  int beg = 0, end = A.size() - 1;
-  while (beg + 1 < end) {
-    int mid = beg + (end - beg) / 2;
-    if (A[mid] == target) {
-      return mid;
-    }
-    if (A[beg] < A[mid]) {  // part 1: top left
-      if (A[beg] <= target && target < A[mid]) {
-        end = mid;
-      } else {  // the same problem
-        beg = mid;
-      }
-    } else {  // part 2: bottom right
-      if(A[mid] < target && target <= A[end]) {
-          beg = mid;
+  // write your code here
+  int size = A.size();
+  if(size == 0)  return -1;
+  int start = 0, end = size - 1;
+  while(start + 1 < end) {
+      int mid = start + (end - start) / 2;
+      if(A[mid] == target)  return mid;
+      // 分情况讨论，mid在左区间 or 右区间
+      if(A[mid] > A[start]) {
+          if(target < A[mid] && target >= A[start] ) { // ！必须是2个判断
+              // 正常二分, A[start] <= target < A[mid]
+              end = mid - 1;  // 这个外围while也支持正常的二分，都是进来A[mid] > A[start]
+          } else {
+              // 退化到初始状况，再来
+              start = mid + 1;
+          }
       } else {
-          end = mid;
+          if(target > A[mid] && target <= A[end]) {
+              // 正常二分, A[mid] < target <= A[end]
+              start = mid + 1;
+          } else {
+              // 退化到初始状况，再来
+              end = mid - 1;
+          }
       }
-    }
   }
-  if(A[beg] == target)  return beg;
+  if(A[start] == target)  return start;
   if(A[end] == target)  return end;
   return -1;
 }
@@ -204,31 +214,36 @@ int search(vector<int> &A, int target) {
 What if duplicates are allowed?
 {% highlight C++ %}
 bool search(vector<int> &A, int target) {
-  if (A.empty()) return false;
-  int beg = 0, end = A.size() - 1;
-  while (beg + 1 < end) {
-    int mid = beg + (end - beg) / 2;
-    if (A[mid] == target) {
-      return true;
-    }
-    if (A[beg] < A[mid]) {  // part 1: top left
-      if (A[beg] <= target && target < A[mid]) {
-        end = mid;
-      } else {  // the same problem
-        beg = mid;
-      }
-    } else if (A[beg] > A[mid]){  // part 2: bottom right
-      if (A[mid] < target && target <= A[end]) {
-        beg = mid;
+  // write your code here
+  int size = A.size();
+  if(size == 0)  return false;
+  int start = 0, end = size - 1;
+  while(start + 1 < end) {
+      int mid = start + (end - start) / 2;
+      if(A[mid] == target)  return true;
+      // 分情况讨论，mid在左区间 or 右区间
+      if(A[mid] > A[start]) {
+          if(target < A[mid] && target >= A[start] ) { // 必须是2个判断
+              // 正常二分, A[start] <= target < A[mid]
+              end = mid - 1;  // 这个外围while也支持正常的二分，都是进来A[mid] > A[start]
+          } else {
+              // 退化到初始状况，再来
+              start = mid + 1;
+          }
+      } else if(A[mid] < A[start]) {
+          if(target > A[mid] && target <= A[end]) {
+              // 正常二分, A[mid] < target <= A[end]
+              start = mid + 1;
+          } else {
+              // 退化到初始状况，再来
+              end = mid - 1;  // !上头判断过 A[mid] == target 了
+          }
       } else {
-        end = mid;
+          start++;
       }
-    } else {
-      beg++; // can not decide either part
-    }
   }
-  if(A[beg] == target || A[end] == target)
-    return true;
+  if(A[start] == target)  return true;
+  if(A[end] == target)  return true;
   return false;
 }
 {% endhighlight %}
@@ -340,21 +355,46 @@ int firstBadVersion(int n) {
 {% highlight C++ %}
 int sqrt(int x) {
   if(x <= 0)  return 0;
-  // last number ^2 <= x
+  // 问题转化：last number ^2 <= x
   long long beg = 1, end = x;  // long long is important!
   while(beg + 1 < end) {
-    long long mid = beg + (end-beg)/2;
-    long long mypow = mid * mid;
+    long long mid = beg + (end-beg)/2;  // 如果不用long，则需要写mid < x / mid，但除法时钟周期慢3倍
+    long long mypow = mid * mid;  // mid必须long，否则要这么写(long long)
     if(mypow == x) {
       return mid;
     } else if (mypow < x) {
-      beg = mid;
+      beg = mid;  // 而且不能是mid + 1，会丢解
     } else {
       end = mid;
     }
   }
   if(end * end <= x)  return end;
   return beg;
+}
+{% endhighlight %}
+若输入输出都是double，精确度保持在小数点后12位
+{% highlight C++ %}
+double sqrt(double x) {
+    // write your code here
+    if(x <= 0)  return 0;  // 特殊情况
+    double eps = 1e-12;
+    double start = 1, end = x;
+    if(x < 1) {  // !特殊情况
+        start = x;
+        end = 1;
+    }
+    while(start + eps < end) {
+        double mid = start + (end - start) / 2;
+        if(abs(mid * mid - x) <= eps) {
+            return mid;
+        }
+        if(mid * mid < x) {
+            start = mid;
+        } else {
+            end = mid;
+        }
+    }
+    return start;
 }
 {% endhighlight %}
 
@@ -364,30 +404,34 @@ Given n pieces of wood with length L[i](integer array). Cut them into small piec
 For L=[232, 124, 456], k=7, return 114.
 ```
 {% highlight C++ %}
-bool canGetK(vector<int> &L, int k, int len) {
-  int num = 0;
-  for(int i = 0; i < L.size(); i++) {
-    num += L[i] / len;
-  }
-  return num >= k;
-}
-int woodCut(vector<int> L, int k) {
-  if(L.empty())  return 0;
-  int max = 0;
-  for(int i = 0; i < L.size(); i++) {
-    max = max < L[i] ? L[i] : max;
-  }
-  int min = 0;  // 0 is returned if no answer
-  // last num to get k
-  while(min + 1 < max) {
-    int mid = min + (max-min)/2;
-    if(canGetK(L, k, mid)) {
-      min = mid;
-    } else {
-      max = mid;
+// cut的长度，能否搞k个
+bool getcut(vector<int> &L, int k, int cut) {
+    int num = 0;
+    for(auto l: L) {
+        num += l/cut;
+        if(num >= k) return true;
     }
-  }
-  if(canGetK(L, k, max))  return max;
-  return min;
+    return false;
+}
+
+int woodCut(vector<int> &L, int k) {
+    if(k == 0 || L.size() == 0) return 0;
+    int maxlen = 1;
+    for(auto l: L) {
+        if(maxlen < l) maxlen = l;
+    }
+    int start = 1, end = maxlen;
+    // last num to get k
+    while(start + 1 < end) {
+        int mid = start + (end - start) / 2;
+        if(getcut(L, k, mid)) {
+            start = mid;
+        } else {
+            end = mid - 1;
+        }
+    }
+    if(getcut(L, k, end)) return end;
+    if(getcut(L, k, start)) return start;
+    return 0;
 }
 {% endhighlight %}

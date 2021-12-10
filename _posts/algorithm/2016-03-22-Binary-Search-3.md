@@ -134,7 +134,7 @@ int binarySearch(vector<int> &A, int target) {
   }
   if(A[beg] >= target)  return beg;
   if(A[end] >= target)  return end;
-  return 0;  // if not exist
+  return end + 1;  //!! if target大于所有的数字
 }
 vector<int> countOfSmallerNumber(vector<int> &A, vector<int> &queries) {
   vector<int> res;
@@ -339,5 +339,32 @@ bool searchRows(vector<vector<char>>& image, int r) {
     if (image[r][i] == '1') return true;
   }
   return false;
+}
+{% endhighlight %}
+
+### 7. [Recover Rotated Sorted Array](https://www.lintcode.com/problem/39/)
+```
+array = [4,5,1,2,3] ==> [1,2,3,4,5]
+```
+{% highlight C++ %}
+// 3步反转法 O(1) extra space and O(n) time.
+// [4,5,1,2,3] → [5,4,1,2,3] → [5,4,3,2,1] → [1,2,3,4,5]
+void reverse(vector<int> &nums, int start, int end) {
+    while(start < end) {
+        int tmp = nums[start];
+        nums[start++] = nums[end];
+        nums[end--] = tmp;
+    }
+}
+void recoverRotatedSortedArray(vector<int> &nums) {
+    // write your code here
+    int i=0;
+    for(; i<nums.size()-1; i++) {
+        if(nums[i] > nums[i+1]) break;  // 因为有重复的数，不需要二分，for循环找到就可以了
+    }
+    // 找到了反转的点，三步反转法
+    reverse(nums, 0, i);
+    reverse(nums, i+1, nums.size()-1);
+    reverse(nums, 0, nums.size()-1);
 }
 {% endhighlight %}
