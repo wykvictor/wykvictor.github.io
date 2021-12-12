@@ -55,7 +55,7 @@ Recurse, version 2：Divide & Conquer
 vector<int> preorderTraversal(TreeNode *root) {
   vector<int> res;
   if(root == NULL)  return res;
-  // Divide：好处，这2句可以并行
+  // Divide：好处，这2句可以并行化；而且从代码结构/coding style更好
   vector<int> left = preorderTraversal(root->left);
   vector<int> right = preorderTraversal(root->right);
   // Conquer
@@ -105,6 +105,27 @@ vector<int> preorderTraversal(TreeNode *root) {
   return res;
 }
 {% endhighlight %}
+迭代3_几种遍历通用的方案，好理解些：
+{% highlight C++ %}
+vector<int> preorderTraversal(TreeNode *root) {
+  vector<int> res;
+  if(root == nullptr) return res;
+  stack<TreeNode *> s;
+  TreeNode *cur = root;
+  while(!s.empty() || cur) {
+      while(cur) {
+          s.push(cur);
+          res.push_back(cur->val);  // 放stack的时候同时访问
+          cur = cur->left;
+      }
+      // 不访问，只是弹出来转向右边，循环往复
+      cur = s.top();
+      s.pop();
+      cur = cur->right;
+  }
+  return res;
+}
+{% endhighlight %}
 
 ### 2. Binary Tree Inorder Traversal
 递归：
@@ -141,8 +162,9 @@ vector<int> inorderTraversal(TreeNode *root) {
     // go to the leftest
     while(node != NULL) {
       s.push(node);
-      node = node->left;
+      node = node->left;  // 区别，只放，不访问
     }
+    // 开始访问啦，访问后转向右边，循环往复
     node = s.top();
     s.pop();
     res.push_back(node->val);
