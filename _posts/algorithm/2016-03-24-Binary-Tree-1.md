@@ -60,7 +60,7 @@ vector<int> preorderTraversal(TreeNode *root) {
   vector<int> right = preorderTraversal(root->right);
   // Conquer
   res.push_back(root->val);
-  // 内存的copy，O(n)时间
+  // 内存的copy，O(n)时间, 整个算法复杂度O(n2)
   res.insert(res.end(), left.begin(), left.end());
   res.insert(res.end(), right.begin(), right.end());
   return res;

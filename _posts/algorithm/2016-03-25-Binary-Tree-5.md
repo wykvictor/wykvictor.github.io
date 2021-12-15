@@ -101,17 +101,14 @@ Given a binary tree, find the maximum path sum from root.
 The path may end at any node in the tree and contain at least one node in it.
 ```
 {% highlight C++ %}
-int maxPathSum2(TreeNode *root) {
-  if(root == NULL) {
-    return 0;
-  }
-  int left = maxPathSum2(root->left);
-  int right = maxPathSum2(root->right);
-  if(left <= 0 && right <= 0) {
+int maxPathSum2(TreeNode * root) {
+    // write your code here
+    if(root == nullptr) return 0;
+    int left = maxPathSum2(root->left);
+    int right = maxPathSum2(root->right);
+    // 只有左 右，有大于0的，才加进去
+    if(max(left, right) > 0) return max(left, right) + root->val;
     return root->val;
-  }
-  // either of the 2 <isindex></isindex> > 0
-  return root->val + (left > right ? left : right);
 }
 {% endhighlight %}
 
@@ -137,20 +134,19 @@ struct ResultType {
   ResultType(int a, int b): max_sum(a), single_path(b) {}
 };
 ResultType maxPathSumHelper(TreeNode *root) {
-  if(root == NULL) {
-      return ResultType(INT_MIN, INT_MIN);
-  }
-  ResultType left = maxPathSumHelper(root->left);
-  ResultType right = maxPathSumHelper(root->right);
+  ResultType res(INT_MIN, INT_MIN);  // 初始化
+  if(root == nullptr) return res;
+  ResultType left = core(root->left);
+  ResultType right = core(root->right);
+  if(max(left.single_path, right.single_path) > 0)
+      res.single_path = max(left.single_path, right.single_path) + root->val;
+  else 
+      res.single_path = root->val;
   
-  int single_path = root->val + 
-    max(0, max(left.single_path, right.single_path));
-  int max1 = max(left.max_sum, right.max_sum);
-  int max2 = root->val +
-    (left.single_path>0?left.single_path:0) +
-    (right.single_path>0?right.single_path:0);
-  int max_sum = max(max1, max2);
-  return ResultType(max_sum, single_path);
+  // 左/右/穿过root的 三个比较
+  int max_sum = max(left.max_sum, right.max_sum);
+  res.max_sum = max(max_sum, max(0, left.single_path) + max(0, right.single_path) + root->val);  // 注意，都要和0比较！
+  return res;
 }
 int maxPathSum(TreeNode *root) {
   return maxPathSumHelper(root).max_sum;
@@ -166,15 +162,16 @@ int maxPathSum(TreeNode *root) {
 }
 //函数返回单个方向路径的最大值，max_sum则是引用 返回了整体的值!
 int dfs(TreeNode *root, int &max_sum) {
-  if(root == NULL)
-      return 0;
-  int lLen = dfs(root->left, max_sum);
-  int rLen = dfs(root->right, max_sum);
-  // 只有大于，才加!!! 注意优先级!!!
-  int sum = (lLen>0?lLen:0) + (rLen>0?rLen:0) + root->val;
-  max_sum = max(max_sum, sum);
-  // 若大于，才加进去
-  return max(lLen, rLen) > 0 ? max(lLen, rLen) + root->val : root->val;
+  if(root == nullptr)  return INT_MIN;
+  int left = core(root->left, max_sum);
+  int right = core(root->right, max_sum);
+  if(max(left, right) <= 0) {
+      max_sum = max(root->val, max_sum);  // 都小于0，那么取root
+      return root->val;
+  }
+  // 有大于0的path
+  max_sum = max(max(left, 0) + max(right, 0) + root->val, max_sum);
+  return root->val + max(left, right);
 }
 {% endhighlight %}
 

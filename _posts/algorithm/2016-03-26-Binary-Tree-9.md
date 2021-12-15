@@ -13,6 +13,36 @@ Given the root and two nodes in a Binary Tree. Find the lowest common ancestor(L
 
 方法1，找到2点的path，再遍历2条path找公共节点
 {% highlight C++ %}
+// 返回，是否找到了path，便于提前返回
+bool getNodePath(TreeNode * root, TreeNode * node, vector<TreeNode *> &path) {
+    if(root == nullptr)  return false;  // !别忘了边界
+    path.push_back(root);
+    if(root == node)  return true;  // 找到了，也要加进去，否则父子关系的会出错
+    // 如果找到了，不需要再继续dfs，直接返回，剪枝
+    if(getNodePath(root->left, node, path) || getNodePath(root->right, node, path)) {
+        return true;
+    }
+    path.pop_back();
+    return false;
+}
+TreeNode * lowestCommonAncestor(TreeNode * root, TreeNode * A, TreeNode * B) {
+    if(root == nullptr)  return nullptr;
+    vector<TreeNode *> pathA, pathB;
+    if(!getNodePath(root, A, pathA)) return nullptr;
+    if(!getNodePath(root, B, pathB)) return nullptr;
+    // 找2条路径上第一次分开的点就可以了
+    TreeNode *lca = root;
+    for(int i = 0; i < pathA.size() && i < pathB.size(); i++) {
+        if(pathA[i] != pathB[i]) {  // 说明已经分开了
+            return lca;
+        }
+        lca = pathA[i];
+    }
+    return lca;  // 已经出来了，AB为父子关系的这种情况
+}
+{% endhighlight %}
+拓展到普通树
+{% highlight C++ %}
 a) 二叉树拓展到了普通数中，根节点到它的路径 这个O(n) Space的方案
 bool GetNodePath(TreeNode* pRoot, TreeNode* pNode, list<TreeNode*>& path){
   if(pRoot == pNode)

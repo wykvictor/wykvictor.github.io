@@ -18,6 +18,23 @@ int maxDepth(TreeNode *root) {
         return 0;
     return max(maxDepth(root->left), maxDepth(root->right))+1;
 }
+// 遍历，需要有个curdepth和最终res，和排列组合的搜索代码类似
+void dfs(TreeNode * root, int &res, int curdepth) {
+    if(root == nullptr) {
+        return;
+    }
+    if(res < curdepth) res = curdepth;
+    dfs(root->left, res, curdepth + 1);
+    dfs(root->right, res, curdepth + 1);
+}
+
+int maxDepth(TreeNode * root) {
+    // write your code here
+    if(root == NULL) return 0;
+    int res = 0;
+    dfs(root, res, 1);
+    return res;
+}
 {% endhighlight %}
 
 ### 2. [Minimum depth of binary tree - Leetcode 111](https://leetcode.com/problems/minimum-depth-of-binary-tree/)
@@ -44,7 +61,7 @@ Given a binary tree, determine if it is height-balanced.
 For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.
 ```
 
-推荐答案(good coding style)：
+推荐(good coding style)：
 {% highlight C++ %}
 // we need this type has two fields:
 struct Result {
@@ -67,7 +84,41 @@ Result isBalancedHelper(TreeNode *root) {
 bool isBalanced(TreeNode *root) {
   return isBalancedHelper(root).isbalanced;
 }
+// 或者用c++ tuple
+std::tuple<bool, int> core(TreeNode * root) {
+    if(root == nullptr) return std::make_tuple(true, 0);
+    auto left = core(root->left);
+    auto right = core(root->right);
+    if(!std::get<0>(left) || !std::get<0>(right)) return std::make_tuple(false, -1);
+    int leftdepth = std::get<1>(left), rigthdepth = std::get<1>(right);
+    return std::make_tuple(abs(leftdepth - rigthdepth) <= 1, max(leftdepth, rigthdepth) + 1);
+}
+bool isBalanced(TreeNode * root) {
+    return std::get<0>(core(root));
+}
 {% endhighlight %}
+如果不改返回的结构，那么可以遍历的过程中，记录下高度（思路参杂了便利/分治，容易写错）
+{% highlight C++ %}
+// 返回root的树，是否是balanced，顺便遍历出depth
+bool core(TreeNode * root, int &depth) {
+    if(root == nullptr) {
+        depth = 0;
+        return true;
+    }
+    int leftdepth, rightdepth;
+    if(!core(root->left, leftdepth)) return false;
+    if(!core(root->right, rightdepth)) return false;
+    depth = max(leftdepth, rightdepth) + 1;  // 分治过程中，记录遍历depth的结果
+    return (abs(leftdepth - rightdepth) <= 1);
+}
+
+bool isBalanced(TreeNode * root) {
+    if(root == nullptr) return true;
+    int depth;
+    return core(root, depth);
+}
+{% endhighlight %}
+
 直观的方法,复杂度高,重复计算，某个节点会被遍历多次，求多次高度：
 {% highlight C++ %}
 int treeDepth(TreeNode *root) {
