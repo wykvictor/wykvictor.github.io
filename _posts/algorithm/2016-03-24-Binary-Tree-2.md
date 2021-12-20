@@ -85,46 +85,42 @@ bool isValidBSTCore(TreeNode *root, int minval, int maxval) {
 {% endhighlight %}
 也可以用中序递归写法，推荐方法，traverse方法：
 {% highlight C++ %}
-bool isValidBSTHelper(TreeNode *root, TreeNode * &prev) {
+bool isValidBSTHelper(TreeNode *root, TreeNode * &prev) {  // 注意! TreeNode* &prev
   if(root == NULL) {
     return true;
   }
   if(!isValidBSTHelper(root->left, prev))
     return false;
   if(prev != NULL &&　prev->val >= root->val) {
-    //cout << prev->val << " " << root->val << endl;
     return false;
   }
   prev = root;
   return isValidBSTHelper(root->right, prev);
 }
 bool isValidBST(TreeNode *root) {
-  TreeNode *prev = NULL; //!不能直接传入NULL，需要声明这个4字节的指针，然后才能取引用
+  TreeNode *prev = NULL; //!不能直接传入NULL，需要是个左值
   return isValidBSTHelper(root, prev);
 }
 {% endhighlight %}
 迭代的方案： 中序
 {% highlight C++ %}
-bool isValidBST(TreeNode *root) {
-  //迭代法：中序遍历，始终记录上一个值
-  int prevVal = INT_MIN;  // also wrong: need use treenode to record
-  stack<TreeNode*> s;
-  TreeNode *node = root;
-  while(!s.empty() || node) {
-    if(node) {
-      s.push(node);
-      node = node->left;
-    }else { //此时访问
-      node = s.top();
-      s.pop();
-      //就这2行不同
-      if(prevVal >= node->val)
-          return false;
-      prevVal = node->val;
-      node = node->right; //转向右子树
+bool isValidBST(TreeNode * root) {
+    stack<TreeNode*> s;
+    TreeNode *node = root, *prev = nullptr;
+    while(!s.empty() || node) {
+        while(node) {
+            s.push(node);
+            node = node->left;
+        }
+        node = s.top();
+        s.pop();
+        // 中序的访问时机
+        if(prev != nullptr && prev->val >= node->val)
+            return false;
+        prev = node;
+        node = node->right; //转向右子树
     }
-  }
-  return true;
+    return true;
 }
 {% endhighlight %}
 
@@ -448,15 +444,15 @@ If there is no such a node with given value, do nothing.
 [solution-2](http://www.mathcs.emory.edu/~cheung/Courses/171/Syllabus/9-BinTree/BST-delete2.html)
 {% highlight C++ %}
 TreeNode* removeNode(TreeNode* root, int value) {
-    // write your code here
     TreeNode dummyNode(-1);  // in case delete root
     dummyNode.right = root;
-    deleteNode(root, value, &dummyNode);
+    deleteNode(root, value, &dummyNode);  // 传个parent，好操作
     return dummyNode.right;
 }
 // helper function
 void deleteNode(TreeNode* root, int value, TreeNode* parent) {
     if(root == NULL)  return;
+    // 先通过递归，找到这个点
     if(root->val < value) {
         deleteNode(root->right, value, root);
         return;
@@ -487,16 +483,21 @@ void deleteNode(TreeNode* root, int value, TreeNode* parent) {
         return;
     }
     // case 3: 2 children
-    // step1: find the smallest of the right
+    // step1: find the smallest of the right，后继节点
     TreeNode *minNode = root->right;
+    if(minNode->left == nullptr) {  // 如果右儿子没有左子树，那后继节点就是右儿子
+        root->val = minNode->val;
+        root->right = minNode->right;
+        return;
+    }
     while(minNode->left != NULL) {
-        parent = minNode;
+        parent = minNode;  // parent不需要了，可以用一用
         minNode = minNode->left;
     }
     // step 2: copy the val
     root->val = minNode->val;
     // step 3: delete it
-    parent->left = NULL;
+    parent->left = nullptr;
     delete minNode;
 }
 {% endhighlight %}
@@ -525,16 +526,21 @@ void deleteNode(TreeNode* root, int value, TreeNode* parent) {
         return;
     }
     // case 3: 2 children
-    // step1: find the smallest of the right
+    // step1: find the smallest of the right，后继节点
     TreeNode *minNode = root->right;
+    if(minNode->left == nullptr) {  // 如果右儿子没有左子树，那后继节点就是右儿子
+        root->val = minNode->val;
+        root->right = minNode->right;
+        return;
+    }
     while(minNode->left != NULL) {
-        parent = minNode;
+        parent = minNode;  // parent不需要了，可以用一用
         minNode = minNode->left;
     }
     // step 2: copy the val
     root->val = minNode->val;
     // step 3: delete it
-    parent->left = NULL;
+    parent->left = nullptr;
     delete minNode;
 }
 {% endhighlight %}
@@ -553,7 +559,7 @@ vector<int> searchRange(TreeNode* root, int k1, int k2) {
 void DFS(vector<int> &res, TreeNode* root, int k1, int k2) {
   if(root == NULL)  return;
   /*if(root->val > k2 || root->val < k1) {
-        return;  // 错误剪枝,return早了
+        return;  // 错误剪枝,return早了，子树可能有在范围里的
   }*/
   if(root->val >= k1) { //优化，如果超出范围，剪枝！
     DFS(res, root->left, k1, k2);
@@ -564,6 +570,20 @@ void DFS(vector<int> &res, TreeNode* root, int k1, int k2) {
   if(root->val <= k2) {
     DFS(res, root->right, k1, k2);
   }
+}
+{% endhighlight %}
+分治方法
+{% highlight C++ %}
+vector<int> searchRange(TreeNode * root, int k1, int k2) {
+    vector<int> res;
+    if(root == nullptr) return res;
+    if(root->val < k1) return searchRange(root->right, k1, k2);
+    if(root->val > k2) return searchRange(root->left, k1, k2);
+    res = searchRange(root->left, k1, k2);
+    res.push_back(root->val);
+    vector<int> right = searchRange(root->right, k1, k2);
+    res.insert(res.end(), right.begin(), right.end());
+    return res;
 }
 {% endhighlight %}
 
@@ -586,20 +606,15 @@ public:
     stack<TreeNode*> s;
     TreeNode *cur;
     //@param root: The root of binary tree.
-    BSTIterator(TreeNode *root): cur(root) {
-        /*while(cur != NULL) { //init to left-most
-            s.push(cur);
-            cur = cur->left;
-        }*/ //comment out: next() has the same function
-    }
+    BSTIterator(TreeNode *root): cur(root) {}
     //@return: True if there has next node, or false
     bool hasNext() {
-        return (cur != NULL) || (!s.empty());
+        return (cur != nullptr) || (!s.empty());
     }
     //@return: return next node
     TreeNode* next() {
         // find cur->next before return cur
-        while(cur != NULL) { //go to left-most
+        while(cur != nullptr) { //go to left-most
             s.push(cur);
             cur = cur->left;
         }
@@ -611,7 +626,7 @@ public:
 };
 {% endhighlight %}
 
-### 15. [Inorder Successor in Binary Search Tree](http://www.lintcode.com/en/problem/inorder-successor-in-binary-search-tree/)
+### 15. [Inorder Successor in Binary Search Tree](https://www.lintcode.com/problem/448/)
 ```
 Given a binary search tree and a node in it, find the in-order successor of that node in the BST.
 If the given node has no in-order successor in the tree, return null.
@@ -619,6 +634,7 @@ It's guaranteed p is one node in the given tree.
 
 Time Complexity: O(h), where h is the height of the BST.
 ```
+如果是O(n),则可以通过非递归遍历先找到该点，然后跳出while，返回下一个即可
 {% highlight C++ %}
 // 错误解法：2,1这种树，1的后继为2，是它的父节点，所以递归写法拿不到父节点，不可行
 TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p) {
@@ -636,10 +652,17 @@ TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p) {
     return inorderSuccessor(root->left, p);
   }
 }
-// 正确：迭代，记录父节点
+/*
+本题是要确定中序遍历的后继:
+如果该节点有右子节点, 那么后继是其右子节点的子树中最左端的节点；
+如果该节点没有右子节点, 那么后继是它的某个祖先(不是左祖先，是右边祖先), 该节点在这个祖先的左子树内.
+使用循环实现:
+查找该节点, 并在该过程中维护上述性质的祖先节点
+查找到后, 如果该节点有右子节点, 则后继在其右子树内; 否则后继就是维护的那个祖先节点
+*/
 TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p) {
   if(root == NULL)  return NULL;
-  TreeNode* successor = NULL;
+  TreeNode* successor = NULL;  // 题目要求了，如果没有就返回nullptr
   // find p
   while(root != p) {
     //successor = root;  // 记录上一个后继:不是这里记！
@@ -660,5 +683,21 @@ TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p) {
     successor = successor->left;
   }
   return successor;
+}
+/*
+使用递归实现:
+如果根节点小于或等于要查找的节点, 直接进入右子树递归
+如果根节点大于要查找的节点, 则暂存左子树递归查找的结果, 如果是 null, 则直接返回当前根节点; 反之返回左子树递归查找的结果.
+在递归实现中, 暂存左子树递归查找的结果就相当于循环实现中维护的祖先节点.
+很难理解，推荐非递归实现
+*/
+TreeNode * inorderSuccessor(TreeNode * root, TreeNode * p) {
+    if(root == nullptr || p == nullptr) return nullptr;
+    if(p->val >= root->val) {
+        return inorderSuccessor(root->right, p);
+    } else {
+        TreeNode * left = inorderSuccessor(root->left, p);
+        return left ? left : root;
+    }
 }
 {% endhighlight %}
