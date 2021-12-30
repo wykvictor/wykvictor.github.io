@@ -365,7 +365,7 @@ Can you partition the array in-place and in O(n)?
 {% highlight C++ %}
 int partitionArray(vector<int> &nums, int k) {
   int i = 0, j = nums.size() - 1;
-  while (i <= j) {  // 比i<j好，不会死循环
+  while (i <= j) {  // 比i<j好，便于处理边界条件(比如nums都比k小的情况)，最终i,j会错开，不会造成死循环
     while (i <= j && nums[i] < k) i++;
     while (i <= j && nums[j] >= k) j--;
     if (i <= j) {
@@ -374,7 +374,7 @@ int partitionArray(vector<int> &nums, int k) {
       j--;
     }
   }
-  return i;  // j+1
+  return i;  // i比j靠后了
 }
 {% endhighlight %}
 
@@ -448,16 +448,16 @@ void sortColors(vector<int> &A) {
   partition(A, index, 1);
 }
 int partition(vector<int> &A, int start, int pivot) {
-  int low = start, high = A.size() - 1;
-  while (low <= high) {
-    while (low <= high && A[low] <= pivot) low++;
-    while (low <= high && A[high] > pivot) high--;
-    if (low < high) {
-      swap(A[high], A[low]);
-      low++;  high--;
+    int low = start, high = A.size() - 1;
+    while (low <= high) {
+        while (low <= high && A[low] <= pivot) low++;
+        while (low <= high && A[high] > pivot) high--;
+        if (low <= high) {
+            swap(A[high], A[low]);
+            low++;  high--;
+        }
     }
-  }
-  return low; // low肯定是对的
+    return low;  // 错开了，low是下一个位置
 }
 {% endhighlight %}
 
@@ -466,24 +466,63 @@ int partition(vector<int> &A, int start, int pivot) {
 n objects with k different colors
 A rather straight forward solution is a two-pass algorithm using counting sort. That will cost O(k) extra memory. Can you do it without using extra memory?
 ```
+// 1. 计数排序是O(k)空间O(n)时间  2. 没有优化的版本，O(nk)时间复杂度，O(1)空间
 {% highlight C++ %}
-void sortColors2(vector<int> &colors, int k) {
-  int start = 0, colorID = 1;
-  while (start < colors.size() && colorID <= k) {
-    start = partition(colors, start, colorID++);
-  }
+template <class T>
+void myswap(T &left, T &right) {
+    T tmp(std::move(left));
+    left = std::move(right);
+    right = std::move(tmp);
 }
-int partition(vector<int> &A, int start, int pivot) {
-  int end = A.size() - 1;
-  while (start <= end) {
-    while (start <= end && A[start] <= pivot) start++;
-    while (start <= end && A[end] > pivot) end--;
-    if (start < end) {
-      swap(A[end], A[start]);
-      start++;
-      end--;
+int partition(vector<int> &colors, int begin, int pivot) {
+    int start = begin, end = colors.size() - 1;
+    while(start <= end) {
+        while(start <= end && colors[start] <= pivot) start++;
+        while(start <= end && colors[end] > pivot) end--;
+        if(start <= end) {
+            myswap(colors[start], colors[end]);
+            start++;
+            end--;
+        }
     }
-  }
+    return start;
+}
+void sortColors2(vector<int> &colors, int k) {
+    int index = 0;
+    for(int i = 1; i <= k; i++) {
+        index = partition(colors, index, i);
+    }
+}
+{% endhighlight %}
+O(logk)空间，O(nlogk)时间，对k进行分治法：
+{% highlight C++ %}
+int partition(vector<int> &colors, int start, int end, int mid) {
+    while(start <= end) {
+        while(start <= end && colors[start] <= mid) start++;
+        while(start <= end && colors[end] > mid) end--;
+        if(start <= end) {
+            swap(colors[start], colors[end]);
+            start++;
+            end--;
+        }
+    }
+    return start;
+}
+void dividcon(vector<int> &colors, int start, int end, int kstart, int kend) {
+    if(kstart >= kend || start >= end) return;
+    int mid = kstart + (kend - kstart) / 2;
+    // 对mid进行partition, O(n)
+    // 0 4 1 2 1
+    // std::cout << start << " " << end << " " << kstart << " " << kend << " " << mid << std::endl;
+    int index = partition(colors, start, end, mid);
+    // for(auto c:colors) std::cout << c << " ";
+    // std::cout << std::endl << index << std::endl; // 2
+    // 完事儿分左右2边
+    dividcon(colors, start, index - 1, kstart, mid); // 0, 1, 1, 1
+    dividcon(colors, index, end, mid + 1, kend);  // 2, 4, 1, 2。!!注意是mid + 1，mid已经分到了左边
+}
+void sortColors2(vector<int> &colors, int k) {
+    dividcon(colors, 0, colors.size() - 1, 1, k);
 }
 {% endhighlight %}
 
@@ -493,6 +532,7 @@ Given an array with positive and negative integers. Re-range it to interleaving 
 Do it in-place and without extra memory
 ```
 {% highlight C++ %}
+// 也是2个指针，只不过不是一前一后，是都从前边开始
 void rerange(vector<int> &A) {
   int pos = 1, neg = 0;
   int posNum = 0, negNum = 0;

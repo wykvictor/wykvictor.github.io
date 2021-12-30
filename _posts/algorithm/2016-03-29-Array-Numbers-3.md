@@ -40,16 +40,18 @@ struct Node {
   int val;
   int x, y;  // 坐标
   Node(int a, int b, int c) : val(a), x(b), y(c) {}
-};
-
-struct cmp {
-  bool operator()(Node a, Node b) { return a.val > b.val; }
+  bool operator < (const Node & other) const {  // !!注意2个const
+    return val > other.val; 
+  } 
 };
 
 vector<int> mergekSortedArrays(vector<vector<int>>& arrays) {
   vector<int> res;
   if (arrays.empty()) return res;
-  priority_queue<Node, vector<Node>, cmp> q;
+  priority_queue<Node> q;
+  // 如果不做<运算符的重载，需要这样写：
+  // auto cmp = [](const Node &a, const Node &b) -> bool { return a.val > b.val; };
+  // priority_queue<Node, vector<Node>, decltype(cmp)> q(cmp);
   for (int i = 0; i < arrays.size(); i++) {
     if (!arrays[i].empty()) {
       q.push(Node(arrays[i][0], i, 0));
@@ -72,7 +74,7 @@ vector<int> mergekSortedArrays(vector<vector<int>>& arrays) {
 Given two arrays, write a function to compute their intersection.
 ```
 
-sort & merge:
+方法1，sort & merge: O(nlogn)，O(1)空间
 {% highlight C++ %}
 vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
   vector<int> res;
@@ -81,7 +83,7 @@ vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
   int i = 0, j = 0;
   while (i < nums1.size() && j < nums2.size()) {
     if (nums1[i] == nums2[j]) {
-      if (res.empty() || nums1[i] != res[res.size() - 1])
+      if (res.empty() || nums1[i] != res.back())
         res.push_back(nums1[i]);
       i++;
       j++;
@@ -94,24 +96,19 @@ vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
   return res;
 }
 {% endhighlight %}
-方法2，sort & binary search: nums1排序，nums2依次二分查找
+方法2，sort & binary search: nums1排序，nums2依次二分查找, O(nlogn)
+方法3，hash表: O(n)，O(n)空间
 {% highlight C++ %}
-// 方法3，用hash，unordered_set!!!额外空间
-vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
-  vector<int> res;
-  unordered_set<int> hash1, hashres;
-  for (auto i : nums1) {  // auto!!
-    hash1.insert(i);  // 自动去除重复元素
-  }
-  for (auto i : nums2) {
-    if (hash1.count(i) && !hashres.count(i)) {
-      hashres.insert(i);
+vector<int> intersection(vector<int> &nums1, vector<int> &nums2) {
+    unordered_set<int> s(nums1.begin(), nums1.end());
+    vector<int> res;
+    unordered_set<int> intersect;
+    for(auto num : nums2) {
+        if(s.find(num) != s.end())
+            intersect.emplace(num);  // insert
     }
-  }
-  for (auto i : hashres) {
-    res.push_back(i);
-  }
-  return res;
+    for(auto num: intersect) res.push_back(num);
+    return res;
 }
 {% endhighlight %}
 
@@ -121,12 +118,13 @@ Find K-th largest element in an array.
 In array [9,3,2,4,8], the 3rd largest element is 4.
 O(n) time, O(1) extra memory.
 ```
+不能用优先队列O(Nlogk)，借鉴快排的partition方法
 {% highlight C++ %}
 int kthLargestElement(int k, vector<int> nums) {
   if (nums.size() == 0) return -1;
   return quickSelect(nums, nums.size() - k + 1, 0, nums.size() - 1);
 }
-// k is the k-th number in an increase array
+// 转换下说法nums.size() - k，第k小
 int quickSelect(vector<int> &nums, int k, int start, int end) {
   if (start == end) {
     return nums[start];

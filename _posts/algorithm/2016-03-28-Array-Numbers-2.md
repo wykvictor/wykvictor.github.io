@@ -105,11 +105,11 @@ int maxProfit(int k, vector<int> &prices) {
 Given the array [−2,2,−3,4,−1,2,1,−5,3], the contiguous subarray [4,−1,2,1] has the largest sum = 6.
 ```
 {% highlight C++ %}
-// 同1是同一个问题prefix[j]-prefix[i-1]，是i~j的subarray的sum
+// 同1是同一个问题prefix[j]-prefix[i-1]，是i~j的subarray的sum. 区别是从下标0开始遍历
 int maxSubArray(vector<int> nums) {
   if (nums.size() == 0) return 0;
   int prefix = 0, minpre = 0, res = INT_MIN;
-  for (int i = 0; i < nums.size(); i++) {
+  for (int i = 0; i < nums.size(); i++) {  // ！i = 0
     prefix += nums[i];
     res = max(res, prefix - minpre);
     minpre = min(minpre, prefix);  // 每次记录minpre
@@ -141,28 +141,28 @@ Find two non-overlapping subarrays which have the largest sum.
 {% highlight C++ %}
 // 和sell stock III非常相似
 int maxTwoSubArrays(vector<int> nums) {
-  int N = nums.size();
-  if (N == 0) return 0;
-  // left to right
-  vector<int> pre(N, INT_MIN);  // 目前为止，前边最大前缀和
-  int minpre = 0, presum = 0;
-  for (int i = 0; i < N; i++) {
-    presum += nums[i];
-    pre[i] = max(i == 0 ? INT_MIN : pre[i - 1], presum - minpre);
-    minpre = min(minpre, presum);
+  if(nums.size() == 1) return nums[0];
+  vector<int> left(nums.size(), 0), right(nums.size(), 0);
+  int presum = 0, premin = 0, maxsum = INT_MIN; // 至少1个数，所以是INT_MIN
+  for(int i=0; i < nums.size(); i++) {
+      presum += nums[i];
+      maxsum = max(maxsum, presum - premin);
+      left[i] = maxsum;
+      premin = min(premin, presum);
   }
-  // right to left
-  vector<int> post(N, INT_MIN);
-  int minpost = 0, postsum = 0;
-  for (int i = N - 1; i >= 0; i--) {
-    postsum += nums[i];
-    post[i] = max(i == N - 1 ? INT_MIN : post[i + 1], postsum - minpost);
-    minpost = min(minpost, postsum);
+  // 再求right，需要从后往前
+  int postsum = 0, postmin = 0;
+  maxsum = INT_MIN;
+  for(int i = nums.size()-1; i >= 0; i--) {
+      postsum += nums[i];
+      maxsum = max(maxsum, postsum - postmin);
+      right[i] = maxsum;
+      postmin = min(postmin, postsum);
   }
-  // get result
+  // 再for一遍
   int res = INT_MIN;
-  for (int i = 0; i < N - 1; i++) {
-    res = max(res, pre[i] + post[i + 1]);
+  for(int i = 0; i < nums.size() - 1; i++) {
+      res = max(res, left[i] + right[i+1]);
   }
   return res;
 }
@@ -254,7 +254,7 @@ vector<int> subarraySum(vector<int> nums) {
   for (int i = 0; i < nums.size(); i++) {
     presum += nums[i];                      // inclusive!
     if (hash.find(presum) != hash.end()) {  // 找到相同的和
-      res.push_back(hash[presum] + 1);
+      res.push_back(hash[presum] + 1);  // 是从i+1 到 j
       res.push_back(i);
       return res;
     }
