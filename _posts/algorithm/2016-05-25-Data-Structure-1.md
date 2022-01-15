@@ -14,13 +14,12 @@ The stack should support push, pop and min operation all in O(1) cost
 class MinStack {
  public:
   MinStack() {}
-
+  // 用单调栈，省一些空间，但时间复杂度不变，而且pop多了判读会慢
   void push(int number) {
     data.push(number);
     // 是否更新最小值, 注意等于号!
     if (mins.empty() || number <= mins.top()) mins.push(number);
   }
-
   int pop() {
     int cur = data.top();
     if (cur == mins.top()) {
@@ -29,7 +28,21 @@ class MinStack {
     data.pop();
     return cur;
   }
-
+  // mins和data同增同减
+  void push(int number) {
+      if(mins.empty() || number < mins.top()) {
+          mins.push(number);
+      } else {
+          mins.push(mins.top());
+      }
+      data.push(number);
+  }
+  int pop() {
+      int res = data.top();
+      data.pop();
+      mins.pop();
+      return res;
+  }
   int min() { return mins.top(); }
 
  private:
@@ -62,18 +75,31 @@ n: 单调栈 [1,4,5] -> push(2) -> [1,2]
 // O(n) time and memory, 每个数在stack上都进出一次；同理，binary tree相关，每个节点O(1),共n个点，所以O(n)
 int largestRectangleArea(vector<int> &height) {
   int res = 0;  // 初始值为0，最小或为空都是0
-  stack<int> incStack;
+  stack<int> incStack;  // 因为求距离，所以加的是下标
   for (int i = 0; i <= height.size(); i++) {
-    int cur = i == height.size() ? -1 : height[i];  // 最后填-1把所有的弹出来
-    while (!incStack.empty() && cur < height[incStack.top()]) {  // cur <= 也可以!
+    int cur = i == height.size() ? 0 : height[i];  // 最后填0把所有的弹出来
+    while (!incStack.empty() && cur <= height[incStack.top()]) {  // cur <= 也可以!
       int h = incStack.top();
       incStack.pop();
-      int w = incStack.empty() ? i : i - incStack.top() - 1;  // 空的时候为i
-      res = max(res, height[h] * w);
+      int w = incStack.empty() ? i : i - incStack.top() - 1;  // 空的时候为i，不空记得-1（代数进去算需要-1）
+      res = max(res, height[h] * w);  // 找的是弹出去的这个index的高度，以它为最矮的最大的面积
     }
     incStack.push(i);
   }
   return res;
+}
+// 暴力解法，O(n2) 超时
+int largestRectangleArea(vector<int> &heights) {
+    // 暴力 O(n2)
+    int area = INT_MIN;
+    for(int i = 0; i < heights.size(); i++) {
+        int minh = heights[i];
+        for(int j = i; j < heights.size(); j++) {
+            minh = min(minh, heights[j]);
+            area = max(area, (j - i + 1) * minh);
+        }
+    }
+    return area;
 }
 {% endhighlight %}
 
@@ -227,7 +253,7 @@ class Stack {
   queue<int> q2;
 };
 {% endhighlight %}
-上述方法，pop和top代码复杂，且top的时间复杂度高，改进push时候倒腾：
+上述方法，pop和top代码复杂，且top的时间复杂度高O(n)，改进push时候倒腾为O(n),pop和top是O(1)：
 {% highlight C++ %}
 class Stack {
  public:
@@ -286,7 +312,7 @@ class Queue {
   void push(int element) { stack1.push(element); }
   //!!提取出代码公共部分，简洁
   void adjust() {
-    if (stack2.empty()) {
+    if (stack2.empty()) {  // 好办法，s2中顺序就是实际顺序，空了再往里放，平均复杂度O(1)，每个元素出入s1,s2一次
       while (!stack1.empty()) {
         stack2.push(stack1.top());
         stack1.pop();
@@ -339,33 +365,31 @@ If the total size of keys is too large (e.g. size >= capacity / 10), we should d
 * @param hashTable: A list of The first node of linked list
 * @return: A list of The first node of linked list which have twice size
 */
-void addToTail(ListNode *&head, ListNode *node) {
-  if (head == NULL) {
-    head = node;  // !!改变head，需要&
-    return;
-  }
-  ListNode *cur = head;
-  while (cur->next != NULL) {
-    cur = cur->next;
-  }
-  cur->next = node;
-}
-
-vector<ListNode *> rehashing(vector<ListNode *> hashTable) {
-  if (hashTable.size() <= 0) {
-    return hashTable;
-  }
-  int newcapacity = 2 * hashTable.size();
-  vector<ListNode *> newTable(newcapacity, NULL);
-  for (auto t : hashTable) {
-    while (t != NULL) {
-      ListNode *cur = t;
-      t = t->next;
-      cur->next = NULL;
-      addToTail(newTable[(cur->val % newcapacity + newcapacity) % newcapacity],
-                cur);
+vector<ListNode*> rehashing(vector<ListNode*> hashTable) {
+    int cap = hashTable.size() * 2;
+    vector<ListNode*> res(cap, NULL);
+    for(auto node: hashTable) {
+        ListNode *curhead = node;
+        // 遍历该节点
+        while(curhead != NULL) {
+            // 先搞一个要插入的点
+            ListNode *insernode = curhead;
+            curhead = curhead->next;
+            insernode->next = NULL;  // 封口
+            // 开始append insernode
+            int key = (insernode->val % cap + cap) % cap;
+            // 放到list最后，很奇怪，放到开头更效率高
+            ListNode *dsthead = res[key];
+            if(dsthead == NULL) {
+                res[key] = insernode;
+                continue;
+            }
+            while(dsthead != NULL && dsthead->next != NULL) {
+                dsthead = dsthead->next;
+            }
+            dsthead->next = insernode;
+        }
     }
-  }
-  return newTable;
+    return res;
 }
 {% endhighlight %}

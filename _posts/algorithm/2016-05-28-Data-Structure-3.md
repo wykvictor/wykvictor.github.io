@@ -18,6 +18,7 @@ set(key, value) - Set or insert the value if the key is not already present. Whe
 
 需要支持在中部，头部删除，尾部添加的数据结构
 {% highlight C++ %}
+#include <list>
 class CacheNode {
  public:
   CacheNode(int k, int v) : key(k), value(v) {}
@@ -59,6 +60,45 @@ class LRUCache {
   list<CacheNode> cacheList;
   unordered_map<int, list<CacheNode>::iterator> cacheMap;
   int capacity;
+};
+
+// 用list的简单的接口
+class LRUCache {
+public:
+    LRUCache(int capacity) : cap(capacity) {
+        // do intialization if necessary
+    }
+    int get(int key) {
+        if(key2node.find(key) == key2node.end()) return -1;
+        // 迁移数据到头部
+        CacheNode curnode(*key2node[key]);
+        nodelist.erase(key2node[key]);
+        nodelist.push_front(curnode);
+        key2node[key] = nodelist.begin();  // 更新索引, erase不会导致之前的iter失效
+        return curnode.val;
+    }
+    void set(int key, int value) {
+        // 如果有这个元素，直接赋值，并调到头部
+        if(get(key) != -1) {  // 相似代码，不用再写了
+            nodelist.front().val = value;  // 更新value
+            return;
+        }
+        //如果没这个元素，就需要插入，先判断空间够不够
+        if(key2node.find(key) == key2node.end()) {
+            if(nodelist.size() >= this->cap) {
+                key2node.erase(nodelist.back().key);
+                nodelist.pop_back();
+            }
+        }
+        nodelist.emplace_front(key, value);  // 用emplace
+        key2node[key] = nodelist.begin();
+    }
+private:
+    int cap;
+    // list，支持从中取元素，放到头部
+    list<CacheNode> nodelist;
+    // hash，支持快速找到元素
+    unordered_map<int, list<CacheNode>::iterator> key2node;
 };
 {% endhighlight %}
 
@@ -149,6 +189,8 @@ vector<string> anagrams(vector<string> &strs) {
   unordered_map<string, int> hash;
   for (int i = 0; i < strs.size(); i++) {
     string str = getSortedString(strs[i]);
+    // string str = strs[i];
+    // sort(str.begin(), str.end());  // 或者就直接调用排序就可以，如果string平均长度都小于26
     if (hash.find(str) == hash.end()) {
       hash[str] = 1;
     } else {
@@ -175,27 +217,26 @@ The longest consecutive elements sequence is [1, 2, 3, 4]. Return its length: 4
 Your algorithm should run in O(n) complexity.
 ```
 {% highlight C++ %}
-int longestConsecutive(vector<int> &nums) {
-  unordered_map<int, bool> hash;  // O(1)时间 map不行
-  for (int i = 0; i < nums.size(); i++) {
-    hash[nums[i]] = true;
-  }
-  int res = 0;
-  for (int i = 0; i < nums.size(); i++) {
-    int up = nums[i];
-    while (hash.find(up) != hash.end()) {
-      hash.erase(up);
-      up++;
+int longestConsecutive(vector<int> &num) {
+    if(num.size() <= 1) return num.size();  // 特殊情况
+    unordered_set<int> hash;  //int hash[10000];
+    for(auto n: num) {
+        hash.insert(n);
     }
-    int down = nums[i] - 1;
-    while (hash.find(down) != hash.end()) {
-      hash.erase(down);
-      down--;
+    int res = 1;
+    for(auto n: num) {
+        int left = n - 1;
+        while(hash.find(left) != hash.end()) {
+            hash.erase(left);  // 这个很重要，否则超时!!算过了，后续碰到不需要再进来while了
+            left--;
+        }
+        int right = n + 1;
+        while(hash.find(right) != hash.end()) {
+            hash.erase(right);
+            right++;
+        }
+        res = max(res, right - left - 1);
     }
-    if (up - down - 1 > res) {
-      res = up - down - 1;
-    }
-  }
-  return res;
+    return res;
 }
 {% endhighlight %}

@@ -60,6 +60,7 @@ Challenge: O(nlogn) or O(n) time
 // 需要很快的add, min == > pq 另：2 * 5, 5 * 2 = 10，用hash记录是否10已经放过了
 int nthUglyNumber(int n) {
   if (n <= 1) return n;
+  // greater是小顶堆，less是大顶堆，默认是less
   priority_queue<long long, vector<long long>, greater<long long>> pq;
   unordered_set<long long> s;
   pq.push(1);
@@ -146,7 +147,7 @@ class Solution {
 };
 {% endhighlight %}
 
-### 4. [Data Stream Median](http://www.lintcode.com/en/problem/data-stream-median/)
+### 4. [Data Stream Median](https://www.lintcode.com/problem/81/)
 ```
 Numbers keep coming, return the median of numbers at every time a new number added.
 If there are n numbers in a sorted array A, the median is A[(n - 1) / 2]
@@ -155,47 +156,32 @@ For example, if A=[1,2,3], median is 2. If A=[1,19], median is 1.
 Total run time in O(nlogn).
 ```
 {% highlight C++ %}
-void rebalance(priority_queue<int, vector<int>, greater<int>>& min_heap,
-               priority_queue<int, vector<int>, less<int>>& max_heap) {
-  if (max_heap.size() > min_heap.size() + 1) {
-    min_heap.push(max_heap.top());
-    max_heap.pop();
-  } else if (max_heap.size() < min_heap.size()) {  // max heap has 1 more member
-    max_heap.push(min_heap.top());
-    min_heap.pop();
-  }
-}
-
-vector<int> medianII(vector<int>& nums) {
-  if (nums.size() <= 1) return nums;
-
-  vector<int> res;
-  priority_queue<int, vector<int>, greater<int>> min_heap;
-  priority_queue<int, vector<int>, less<int>> max_heap;
-  // 初始化
-  if (nums[1] > nums[0]) {
-    max_heap.push(nums[0]);
-    min_heap.push(nums[1]);
-    res.push_back(nums[0]);
-    res.push_back(nums[0]);
-  } else {
-    min_heap.push(nums[0]);
-    max_heap.push(nums[1]);
-    res.push_back(nums[0]);  // 注意!
-    res.push_back(nums[1]);
-  }
-
-  for (int i = 2; i < nums.size(); i++) {
-    if (nums[i] < max_heap.top()) {
-      max_heap.push(nums[i]);
-    } else {
-      min_heap.push(nums[i]);
+class Solution {
+public:
+    void add(int val) {
+        maxq.push(val);  // 先无脑放第1个里
+        // balancing: 保持maxq比minq最多长1
+        if(maxq.size() > minq.size() + 1) {
+            minq.push(maxq.top());
+            maxq.pop();
+        }
+        // balancing: 保持maxq的top()不大于minq.top()
+        if(!minq.empty() && maxq.top() > minq.top()) {
+            int tmp = minq.top();
+            minq.pop();
+            minq.push(maxq.top());
+            maxq.pop();
+            maxq.push(tmp);
+        }
     }
-    rebalance(min_heap, max_heap);
-    res.push_back(max_heap.top());
-  }
-  return res;
-}
+    int getMedian() {
+        if(maxq.empty()) return -1;
+        return maxq.top();
+    }
+private:
+    priority_queue<int, vector<int>, greater<int>> minq;
+    priority_queue<int> maxq;
+};
 {% endhighlight %}
 
 ### 5. [Kth Smallest Number in Sorted Matrix](http://www.lintcode.com/en/problem/kth-smallest-number-in-sorted-matrix/)
@@ -237,9 +223,12 @@ struct cmp {  // struct is Public in default!!
 int kthSmallest(vector<vector<int>>& matrix, int k) {
   // priority_queue<Node> min_heap;  // call operator < to compare
   priority_queue<Node, vector<Node>, cmp> min_heap;  // 3 ways to use heap
+  // 方法4
+  // auto cmp = [](const Node &a, const Node &b) -> bool { return a.val > b.val; };
+  // std::priority_queue<Node, vector<Node>, decltype(cmp)> pq(cmp);
   int M = matrix.size(), N = matrix[0].size();
   if (M * N < k) return -1;  // 極端情況
-  vector<bool> visited(M * N, false);
+  vector<bool> visited(M * N, false);  // 一定注意，需要这个，否则一个点放进去2次
   min_heap.push(Node(matrix[0][0], 0, 0));
   visited[0] = true;
 
@@ -286,9 +275,8 @@ vector<string> topKFrequentWords(vector<string>& words, int k) {
     hash[a]++;
   }
   priority_queue<Node> min_heap;  // 用小顶堆!!
-  for (unordered_map<string, int>::iterator it = hash.begin(); it != hash.end();
-       it++) {
-    Node cur(it->first, it->second);
+  for (auto it: hash) {
+    Node cur(it.first, it.second);
     min_heap.push(cur);
     // 不能直接利用重载的<比较，反着的if (min_heap.top() < cur) {
     if (min_heap.size() > k) {
@@ -322,59 +310,62 @@ double average(priority_queue<int, vector<int>, greater<int>>& pq) {
   return res / size;
 }
 map<int, double> highFive(vector<Record>& results) {
-  unordered_map<int, priority_queue<int, vector<int>, greater<int>>> pqmap;  // 小頂堆
-  map<int, double> res;
-  for (auto i : results) {
-    if (pqmap.find(i.id) == pqmap.end()) {
-      pqmap[i.id].push(i.score);
-    } else {
-      if (pqmap[i.id].size() < 5) {
-        pqmap[i.id].push(i.score);
-      } else if (i.score > pqmap[i.id].top()) {
-        pqmap[i.id].pop();
-        pqmap[i.id].push(i.score);
-      }
+    unordered_map<int, priority_queue<int, vector<int>, greater<int>>> infos;
+    for (auto i : results) {
+        // if(infos.find(i.id) == infos.end()) {
+        //     // priority_queue<int, vector<int>, greater<int>> q;
+        //     // q.push(i.score);
+        //     // infos[i.id] = q;
+        //     // 不需要这么写，https://www.cplusplus.com/reference/unordered_map/unordered_map/operator[]/
+        //     infos[i.id].push(i.score);  // 构造参数，默认构造了空的priority_queue
+        //     continue;
+        // }
+        if(infos[i.id].size() < 5) {
+            infos[i.id].push(i.score);
+        } else if(i.score > infos[i.id].top()) {
+            infos[i.id].pop();
+            infos[i.id].push(i.score);
+        }
     }
-  }
-  for (auto i : pqmap) {
-    res[i.first] = average(i.second);
-  }
-  return res;
+    map<int, double> res;
+    for(auto info: infos) {
+        res[info.first] = average(info.second);
+    }
+    return res;
 }
 {% endhighlight %}
 
 ### 8.[K Closest Points](http://www.lintcode.com/en/problem/k-closest-points/)
 {% highlight C++ %}
-Point g_origin;
-double dist(const Point& p1, const Point& p2) {
-  return pow((p1.x - p2.x), 2) + pow((p1.y - p2.y), 2);
+int dist(const Point& p1, const Point& p2) {
+    return pow((p1.x - p2.x), 2) + pow((p1.y - p2.y), 2);
 }
-struct cmp {
-  bool operator()(const Point& p1, const Point& p2) {
-    double d1 = dist(p1, g_origin), d2 = dist(p2, g_origin);
-    if (d1 == d2) {
-      return p1.x < p2.x || p1.y < p2.y;
+// 注意抽象函数!
+bool compare(const Point& p1, const Point& p2, const Point& origin) {
+    if(dist(p1, origin) == dist(p2, origin)) {
+        return p1.x < p2.x || p1.y < p2.y;
     }
-    return d1 < d2;
-  }
-};
-vector<Point> kClosest(vector<Point>& points, Point& origin, int k) {
-  g_origin = origin;
-  priority_queue<Point, vector<Point>, cmp> max_heap; //大顶堆
-  vector<Point> res;
-  for (auto i : points) {
-    if (max_heap.size() < k) {
-      max_heap.push(i);
-    } else if (dist(i, g_origin) < dist(max_heap.top(), g_origin)) {
-      max_heap.pop();
-      max_heap.push(i);
+    return dist(p1, origin) < dist(p2, origin);
+}
+vector<Point> kClosest(vector<Point> &points, Point &origin, int k) {
+    auto cmp = [&origin](const Point &p1, const Point &p2) -> bool {
+        return compare(p1, p2, origin);
+    };
+    priority_queue<Point, vector<Point>, decltype(cmp)> maxq(cmp);
+    for(auto p: points) {
+        if(maxq.size() < k) {
+            maxq.push(p);
+        } else if(compare(p, maxq.top(), origin)) {  // 只判断距离不行，要有x,y判断
+            maxq.pop();
+            maxq.push(p);
+        }
     }
-  }
-  while (!max_heap.empty()) {
-    res.push_back(max_heap.top());
-    max_heap.pop();
-  }
-  reverse(res.begin(), res.end());
-  return res;
+    vector<Point> res;
+    while (!maxq.empty()) {
+        res.push_back(maxq.top());
+        maxq.pop();
+    }
+    reverse(res.begin(), res.end());
+    return res;
 }
 {% endhighlight %}
