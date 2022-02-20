@@ -41,6 +41,7 @@ void shiftDown(vector<int> &A, int cur) {
 
 void heapify(vector<int> &A) {
   int N = A.size();
+  // 注意倒着来，防止覆盖
   for (int i = N / 2; i >= 0; i--) {
     shiftDown(A, i);
   }

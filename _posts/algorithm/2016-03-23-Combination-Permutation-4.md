@@ -109,3 +109,99 @@ bool isPalindrome(string s) {
     return true;
 }
 {% endhighlight %}
+
+### 3. [N Queens](https://www.lintcode.com/problem/33/)
+```
+Placing n queens on an n×n chessboard, and the queens can't be in the same row, column, diagonal line.Given an integer n, return all distinct solutions.
+Each solution contains a distinct board configuration of the N-queens' placement, where 'Q' and '.' each indicate a queen and an empty space respectively.
+```
+return all distinct solutions -> DFS：
+{% highlight C++ %}
+void printQ(vector<vector<string>> &results, vector<vector<int>> &positions) {
+    for(auto pos: positions) {
+        vector<string> res;
+        for(int i = 0; i < pos.size(); i++) {
+            // string line {};
+            // for(int j = 0; j < pos.size(); j++) {
+            //     if(j == pos[i]) line += "Q";
+            //     else line += ".";
+            // }
+            string line(pos.size(), '.');  // 注意string的这种初始化方式，类似vector!
+            line[pos[i]] = 'Q';
+            res.push_back(line);
+        }
+        results.push_back(res);
+    }
+}
+bool canput(vector<int> &path, int pos) {
+    for(int i = 0; i < path.size(); i++) {
+        if(pos == path[i] || abs(pos - path[i]) == path.size() - i) {
+            return false;
+        }
+    }
+    return true;
+}
+void dfs(vector<vector<int>> &positions, vector<int> &path, int row, int N) {
+    if(row == N) {
+        positions.push_back(path);
+        return;
+    }
+    // 第row行，从0位置开始放
+    for(int i = 0; i < N; i++) {
+        if(!canput(path, i)) continue;  // 这种continue方式代码缩进更少
+        path.push_back(i);
+        dfs(positions, path, row + 1, N);
+        path.pop_back();
+    }
+}
+vector<vector<string>> solveNQueens(int n) {
+    // DFS
+    vector<vector<int>> positions;
+    vector<int> path;
+    dfs(positions, path, 0, n);  // 从第0行开始
+    vector<vector<string>> result;
+    printQ(result, positions);
+    return result;
+}
+{% endhighlight %}
+
+### 4. [Word Ladder](https://www.lintcode.com/problem/120/)
+```
+find the shortest transformation sequence from start to end, output the length of the sequence
+```
+find the shortest path -> BFS：
+{% highlight C++ %}
+int ladderLength(string &start, string &end, unordered_set<string> &dict) {
+    // 最短长度，那就是BFS啦
+    unordered_set<string> visited;
+    queue<string> q;
+    q.push(start);
+    visited.insert(start);
+    int shortest = 2;
+    while(!q.empty()) {
+        // 把上一轮的都pop出来
+        for(int i = q.size(); i > 0; i--) {
+            string cur = q.front();
+            q.pop();
+            for(char c = 'a'; c <= 'z'; c++) {
+                for(int l = 0; l < cur.size(); l++) {
+                    string nextcur = cur;
+                    nextcur[l] = c;
+                    // 先判断，如果对了，就退出了。因为end不在dict里
+                    if(nextcur == end) return shortest;
+                    // 是它自己，或者dict里没有，就continue
+                    if(nextcur == cur || dict.find(nextcur) == dict.end()) continue;
+                    if(visited.find(nextcur) != visited.end()) continue;  // !!别忘了，如果放过了，否则死循环
+                    q.push(nextcur);
+                    visited.insert(nextcur);
+                }
+            }
+        }
+        shortest++;
+    }
+    return 0;
+}
+// 拓展：找出所有从start到end的最短转换序列
+// 那么需要在BFS过程中，记录图的边map<string, vector<string>> next_word_dict;然后用DFS找distance为最短的path
+// 剪枝：用距离，比如存unordered_map<string, int> distance(代替之前的visited)，保证distance是一个越来越近的状态
+{% endhighlight %}
