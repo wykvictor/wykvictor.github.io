@@ -37,20 +37,21 @@ int lengthOfLongestSubstring(string s) {
 {% endhighlight %}
 优化：用int hash记录位置，这样不需要回头搞，记录一个上次start开始的位置就可以
 {% highlight C++ %}
-int lengthOfLongestSubstring(string s) {
-  //更新后，时间复杂度 O(n)，空间复杂度 O(1)，因为i不往回倒退了，只走一遍!!
-  int hash[256];  //为了记录位置，所以用int
-  for (int i = 0; i < 256; i++) hash[i] = -1;
-  int maxLen = 0;
-  int i = 0, j = 0;  //一前，一后指针
-  for (; j < s.size(); j++) {
-    if (hash[s[j]] >= i) {  //!从开始点i开始算才有效
-      maxLen = max(maxLen, (j - i));
-      i = hash[s[j]] + 1;  //新的开始点
+int lengthOfLongestSubstring(string &s) {
+    // write your code here
+    if(s.empty()) return 0;  // 1. 错误处理
+    std::vector<int> index(256, -1);  // 用int存上一次出现位置
+    int longest = 1;  // 0已经返回了，那最小就是1
+    int lastindex = 0;
+    for(int i = 0; i < s.size(); i++) {
+        if(index[s[i]] >= lastindex) {
+            // 代表有了，那么就要重新计算了，记录上次的长度
+            longest = max(longest, i - lastindex);
+            lastindex = index[s[i]] + 1;  // 新的开始点index[s[i]], 不是last index!!
+        }
+        index[s[i]] = i; // 不管是否命中，都需要记录最新的下标
     }
-    hash[s[j]] = j; //不管是否命中，都需要记录最新的下标
-  }
-  return max(maxLen, j-i);  //必须最后再比较一下，防止最后一次的遗漏!
+    return max(longest, (int)(s.size() - lastindex));  // 必须最后再比较一下，防止最后一次的遗漏!如bba
 }
 {% endhighlight %}
 
