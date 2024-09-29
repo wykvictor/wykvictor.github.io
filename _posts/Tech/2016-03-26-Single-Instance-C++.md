@@ -54,6 +54,31 @@ class S
 };
 {% endhighlight %}
 
+another implementation
+{% highlight C++ %}
+class Singleton {
+    public:
+        static Singleton& getInstance() {
+            if (instance == nullptr){
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (instance == nullptr)
+                    instance.reset(new Singleton());
+            }
+            return *instance;
+        }
+        Singleton(const Singleton &) = delete;
+        Singleton &operator=(const Singleton &) = delete;
+    private:
+        Singleton() {
+            cout << "constructor" << endl;
+        };
+        static std::mutex mutex_;
+        static std::shared_ptr<Singleton> instance;
+};
+std::mutex Singleton::mutex_;
+std::shared_ptr<Singleton> Singleton::instance = nullptr;
+{% endhighlight %}
+
 ### 2. 使用时需要注意的问题
 C++中static变量的release顺序和allocate顺序相反：
 {% highlight C++ %}
